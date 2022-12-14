@@ -1,0 +1,38 @@
+software =
+{
+    version = "0.1.0";
+    description = "Firmware update for tpi demo2.0 Project";
+
+    stable = {
+
+        /* upgrade recovery,uboot,boot0 ==> change swu_mode,boot_partition ==> reboot */
+        upgrade_ubi6 = {
+            /* upgrade recovery */
+            images: (
+				{
+					filename = "rootfs.ubifs";
+					volume = "recovery";
+				},
+				{
+					filename = "env0.fex";
+					volume = "env";
+				}
+            );
+        };
+
+        /* upgrade kernel,rootfs ==> change sw_mode */
+        upgrade_ubi5 = {
+            /* upgrade kernel,rootfs */
+            images: (
+				{
+					filename = "rootfs.ubifs";
+					volume = "rootfs";
+				},
+				{
+					filename = "env1.fex";
+					volume = "env";
+				}
+            );
+        };
+    };
+}
