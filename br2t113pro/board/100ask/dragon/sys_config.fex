@@ -1,0 +1,206 @@
+;sunxi platform application
+;---------------------------------------------------------------------------------------------------------
+; 说明： 脚本中的字符串区分大小写，用户可以修改"="后面的数值，但是不要修改前面的字符串
+; 描述gpio的形式：Port:端口+组内序号<功能分配><内部电阻状态><驱动能力><输出电平状态>
+;---------------------------------------------------------------------------------------------------------
+
+;---------------------------------------------------------------------------------
+; version:版本1.00
+; machine:板级文件名
+;---------------------------------------------------------------------------------
+[product]
+version = "100"
+machine = "evb1"
+
+
+;----------------------------------------------------------------------------------
+;debug_mode     = 0-close printf, > 0-open printf
+;----------------------------------------------------------------------------------
+[platform]
+eraseflag   = 1
+debug_mode  = 8
+;----------------------------------------------------------------------------------
+;   system configuration
+;   ?
+;dcdc1_vol							---set dcdc1 voltage,mV,1600-3400,100mV/step
+;dcdc2_vol							---set dcdc2 voltage,mV,600-1540,20mV/step
+;dcdc3_vol							---set dcdc3 voltage,mV,600-1860,20mV/step
+;dcdc4_vol							---set dcdc4 voltage,mV,600-1540,20mV/step
+;dcdc5_vol							---set dcdc5 voltage,mV,1000-2550,50mV/step
+;aldo2_vol							---set aldo2 voltage,mV,700-3300,100mV/step
+;aldo3_vol							---set aldo3 voltage,mV,700-3300,100mV/step
+;----------------------------------------------------------------------------------
+;storage_type   = boot medium, 0-nand, 1-sd, 2-emmc, 3-nor, 4-emmc3, 5-spinand -1(defualt)auto scan
+;----------------------------------------------------------------------------------
+[target]
+storage_type    = 5
+burn_key        = 0
+
+;----------------------------------------------------------------------------------
+;card_ctrl 		-卡量产相关的控制器选择0      |
+;card_high_speed        -速度模式 0为低速，1为高速|
+;card_line        	-4：4线卡，8：8线卡|
+;sdc_d1  		-sdc卡数据1线信号的GPIO配置     |
+;sdc_d0			-sdc卡数据0线信号的GPIO配置  |
+;sdc_clk  		-sdc卡时钟信号的GPIO配置   |
+;sdc_cmd       		-sdc命令信号的GPIO配置|
+;sdc_d3  		-sdc卡数据3线信号的GPIO配置    |
+;sdc_d2			-sdc卡数据2线信号的GPIO配置  |
+;----------------------------------------------------------------------------------
+[card0_boot_para]
+card_ctrl       = 0
+card_high_speed = 1
+card_line       = 4
+sdc_d1          = port:PF0<2><1><2><default>
+sdc_d0          = port:PF1<2><1><2><default>
+sdc_clk         = port:PF2<2><1><2><default>
+sdc_cmd         = port:PF3<2><1><2><default>
+sdc_d3          = port:PF4<2><1><2><default>
+sdc_d2          = port:PF5<2><1><2><default>
+bus-width = 4
+cap-sd-highspeed =
+cap-wait-while-busy =
+no-sdio =
+no-mmc =
+sunxi-power-save-mode =
+
+
+;----------------------------------------------------------------------------------
+;card_ctrl  		-卡启动控制器选择2
+;card_high_speed       	-速度模式 0为低速，1为高速
+;card_line        	-4：4线卡，8：8线卡
+;sdc_ds  		-ds信号的GPIO配置
+;sdc_d1  		-sdc卡数据1线信号的GPIO配置
+;sdc_d0			-sdc卡数据0线信号的GPIO配置
+;sdc_clk  		-sdc卡时钟信号的GPIO配置
+;sdc_cmd       		-sdc命令信号的GPIO配置
+;sdc_d3  		-sdc卡数据3线信号的GPIO配置
+;sdc_d2			-sdc卡数据2线信号的GPIO配置
+;sdc_d4  		-sdc卡数据4线信号的GPIO配置
+;sdc_d5			-sdc卡数据5线信号的GPIO配置
+;sdc_d6 	 	-sdc卡数据6线信号的GPIO配置
+;sdc_d7			-sdc卡数据7线信号的GPIO配置
+;sdc_emmc_rst  		-emmc_rst信号的GPIO配置
+;sdc_ex_dly_used  	-ex_dly_used信号
+;sdc_io_1v8  		-sdc_io_1v8高速emmc模式配置
+;----------------------------------------------------------------------------------
+[card2_boot_para]
+card_ctrl       = 2
+card_high_speed = 1
+card_line       = 4
+sdc_clk         = port:PC02<3><1><3><default>
+sdc_cmd         = port:PC03<3><1><3><default>
+sdc_d0          = port:PC06<3><1><3><default>
+sdc_d1          = port:PC5<3><1><3><default>
+sdc_d2          = port:PC04<3><1><3><default>
+sdc_d3          = port:PC07<3><1><3><default>
+sdc_tm4_hs200_max_freq = 150
+sdc_tm4_hs400_max_freq = 100
+sdc_ex_dly_used = 2
+;sdc_io_1v8	= 1
+sdc_tm4_win_th = 8
+sdc_dis_host_caps = 0x180
+;sdc_erase	= 2
+;sdc_boot0_sup_1v8 = 1
+;sdc_type	= "tm4"
+
+
+
+;----------------------------------------------------------------------------------
+;jtag_enable  	|JTAG使能   |
+;jtag_ms        |测试模式选择输入(TMS) 的GPIO配置|
+;jtag_ck 	|测试时钟输入(CLK) 的GPIO配置    |
+;jtag_do	|测试数据输出(TDO) 的GPIO配置     |
+;jtag_di	|测试数据输出(TDI) 的GPIO配置     |
+;----------------------------------------------------------------------------------
+[jtag_para]
+jtag_enable     = 1
+jtag_ms         = port:PH9<3><default><default><default>
+jtag_ck         = port:PH10<3><default><default><default>
+jtag_do         = port:PH11<3><default><default><default>
+jtag_di         = port:PH12<3><default><default><default>
+
+;*****************************************************************************
+;
+;dram select configuration
+;
+;select_mode	:	dram模式选择,	0:不进行自动识别
+;					1:gpio识别模式(dram_para, dram_para1-15, 共16组有效)
+;					2:gpadc识别模式(dram_para, dram_para1-7, 共8组有效)
+;					3:1个IO+gpadc识别模式(dram_para, dram_para1-15, 共16组有效)。其中IO配置优先级按select_gpio0>select_gpio1>select_gpio2>select_gpio3
+;gpadc_channel	:	选择gpadc通道	有效值(0-3)
+;select_gpio1-4	:	选择gpio pin
+;*****************************************************************************
+
+
+[dram_select_para]
+select_mode	= 0
+gpadc_channel	= 1
+select_gpio0	= port:PB7<0><1><default><default>
+select_gpio1	= port:PB4<0><1><default><default>
+select_gpio2	= port:PH1<0><1><default><default>
+select_gpio3	= port:PH0<0><1><default><default>
+
+
+;*****************************************************************************
+;sdram configuration
+;
+;*****************************************************************************
+[dram_para]
+dram_clk            = 792
+dram_type           = 3
+dram_zq             = 0x7b7bfb
+dram_odt_en         = 0x00
+dram_para1          = 0x000010d2
+dram_para2          = 0x0000
+dram_mr0            = 0x1c70
+dram_mr1            = 0x042
+dram_mr2            = 0x18
+dram_mr3            = 0x0
+dram_tpr0           = 0x004A2195
+dram_tpr1           = 0x02423190
+dram_tpr2           = 0x0008B061
+dram_tpr3           = 0xB4787896
+dram_tpr4           = 0x0
+dram_tpr5           = 0x48484848
+dram_tpr6           = 0x00000048
+dram_tpr7           = 0x1620121e
+dram_tpr8           = 0x0
+dram_tpr9           = 0x0
+dram_tpr10          = 0x0
+dram_tpr11          = 0x00340000
+dram_tpr12          = 0x00000046
+dram_tpr13          = 0x34000100
+
+;----------------------------------------------------------------------------------
+;twi configuration
+;twi_used	0：关闭, 1：打开
+;twi_port	0:twi0,  1:twi1, 2:twi2, 3:twi3, 4:twi4, 5:twi5, 6:r_twi0, 7:r_twi1
+;twi_scl	boot0 scl的GPIO配置
+;twi_sda	boot0 sda的GPIO配置
+;----------------------------------------------------------------------------------
+[twi_para]
+twi_used = 0
+twi_port = 2
+twi_scl  = port:PC0<3><1><default><default>
+twi_sda  = port:PC1<3><1><default><default>
+
+;----------------------------------------------------------------------------------
+;uart configuration
+;uart_debug_port  |Boot串口控制器编号        |
+;uart_debug_tx       |Boot串口发送的GPIO配置|
+;uart_debug_rx  |Boot串口接收的GPIO配置     |
+;----------------------------------------------------------------------------------
+[uart_para]
+uart_debug_port = 3
+uart_debug_tx   = port:PB06<7><1><default><default>
+uart_debug_rx   = port:PB07<7><1><default><default>
+
+
+;----------------------------------------------------------------------------------
+;dram_region_mbytes :设置drm大小以bytes为单位
+;----------------------------------------------------------------------------------
+[secure]
+dram_region_mbytes       = 80
+drm_region_mbytes        = 0
+drm_region_start_mbytes  = 0

@@ -1,0 +1,4 @@
+config BR2_PACKAGE_BMCTEST
+    bool "bmctest"
+    help
+        This is a bmc test 

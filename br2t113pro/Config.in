@@ -1,0 +1,2 @@
+source "$BR2_EXTERNAL_T113_PATH/package/sun8iw20p1-spl/Config.in"
+
