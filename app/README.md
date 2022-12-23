@@ -1,10 +1,9 @@
-# turing pi
+## bmctest
+Bmctest is a normal program
 
-turing pi是一个集群板。使用t113做bmc管理节点。
+## tpi
+Tpi is a CLI program with control functions, which can be compiled and run on a PC or raspberry pi
 
-## 分支说明
-main为正常情况的处理
-factory为工厂模式测试模块
+## board
+The board is the file of the newly added program, which needs to be used when making images later.
 
----
-board的rootfs_overlay也需要使用分支来这样做。
