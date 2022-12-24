@@ -1,7 +1,7 @@
 deps_config := \
-	/home/wille/development/sdk/T113_PRO/turing-pi/turing-pi/br2t113pro/package/sun8iw20p1-spl/Config.in \
-	/home/wille/development/sdk/T113_PRO/turing-pi/turing-pi/br2t113pro/Config.in \
-	/home/wille/development/sdk/T113_PRO/turing-pi/turing-pi/buildroot/output/.br2-external.in.menus \
+	/home/wille/development/github/turing-pi/br2t113pro/package/sun8iw20p1-spl/Config.in \
+	/home/wille/development/github/turing-pi/br2t113pro/Config.in \
+	/home/wille/development/github/turing-pi/buildroot/output/.br2-external.in.menus \
 	Config.in.legacy \
 	package/zstd/Config.in.host \
 	package/zip/Config.in.host \
@@ -150,7 +150,7 @@ deps_config := \
 	fs/axfs/Config.in \
 	fs/Config.in \
 	package/tpi/Config.in \
-	package/bmctest/Config.in \
+	package/bmc/Config.in \
 	package/helloworld/Config.in \
 	package/vim/Config.in \
 	package/uemacs/Config.in \
@@ -1181,7 +1181,7 @@ deps_config := \
 	package/lcms2/Config.in \
 	package/kmsxx/Config.in \
 	package/jpeg-turbo/Config.in.options \
-	/home/wille/development/sdk/T113_PRO/turing-pi/turing-pi/buildroot/output/.br2-external.in.jpeg \
+	/home/wille/development/github/turing-pi/buildroot/output/.br2-external.in.jpeg \
 	package/jpeg/Config.in \
 	package/jbig2dec/Config.in \
 	package/jasper/Config.in \
@@ -1260,7 +1260,7 @@ deps_config := \
 	package/tinydtls/Config.in \
 	package/rhash/Config.in \
 	package/pkcs11-helper/Config.in \
-	/home/wille/development/sdk/T113_PRO/turing-pi/turing-pi/buildroot/output/.br2-external.in.openssl \
+	/home/wille/development/github/turing-pi/buildroot/output/.br2-external.in.openssl \
 	package/libressl/Config.in \
 	package/libopenssl/Config.in \
 	package/openssl/Config.in \
@@ -2927,8 +2927,8 @@ deps_config := \
 	package/linux-tools/Config.in \
 	linux/Config.ext.in \
 	linux/Config.in \
-	/home/wille/development/sdk/T113_PRO/turing-pi/turing-pi/buildroot/output/.br2-external.in.init \
-	/home/wille/development/sdk/T113_PRO/turing-pi/turing-pi/buildroot/output/.br2-external.in.skeleton \
+	/home/wille/development/github/turing-pi/buildroot/output/.br2-external.in.init \
+	/home/wille/development/github/turing-pi/buildroot/output/.br2-external.in.skeleton \
 	system/Config.in \
 	package/gdb/Config.in.host \
 	toolchain/toolchain-external/toolchain-external-custom/Config.in.options \
@@ -2948,7 +2948,7 @@ deps_config := \
 	toolchain/toolchain-external/toolchain-external-codesourcery-aarch64/Config.in.options \
 	toolchain/toolchain-external/toolchain-external-linaro-aarch64/Config.in.options \
 	toolchain/toolchain-external/toolchain-external-arm-aarch64/Config.in.options \
-	/home/wille/development/sdk/T113_PRO/turing-pi/turing-pi/buildroot/output/.br2-external.in.toolchains \
+	/home/wille/development/github/turing-pi/buildroot/output/.br2-external.in.toolchains \
 	toolchain/toolchain-external/toolchain-external-custom/Config.in \
 	toolchain/toolchain-external/toolchain-external-bootlin/Config.in \
 	toolchain/toolchain-external/toolchain-external-codesourcery-niosII/Config.in \
@@ -2994,29 +2994,29 @@ deps_config := \
 	arch/Config.in.arm \
 	arch/Config.in.arc \
 	arch/Config.in \
-	/home/wille/development/sdk/T113_PRO/turing-pi/turing-pi/buildroot/output/.br2-external.in.paths \
+	/home/wille/development/github/turing-pi/buildroot/output/.br2-external.in.paths \
 	Config.in
 
-/home/wille/development/sdk/T113_PRO/turing-pi/turing-pi/buildroot/output/build/buildroot-config/auto.conf: \
+/home/wille/development/github/turing-pi/buildroot/output/build/buildroot-config/auto.conf: \
 	$(deps_config)
 
 ifneq "$(SKIP_LEGACY)" ""
-/home/wille/development/sdk/T113_PRO/turing-pi/turing-pi/buildroot/output/build/buildroot-config/auto.conf: FORCE
+/home/wille/development/github/turing-pi/buildroot/output/build/buildroot-config/auto.conf: FORCE
 endif
 ifneq "$(BR2_DEFCONFIG)" ""
-/home/wille/development/sdk/T113_PRO/turing-pi/turing-pi/buildroot/output/build/buildroot-config/auto.conf: FORCE
+/home/wille/development/github/turing-pi/buildroot/output/build/buildroot-config/auto.conf: FORCE
 endif
 ifneq "$(HOST_GCC_VERSION)" "5"
-/home/wille/development/sdk/T113_PRO/turing-pi/turing-pi/buildroot/output/build/buildroot-config/auto.conf: FORCE
+/home/wille/development/github/turing-pi/buildroot/output/build/buildroot-config/auto.conf: FORCE
 endif
-ifneq "$(BASE_DIR)" "/home/wille/development/sdk/T113_PRO/turing-pi/turing-pi/buildroot/output"
-/home/wille/development/sdk/T113_PRO/turing-pi/turing-pi/buildroot/output/build/buildroot-config/auto.conf: FORCE
+ifneq "$(BASE_DIR)" "/home/wille/development/github/turing-pi/buildroot/output"
+/home/wille/development/github/turing-pi/buildroot/output/build/buildroot-config/auto.conf: FORCE
 endif
 ifneq "$(HOSTARCH)" "x86_64"
-/home/wille/development/sdk/T113_PRO/turing-pi/turing-pi/buildroot/output/build/buildroot-config/auto.conf: FORCE
+/home/wille/development/github/turing-pi/buildroot/output/build/buildroot-config/auto.conf: FORCE
 endif
-ifneq "$(BR2_VERSION_FULL)" "2022.02.1"
-/home/wille/development/sdk/T113_PRO/turing-pi/turing-pi/buildroot/output/build/buildroot-config/auto.conf: FORCE
+ifneq "$(BR2_VERSION_FULL)" "-g4b013a7-dirty"
+/home/wille/development/github/turing-pi/buildroot/output/build/buildroot-config/auto.conf: FORCE
 endif
 
 $(deps_config): ;

@@ -1,5 +1,5 @@
-## bmctest
-Bmctest is a normal program
+## bmc
+Bmc is a normal program
 
 ## tpi
 Tpi is a CLI program with control functions, which can be compiled and run on a PC or raspberry pi

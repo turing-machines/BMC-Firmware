@@ -10,8 +10,8 @@
  */
 
 
-#ifndef __BMCTEST_H__
-#define __BMCTEST_H__
+#ifndef __BMC_H__
+#define __BMC_H__
 
 #include <pthread.h>
 
@@ -44,4 +44,4 @@ char* get_nodeType(int num);
 
 int uart_write(int index,char *data,int len);
 
-#endif // !__BMCTEST_H__
+#endif // !__BMC_H__
