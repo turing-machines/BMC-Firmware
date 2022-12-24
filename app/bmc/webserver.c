@@ -15,7 +15,7 @@
 #include "cjson/cJSON.h"
 #include "param.h"
 #include <stdbool.h>
-#include "bmctest.h"
+#include "bmc.h"
 #include <linux/reboot.h>
 
 #define  SD_PATH "/mnt/sdcard"

@@ -1,13 +1,13 @@
 CPPFLAGS +=
 LDLIBS += -L./lib/ -lpthread -lgo -lcjson
  
-all: bmctest
+all: bmc
  
-bmctest:  bmctest.o comm_gpio.o param.o webserver.o  comm_device_serial.o
+bmc:  bmc.o comm_gpio.o param.o webserver.o  comm_device_serial.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 	cp $@ ~/tftpboot/
  
 clean:
-	rm -f *.o bmctest
+	rm -f *.o bmc
  
 .PHONY: all clean

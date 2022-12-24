@@ -13,7 +13,7 @@
 
 #include "webserver.h"
 #include "param.h"
-#include "bmctest.h"
+#include "bmc.h"
 
 #include "comm_device_serial.h"
 

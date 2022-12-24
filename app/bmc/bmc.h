@@ -1,5 +1,5 @@
 /**
- * @file bmctest.h
+ * @file bmc.h
  * @author wenyi (wenyi0421@163.com)
  * @brief 
  * @version 0.1

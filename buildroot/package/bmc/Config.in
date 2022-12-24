@@ -1,0 +1,4 @@
+config BR2_PACKAGE_BMC
+    bool "bmc"
+    help
+        This is a bmc
