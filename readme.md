@@ -32,4 +32,7 @@ make V=1	//build img
 cd output/images/
 ./genSWU.sh 1.0.0	//build swu
 
+//Execute mkfw.sh 1.0.0 in the root directory to directly compile the firmware to the build directory
+./mkfw.sh 1.0.0 
+
 ```
