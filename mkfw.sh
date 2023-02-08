@@ -9,7 +9,8 @@ if [ 1 != $# ]; then
 fi
 echo $1 |grep "^[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}$" > /dev/null
 if [ $? = 1 ];then
-	echo please version 0~999 and must 3 version eg:1.1.1
+	echo version 0~999 and must 3 version eg:1.1.1
+	echo ./mkfw.sh "<version>"
 	exit 1
 fi
 
@@ -34,3 +35,10 @@ cd -
 cp -rf ./buildroot/output/images/turingpi_.swu ./build/${date}/turingpi-${version}.swu
 
 echo "build turing pi firmware over"
+if [ ! -f "build/tpi/linux/tpi" ];then
+	mkdir -p build/tpi/linux
+	echo "build tpi cli"
+	gcc app/tpi/tpi.c -o build/tpi/linux/tpi
+	echo "build tpi cli over"
+fi
+
