@@ -410,6 +410,7 @@ static int get_ubi_num(void)
     return ret;
 }
 
+static const char* swupdate_file = "/mnt/sdcard/update.bin";
 static int swupdate_cmd(void)
 {
     char cmd[256] = {0};
@@ -422,7 +423,7 @@ static int swupdate_cmd(void)
         printf("error\n");
         return -1;
     }
-    snprintf(cmd,sizeof(cmd),"swupdate -i %s -e stable,upgrade_ubi%d",updateFilePath,ver);
+    snprintf(cmd,sizeof(cmd),"swupdate -i %s -e stable,upgrade_ubi%d",swupdate_file,ver);
     FILE* pp = popen(cmd,"r");
     if(pp)
     {
@@ -482,40 +483,61 @@ static int swupdate_cmd(void)
         printf("--------------UPDATE faild--------------------\n");
     }
     printf("=================system will reboot ====================\n");
+    sprintf(cmd,"rm %s",swupdate_file);
+    system(cmd);
     sleep(3);
     system("reboot");
     // reboot();
 }
 
+static bool isMountSDcard(char* mountPoint)
+{
+    if(NULL == mountPoint)
+        return false;
+    int fd = -1;
+    char buff[1024];
+    if((fd = open("/proc/mounts",O_RDONLY)) < 0)
+    {
+        printf("open /proc/mounts error\n");
+        return false;
+    }
+    while(read(fd,buff,1024)>0)
+    {
+        if(strstr(buff,mountPoint))
+        {
+            close(fd);
+            return true;
+        }
+    }
+    close(fd);
+    return false;
+}
 
-			//TODO
+
+
 static void uploadFirmware(Webs *wp)
 {
     WebsKey         *s;
     WebsUpload      *up;
 
+    char    cmd[128];
    	char    sessionIdBuf[128] = {0};
 	int 	sessionIdBufLen = sizeof(sessionIdBuf);
 
 
-//	if (websCheckSession(wp, sessionIdBuf, &sessionIdBufLen) == 0)
-//	{
-//		Printf("get wp->session NULL\n");
-//		websSetStatus(wp, 401);
-//        websWriteHeaders(wp, -1, 0);
-//		websWriteHeader(wp, "Content-Type", "text/plain");
-//        websWriteEndHeaders(wp);
-//		websWrite(wp,"{\"response\":[{\"result\":\"err:login auth\"}]}");
-//		websDone(wp);
-//		return ;
-//	}
-
 	websSetStatus(wp, 200);
 	websWriteHeaders(wp, -1, 0);
 	websWriteHeader(wp, "Content-Type", "text/plain");
-//	websWriteEndHeaders(wp);
 
     websWriteEndHeaders(wp);
+
+    if(!isMountSDcard("/mnt/sdcard"))
+    {
+        websWrite(wp,"{\"response\":[{\"result\":\"err:no sdcard\"}]}");
+        websDone(wp);
+        return ;
+    }
+    
     if (scaselessmatch(wp->method, "POST")) {
         for (s = hashFirst(wp->files); s; s = hashNext(wp->files, s)) {
             up = (WebsUpload*)(s->content.value.symbol);
@@ -528,6 +550,8 @@ static void uploadFirmware(Webs *wp)
             websWrite(wp, "%s=%s\r\n", s->name.value.string, s->content.value.string);
         }
     }
+    sprintf(cmd,"mv %s %s;sync",updateFilePath,swupdate_file);
+    system(cmd);
 	websWrite(wp,"{\"response\":[{\"result\":\"ok\"}]}");
     websDone(wp);
 	printf("upload Filename=%s\n",up->clientFilename);

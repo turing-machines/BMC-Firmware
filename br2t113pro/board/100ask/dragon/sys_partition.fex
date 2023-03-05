@@ -35,7 +35,7 @@ size = 16384
 
 [partition]
     name         = boot-resource
-    size         = 34438
+    size         = 8192
     downloadfile = "boot-resource.fex"
     user_type    = 0x8000
 
@@ -54,19 +54,19 @@ size = 16384
 
 [partition]
     name         = boot
-    size         = 35200
+    size         = 8192
     downloadfile = "boot.fex"
     user_type    = 0x8000
 
 [partition]
     name         = rootfs
-    size         = 65536
+    size         = 81920
     downloadfile = "rootfs-ubifs.fex"
     user_type    = 0x8000
 
 [partition]
-    name         = rootfsbak
-    size         = 65536
+    name         = recovery
+    size         = 81920
     downloadfile = "rootfs-ubifs.fex"
     user_type    = 0x8000
 
@@ -85,4 +85,3 @@ size = 16384
 [partition]
     name         = UDISK
     user_type    = 0x8100
-
