@@ -1,0 +1,7 @@
+config BR2_PACKAGE_TPI_COMMON
+	bool "tpi_common"
+	depends on BR2_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS
+	select BR2_PACKAGE_HOST_RUSTC
+	help
+	  Static library with node flashing functionality for
+	  version 1 of the TPI 2 firmware
