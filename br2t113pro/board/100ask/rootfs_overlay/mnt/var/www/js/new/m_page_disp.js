@@ -115,6 +115,8 @@ function page_http_req_get(uUrl, lType) {
       C_getCBResuleParseUSBDisp(json);
     else if (lType == 'sdcard')
       C_getCBResuleParseSDCardDisp(json);
+    else if(lType == 'other')
+      C_getCBResuleParseOtherDisp(json);
     else if(lType == 'power')
       C_getCBResuleParsePowerDisp(json);
     else if(lType == 'nodeinfo')

@@ -15,6 +15,8 @@
 #include "param.h"
 #include "bmc.h"
 
+#include "version.h"
+
 #include "comm_device_serial.h"
 
 #define RTL_RESET GPIO_PIN_PG(13)
@@ -394,7 +396,7 @@ void *key_thread(void *arg)
         }
         sleep(1);
     }
-    return;
+    // return;
 }
 
 /**
@@ -678,7 +680,8 @@ void node_uart_init()
 
 int main(int argc, char *argv[])
 {
-    printf("Hello bmct start build time = %s-%s------>\n", __TIME__, __DATE__);
+    printf("Hello bmc start build time = %s-%s\n", __TIME__, __DATE__);
+    printf("bmc version:v%s\n", BMCVERSION);
     int ret = -1;
     int i;
     pthread_t pid, piduart;

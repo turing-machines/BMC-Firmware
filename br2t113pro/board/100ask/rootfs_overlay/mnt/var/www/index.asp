@@ -90,6 +90,32 @@
       });
     }
 
+
+    function C_getCBResuleParseOtherDisp(json) {
+      console.log(json);
+
+      $.each(json, function (index, item) {
+        var version = json[index][0].version;
+        var buildtime = json[index][0].buildtime;
+        var ip = json[index][0].ip;
+        var mac = json[index][0].mac;
+
+        // var resultDiv = document.getElementById("result");
+        // resultDiv.innerHTML = "Name: " + version + "<br>Age: " + buildtime;
+
+        document.getElementById("otherVer").innerHTML = version;
+        document.getElementById("otherBuildtime").innerHTML = buildtime;
+        document.getElementById("otherIp").innerHTML = ip;
+        document.getElementById("otherMac").innerHTML = mac;
+
+        // $("#otherVer").val(version);
+        // $("#otherBuildtime").val(buildtime);
+        // $("#otherIp").val(ip);
+        // $("#otherMac").val(mac);
+        console.log('version:' + version);
+      });
+    }
+
     function C_getCBResuleParsePowerDisp(json) {
       console.log(json);
       $.each(json, function (index, item) {
@@ -154,6 +180,7 @@
       C_getParamList('sdcard');
       C_getParamList('power');
       C_getParamList('nodeinfo');
+      C_getParamList('other');
     }
 
 
@@ -169,6 +196,9 @@
       }
       else if(ltype == 'nodeinfo'){
         var url = '/api/bmc?opt=get&type=nodeinfo';
+      }
+      else if(ltype == 'other'){
+        var url = '/api/bmc?opt=get&type=other';
       }
       else
         return;
@@ -423,7 +453,7 @@
             <ul>
               <div class="row">
                 <div class="col-lg-6">
-                  <form role="form" id="form2" ">
+                  <form role="form" id="form2">
 
                     <div class="form-group row">
                       <label for="inputEmail3" class="col-sm-2 col-form-label">total:</label>
@@ -465,13 +495,41 @@
               <div class="row">
                 <div class="col-lg-6">
 
-                  <form role="form" id="form=4">
+                  <form role="form" id="other">
                     <div class="form-group row">
                       <div class="col-sm-12 " style="text-align: left;left: 250px;">
                         <button type="submit" class="btn btn-outline-danger btn-rounded w-md">reset network</button>
                         <!-- <button type="reset" class="btn btn-outline-secondary btn-rounded w-md">重置</button> -->
                       </div>
                     </div>
+
+                    <!-- <div id="result"></div> -->
+                    
+                    <div class="form-group row">
+                      <label for="inputEmail3" class="col-sm-2 col-form-label">bmc version:</label>
+                      <div class="col-sm-7">
+                        <div  id="otherVer" class="col-sm-8 col-form-label"></div>
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <label for="inputEmail3" class="col-sm-2 col-form-label">build time:</label>
+                      <div class="col-sm-7">
+                        <div  id="otherBuildtime" class="col-sm-8 col-form-label"></div>
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <label for="inputEmail3" class="col-sm-2 col-form-label">ip:</label>
+                      <div class="col-sm-7">
+                        <div  id="otherIp" class="col-sm-8 col-form-label"></div>
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <label for="inputEmail3" class="col-sm-2 col-form-label">mac:</label>
+                      <div class="col-sm-7">
+                        <div  id="otherMac" class="col-sm-8 col-form-label"></div>
+                      </div>
+                    </div>
+
                   </form>
 
                 </div>

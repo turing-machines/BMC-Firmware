@@ -11,12 +11,27 @@
 
 
 #include <sys/vfs.h>    //statfs
+#include <net/if.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <netdb.h>
+#include <string.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <linux/reboot.h>
+
+
 #include "inc/goahead.h"
 #include "cjson/cJSON.h"
 #include "param.h"
-#include <stdbool.h>
 #include "bmc.h"
-#include <linux/reboot.h>
+#include "version.h"
+
+#include <stdbool.h>
 
 #define  SD_PATH "/mnt/sdcard"
 
@@ -269,6 +284,124 @@ static int get_nodeInfoType(Webs* wp)
 }
 
 
+
+int comm_getMacAddr(char* ethname, char *macaddr, size_t len)
+{
+    int fd;
+    char buffer[20];
+    struct ifreq ifr;
+
+    if ((fd = socket (AF_INET, SOCK_DGRAM, 0)) >= 0)
+    {
+        strncpy(ifr.ifr_name, ethname, IFNAMSIZ);
+        ifr.ifr_name[IFNAMSIZ - 1] = '\0';
+        if (ioctl(fd, SIOCGIFHWADDR, &ifr) == 0)
+        {
+            snprintf(buffer, 20, "%02x:%02x:%02x:%02x:%02x:%02x",
+                     (unsigned char)ifr.ifr_hwaddr.sa_data[0],
+                     (unsigned char)ifr.ifr_hwaddr.sa_data[1],
+                     (unsigned char)ifr.ifr_hwaddr.sa_data[2],
+                     (unsigned char)ifr.ifr_hwaddr.sa_data[3],
+                     (unsigned char)ifr.ifr_hwaddr.sa_data[4],
+                     (unsigned char)ifr.ifr_hwaddr.sa_data[5]);
+        }
+        else
+        {
+            close(fd);
+            return(-1);
+        }
+    }
+    else
+    {
+        return(-1);
+    }
+
+    if (strlen(buffer) > len - 1)
+    {
+		close(fd);
+        return(-1);
+    }
+    strncpy(macaddr, buffer, len);
+
+    close(fd);
+    return(0);
+}
+
+
+
+int comm_getIpAddr(char* ethname, char *ipaddr, size_t len)
+{
+    int fd;
+    char buffer[20];
+    struct ifreq ifr;
+    struct sockaddr_in *addr;
+
+    if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) >= 0)
+    {
+        strncpy(ifr.ifr_name, ethname, IFNAMSIZ);
+        ifr.ifr_name[IFNAMSIZ - 1] = '\0';
+        if (ioctl(fd, SIOCGIFADDR, &ifr) == 0)
+        {
+            addr = (struct sockaddr_in *) & (ifr.ifr_addr);
+            inet_ntop(AF_INET, &addr->sin_addr, buffer, 20);
+        }
+        else
+        {
+            close(fd);
+            return(-1);
+        }
+    }
+    else
+    {
+        perror("st_comm_net_card_getIpAddr error :");
+        return(-1);
+    }
+
+    if (strlen(buffer) > len - 1)
+    {
+		close(fd);
+        return(-1);
+    }
+    strncpy(ipaddr, buffer, len);
+    close(fd);
+    return(0);
+}
+
+
+
+
+static int get_otherInfo(Webs* wp)
+{
+    /*--json start--*/
+    cJSON* pRoot = cJSON_CreateObject();
+    cJSON* pArray = cJSON_CreateArray();
+    cJSON_AddItemToObject(pRoot, "response", pArray);
+    cJSON* pItem = NULL;
+
+    /*--json body--*/
+    char mac[24];
+    char ip[24];
+    comm_getMacAddr("eth0",mac,sizeof(mac));
+    comm_getIpAddr("eth0",ip,sizeof(ip));
+
+    pItem = cJSON_CreateObject();
+	cJSON_AddStringToObject(pItem, "version", BMCVERSION);  
+	cJSON_AddStringToObject(pItem, "buildtime", BUILDTIME);  
+    cJSON_AddStringToObject(pItem, "ip", ip);  
+	cJSON_AddStringToObject(pItem, "mac", mac);  
+    cJSON_AddItemToArray(pArray, pItem);
+
+    /*--json end--*/
+    char* szJSON = cJSON_Print(pRoot);
+    // printf("json ret:%s\n", szJSON);
+
+    websWrite(wp, szJSON);
+    websFlush(wp, 0);
+    websDone(wp);
+
+    cJSON_Delete(pRoot);
+    return 0;
+}
 
 static int get_uartString(Webs* wp)
 {
@@ -606,6 +739,10 @@ static void bmcdemo(Webs *wp)
         else if(0==strcasecmp(pType,"uart"))
         {
             get_uartString(wp);
+        }
+        else if(0==strcasecmp(pType,"other"))
+        {
+            get_otherInfo(wp);
         }
         // strcpy(json_result_buff,"{\"response\":[{\"result\":\"ok\"}]}");
         // websWrite(wp, "%s", json_result_buff);

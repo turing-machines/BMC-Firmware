@@ -14,6 +14,10 @@ if [ $? = 1 ];then
 	exit 1
 fi
 
+echo  "/* This file is auto generated. do not modify */ 
+#define BMCVERSION \"${version}\"
+#define BUILDTIME \"${date}\" " > app/bmc/version.h
+
 if [ ! -d "build/${date}" ];then
     echo "mkdir build/${date}"
     mkdir -p "build/${date}"
@@ -24,6 +28,7 @@ echo "Version: ${version}"
 echo "Date: ${date}"
 
 echo "build fw"
+make -C buildroot bmc-rebuild V=1
 make -C buildroot V=1
 echo "cp -rf buildroot/output/images/buildroot_linux_nand_uart3.img ./build/${date}/turingpi-${version}.img"
 cp -rf buildroot/output/images/buildroot_linux_nand_uart3.img ./build/${date}/turingpi-${version}.img
