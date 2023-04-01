@@ -14,6 +14,10 @@ if [ $? = 1 ];then
 	exit 1
 fi
 
+echo  "/* This file is auto generated. do not modify */ 
+#define BMCVERSION \"${version}\"
+#define BUILDTIME \"${date}\" " > app/bmc/version.h
+
 if [ ! -d "build/${date}" ];then
     echo "mkdir build/${date}"
     mkdir -p "build/${date}"
