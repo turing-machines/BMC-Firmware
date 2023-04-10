@@ -41,7 +41,7 @@ jobs:
           ./genSWU.sh dev-${GITHUB_SHA::6}
 
       - name: run mkfw
-        run: ./mkfw.sh dev-${GITHUB_SHA::6}
+        run: ./mkfw.sh 0.0.0
 
       - name: compress
         run: tar -czvf bmc-fw-dev-${GITHUB_SHA::6}.tar.gz build/$(date +%F)
