@@ -1,0 +1,35 @@
+From b4b3302832f8ba46312048743645f044bb31b4ef Mon Sep 17 00:00:00 2001
+From: Ruslan Akbashev <ra@turingpi.com>
+Date: Thu, 13 Apr 2023 20:01:37 +0400
+Subject: [PATCH] main: add intermediate function
+
+This temporary hack allows using functionality of the tool via compiling
+as a library
+---
+ main.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/main.c b/main.c
+index 1732afa..a8f3146 100644
+--- a/main.c
++++ b/main.c
+@@ -640,7 +640,7 @@ int file_server(libusb_device_handle * usb_device)
+ 	return 0;
+ }
+ 
+-int main(int argc, char *argv[])
++int rpiboot_start(int argc, char *argv[])
+ {
+ 	libusb_context *ctx;
+ 	libusb_device_handle *usb_device;
+@@ -758,3 +758,7 @@ int main(int argc, char *argv[])
+ 	return 0;
+ }
+ 
++int main(int argc, char *argv[])
++{
++	return rpiboot_start(argc, argv);
++}
+-- 
+2.39.2
+

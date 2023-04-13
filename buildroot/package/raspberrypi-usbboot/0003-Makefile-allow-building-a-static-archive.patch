@@ -1,0 +1,29 @@
+From 7966f173fa8fb90ed037cee34bcd3472b96d066b Mon Sep 17 00:00:00 2001
+From: Ruslan Akbashev <ra@turingpi.com>
+Date: Thu, 13 Apr 2023 20:18:49 +0400
+Subject: [PATCH] Makefile: allow building a static archive
+
+---
+ Makefile | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index 822e714..fa324ab 100755
+--- a/Makefile
++++ b/Makefile
+@@ -1,6 +1,12 @@
+ rpiboot: main.c msd/bootcode.h msd/start.h msd/bootcode4.h msd/start4.h
+ 	$(CC) -Wall -Wextra -g -o $@ $< -lusb-1.0
+ 
++main.o: main.c msd/bootcode.h msd/start.h msd/bootcode4.h msd/start4.h
++	$(CC) -Wall -Wextra -g -o $@ $< -c
++
++librpiboot.a: main.o
++	$(AR) rcs $@ $<
++
+ %.h: %.bin ./bin2c
+ 	./bin2c $< $@
+ 
+-- 
+2.39.2
+
