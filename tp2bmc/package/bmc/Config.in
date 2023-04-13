@@ -1,5 +1,5 @@
 config BR2_PACKAGE_BMC
     bool "bmc"
-    depends on BR2_PACKAGE_TPI_COMMON
+    depends on BR2_PACKAGE_TPI_COMMON || BR2_PACKAGE_RASPBERRYPI_USBBOOT
     help
         This is a bmc
