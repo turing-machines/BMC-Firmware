@@ -44,10 +44,11 @@ jobs:
         run: ./mkfw.sh 0.0.0
 
       - name: compress
-        run: tar -czvf bmc-fw-dev-${GITHUB_SHA::6}.tar.gz build/$(date +%F)
+        run: tar -czvf bmc-fw-dev-$(echo $GITHUB_SHA | cut -c-6).tar.gz build/$(date +%F)
 
       - name: upload
         uses: actions/upload-artifact@v2
         with:
           name: bmc-fw-dev-${GITHUB_SHA::6}
           path: bmc-fw-dev-${GITHUB_SHA::6}.tar.gz
+          if-no-files-found: error 
