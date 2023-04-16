@@ -38,17 +38,17 @@ jobs:
       - name: build swupdate
         run: |
           cd buildroot/output/images/
-          ./genSWU.sh dev-${GITHUB_SHA::6}
+          ./genSWU.sh dev-${{ github.sha }}
 
       - name: run mkfw
         run: ./mkfw.sh 0.0.0
 
       - name: compress
-        run: tar -czvf bmc-fw-dev-$(echo $GITHUB_SHA | cut -c-6).tar.gz build/$(date +%F)
+        run: tar -czvf bmc-fw-dev-${{ github.sha }}.tar.gz build/$(date +%F)
 
       - name: upload
         uses: actions/upload-artifact@v2
         with:
-          name: bmc-fw-dev-$(echo $GITHUB_SHA | cut -c-6)
-          path: bmc-fw-dev-$(echo $GITHUB_SHA | cut -c-6).tar.gz
+          name: bmc-fw-dev-${{ github.sha }}
+          path: bmc-fw-dev-${{ github.sha }}.tar.gz
           if-no-files-found: error 
