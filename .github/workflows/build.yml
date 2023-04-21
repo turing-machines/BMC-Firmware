@@ -43,12 +43,9 @@ jobs:
       - name: run mkfw
         run: ./mkfw.sh 0.0.0
 
-      - name: compress
-        run: tar -czvf bmc-fw-dev-${{ github.sha }}.tar.gz build/$(date +%F)
-
       - name: upload
         uses: actions/upload-artifact@v2
         with:
           name: bmc-fw-dev-${{ github.sha }}
-          path: bmc-fw-dev-${{ github.sha }}.tar.gz
+          path: build
           if-no-files-found: error 
