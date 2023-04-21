@@ -1,8 +1,11 @@
-pub fn add(x: i32, y: i32) -> i32 {
-    x + y
-}
+pub mod c_interface;
+pub mod power;
 
-#[no_mangle]
-pub extern "C" fn c_add(x: i32, y: i32) -> i32 {
-    add(x, y)
+#[repr(C)]
+pub enum NodeId {
+    Node1,
+    Node2,
+    Node3,
+    Node4,
+    All,
 }

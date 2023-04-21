@@ -30,8 +30,9 @@
 #include "param.h"
 #include "bmc.h"
 #include "version.h"
-
 #include <stdbool.h>
+#include "tpi_common.h"
+#include <linux/reboot.h>
 
 #define  SD_PATH "/mnt/sdcard"
 

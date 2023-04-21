@@ -6,3 +6,15 @@ license = "Apache-2.0"
 
 [lib]
 crate-type = ["lib", "staticlib"]
+
+[dependencies]
+once_cell = "*"
+tokio = { version = "*", features = [
+    "rt-multi-thread",
+    "rt",
+    "time",
+] }
+gpio = "*"
+futures-concurrency = "*"
+futures = "*"
+anyhow = "*"
