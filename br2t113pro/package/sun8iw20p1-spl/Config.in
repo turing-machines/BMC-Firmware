@@ -1,8 +1,0 @@
-config BR2_TARGET_SUN8IW20P1_SPL
-	bool "sun8iw20p1-spl"
-	depends on BR2_arm
-	help
-	  Allwinner T113-S3  boot0 code with modifications to use as U-Boot
-	  SPL.
-
-
