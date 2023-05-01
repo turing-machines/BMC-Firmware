@@ -1,4 +1,5 @@
 buildroot/output/
+buildroot/*.config*
 build/*
 !build/tpi
 app/board/*
