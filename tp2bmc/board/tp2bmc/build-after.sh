@@ -5,7 +5,7 @@ BOARD_DIR="$(dirname $0)"
 echo "Target binary dir $BOARD_DIR"
 
 # Copy Files to BINARY
-cp $BOARD_DIR/../dragon/* -rfvd  $BINARIES_DIR
+cp $BOARD_DIR/dragon/* -rfvd  $BINARIES_DIR
 
 cd  $BINARIES_DIR
 rm boot.fex

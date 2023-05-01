@@ -1,5 +1,5 @@
 #!/bin/sh
-BOARD_DIR="$(dirname $0)"
+BOARD_DIR="$(dirname $0)/../../../br2t113pro/board/100ask/t113-pro"
 
 
 # For debug
