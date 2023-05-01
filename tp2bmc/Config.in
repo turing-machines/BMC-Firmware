@@ -1,0 +1,5 @@
+menu "wenyi private app package"
+	source "$BR2_EXTERNAL_TP2BMC_PATH/package/helloworld/Config.in"
+	source "$BR2_EXTERNAL_TP2BMC_PATH/package/bmc/Config.in"
+	source "$BR2_EXTERNAL_TP2BMC_PATH/package/tpi/Config.in"
+endmenu

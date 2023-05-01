@@ -2618,10 +2618,4 @@ menu "Text editors and viewers"
 	source "package/vim/Config.in"
 endmenu
 
-menu "wenyi private app package"
-	source "package/helloworld/Config.in"
-	source "package/bmc/Config.in"
-	source "package/tpi/Config.in"
-endmenu
-
 endmenu
