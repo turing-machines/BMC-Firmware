@@ -1,0 +1,598 @@
+// SPDX-License-Identifier: GPL-2.0
+// Copyright (C) 2023 Sam Edwards <CFSworks@gmail.com>
+
+/dts-v1/;
+
+/memreserve/ 0x41900000 0x00100000;
+
+#include "sun8iw20p1.dtsi"
+#include <dt-bindings/input/input.h>
+
+/{
+	model = "Turing Machines Turing Pi 2 BMC";
+	compatible = "turingmachines,tp2bmc", "allwinner,r528", "arm,sun8iw20p1";
+
+	// The i2c-sunxi driver does not currently support NOSTART
+	// transactions, which are necessary to support the RTL8370MB's Realtek
+	// mode, so GPIO mode is used instead for now. This can be removed once
+	// NOSTART support is added to i2c-sunxi.
+	i2c_gpio: i2c@2 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		status = "disabled";
+		compatible = "i2c-gpio";
+
+		sda-gpios = <&pio PE 13 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+		scl-gpios = <&pio PE 12 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+		i2c-gpio,delay-us = <2>; /* 100 KHz */
+	};
+
+	// The LEDs are actually GPIO lines that go to the front-panel LEDs.
+	// This is currently disabled; userspace wants to manage the GPIOs
+	// directly for now.
+	leds {
+		status = "disabled";
+		compatible = "gpio-leds";
+
+		sys {
+			label = "fp:sys";
+			gpios = <&pio PG 8 GPIO_ACTIVE_LOW>;
+		};
+
+		reset {
+			label = "fp:reset";
+			gpios = <&pio PG 9 GPIO_ACTIVE_LOW>;
+		};
+	};
+
+	// The keys are also GPIO lines.
+	// This is also disabled, for the same reason as above.
+	keys {
+		status = "disabled";
+		compatible = "gpio-keys";
+
+		// Part of the front-panel connector
+		power {
+			label = "fp:power";
+			linux,code = <KEY_POWER>;
+			gpios = <&pio PG 10 GPIO_ACTIVE_HIGH>;
+		};
+
+		reset {
+			label = "fp:reset";
+			linux,code = <KEY_RESTART>;
+			gpios = <&pio PG 11 GPIO_ACTIVE_HIGH>;
+		};
+
+		// Located on the board itself
+		key1 {
+			label = "key1";
+			linux,code = <KEY_1>;
+			gpios = <&pio PG 15 GPIO_ACTIVE_LOW>;
+		};
+
+	};
+
+	reg_otg_vbus: otg-vbus {
+		compatible = "regulator-fixed";
+
+		regulator-name = "usb-otg";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		startup-delay-us = <50000>;
+
+		gpio = <&pio PG 12 GPIO_ACTIVE_LOW>;
+	};
+};
+
+/* --- Pin controller --- */
+&pio {
+	/* SDMMC Controller 0: microSD slot */
+	sdc0_pins_a: sdc0@0 {
+		allwinner,pins = "PF0", "PF1", "PF2",
+				 "PF3", "PF4", "PF5";
+		allwinner,function = "sdc0";
+		allwinner,muxsel = <2>;
+		allwinner,drive = <3>;
+		allwinner,pull = <1>;
+		pins = "PF0", "PF1", "PF2",
+		       "PF3", "PF4", "PF5";
+		function = "sdc0";
+		drive-strength = <30>;
+		bias-pull-up;
+		power-source = <3300>;
+	};
+
+	sdc0_pins_b: sdc0@1 {
+		pins = "PF0", "PF1", "PF2",
+		       "PF3", "PF4", "PF5";
+		function = "sdc0";
+		drive-strength = <30>;
+		bias-pull-up;
+		power-source = <1800>;
+	};
+
+	sdc0_pins_c: sdc0@2 {
+		pins = "PF0", "PF1", "PF2",
+			"PF3", "PF4", "PF5";
+		function = "gpio_in";
+	};
+
+
+
+	/* SDMMC Controller 2: SPI-NAND, for boot control */
+	sdc2_pins_a: sdc2@0 {
+		allwinner,pins = "PC2", "PC3", "PC4",
+				 "PC5", "PC6", "PC7";
+		allwinner,function = "sdc2";
+		allwinner,muxsel = <3>;
+		allwinner,drive = <3>;
+		allwinner,pull = <1>;
+		pins = "PC2", "PC3", "PC4",
+			"PC5", "PC6", "PC7";
+		function = "sdc2";
+		drive-strength = <30>;
+		bias-pull-up;
+	};
+
+
+
+	/* UARTs, as follows:
+	 * UART0: Unused
+	 * UART1: Node 2
+	 * UART2: Node 1
+	 * UART3: BMC console
+	 * UART4: Node 3
+	 * UART5: Node 4
+	 */
+	uart1_pins_a: uart1_pins@0 {
+		pins = "PG6", "PG7";
+		function = "uart1";
+		drive-strength = <10>;
+		bias-pull-up;
+	};
+
+	uart1_pins_b: uart1_pins {
+		pins = "PG6", "PG7";
+		function = "gpio_in";
+	};
+
+	uart2_pins_a: uart2_pins@0 {
+		pins = "PD1", "PD2";
+		function = "uart2";
+		drive-strength = <10>;
+		bias-pull-up;
+	};
+
+	uart2_pins_b: uart2_pins@1 {
+		pins = "PD1", "PD2";
+		function = "gpio_in";
+	};
+
+	uart3_pins_a: uart3_pins@0 {
+		pins = "PB6", "PB7";
+		function = "uart3";
+		drive-strength = <10>;
+		bias-pull-up;
+	};
+
+	uart3_pins_b: uart3_pins@1 {
+		pins = "PB6", "PB7";
+		function = "gpio_in";
+	};
+
+	uart4_pins_a: uart4_pins@0 {
+		pins = "PB2", "PB3";
+		function = "uart4";
+		drive-strength = <10>;
+		bias-pull-up;
+	};
+
+	uart4_pins_b: uart4_pins@1 {
+		pins = "PB2", "PB3";
+		function = "gpio_in";
+	};
+
+	uart5_pins_a: uart5_pins@0 {
+		pins = "PB4", "PB5";
+		function = "uart5";
+		drive-strength = <10>;
+		bias-pull-up;
+	};
+
+	uart5_pins_b: uart5_pins@1 {
+		pins = "PB4", "PB5";
+		function = "gpio_in";
+	};
+
+
+
+	/* TWI Controller 2: 24C02 and RTL8370MB-CG */
+	twi2_pins_a: twi2@0 {
+		pins = "PE12", "PE13";
+		function = "twi2";
+		drive-strength = <10>;
+	};
+
+	twi2_pins_b: twi2@1 {
+		pins = "PE12", "PE13";
+		function = "gpio_in";
+	};
+
+
+
+	/* Ethernet MAC: RTL8201F in RMII mode */
+	gmac0_pins_a: gmac@0 {
+		allwinner,pins = "PE0", "PE1", "PE2", "PE3", "PE4",
+				 "PE5", "PE6", "PE7","PE8", "PE9";
+		allwinner,function = "gmac0";
+		allwinner,muxsel = <8>;
+		allwinner,drive = <1>;
+		allwinner,pull = <0>;
+	};
+
+	gmac0_pins_b: gmac@1 {
+		allwinner,pins = "PE0", "PE1", "PE2", "PE3", "PE4",
+				 "PE5", "PE6", "PE7","PE8", "PE9";
+		allwinner,function = "gpio_in";
+		allwinner,muxsel = <0>;
+		allwinner,drive = <1>;
+		allwinner,pull = <0>;
+	};
+
+
+
+	/* SPI Controller 0: NAND flash */
+	spi0_pins_a: spi0@0 {
+		pins = "PC2", "PC4", "PC5","PC7", "PC6";
+		function = "spi0";
+		drive-strength = <10>;
+	};
+
+	spi0_pins_b: spi0@1 {
+		pins = "PC3";
+		function = "spi0";
+		drive-strength = <10>;
+		bias-pull-up;   /* only CS should be pulled up */
+	};
+
+	spi0_pins_c: spi0@2 {
+		pins = "PC2", "PC3", "PC4", "PC5","PC6", "PC7";
+		function = "gpio_in";
+		drive-strength = <10>;
+	};
+};
+
+
+
+/* --- SDMMC --- */
+&sdc0 {
+	status = "okay";
+
+	pinctrl-names = "default", "mmc_1v8", "sleep";
+	pinctrl-0 = <&sdc0_pins_a>;
+	pinctrl-1 = <&sdc0_pins_b>;
+	pinctrl-2 = <&sdc0_pins_c>;
+	pinctrl-3;
+
+	bus-width = <4>;
+	cd-gpios = <&pio PF 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+	cd-used-24M;
+	cap-sd-highspeed;
+	no-sdio;
+	no-mmc;
+	sunxi-power-save-mode;
+	max-frequency = <150000000>;
+	ctl-spec-caps = <0x8>;
+};
+
+
+
+/* --- UARTs --- */
+&uart1 {
+	status = "okay";
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&uart1_pins_a>;
+	pinctrl-1 = <&uart1_pins_b>;
+};
+
+&uart2 {
+	status = "okay";
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&uart2_pins_a>;
+	pinctrl-1 = <&uart2_pins_b>;
+};
+
+&uart3 {
+	status = "okay";
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&uart3_pins_a>;
+	pinctrl-1 = <&uart3_pins_b>;
+};
+
+&uart4 {
+	status = "okay";
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&uart4_pins_a>;
+	pinctrl-1 = <&uart4_pins_b>;
+};
+
+&uart5 {
+	status = "okay";
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&uart5_pins_a>;
+	pinctrl-1 = <&uart5_pins_b>;
+};
+
+
+
+/* --- TWI --- */
+&twi2 {
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&twi2_pins_a>;
+	pinctrl-1 = <&twi2_pins_b>;
+
+#if 1
+	status = "disabled";
+};
+
+&i2c_gpio {
+#endif
+
+	status = "okay";
+
+	clock-frequency = <100000>; // RTL8370MB-CG not rated for 400KHz
+
+	eeprom@50 {
+		status = "okay";
+		compatible = "atmel,24c02";
+		reg = <0x50>;
+
+		pagesize = <16>;
+	};
+
+	switch@5c {
+		status = "okay";
+		compatible = "realtek,rtl83xx-i2c"; // This is made up.
+		reg = <0x5C>;
+
+		realtek,i2c-mode = "realtek";
+	};
+};
+
+
+
+/* --- Ethernet --- */
+&gmac0 {
+	status = "okay";
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&gmac0_pins_a>;
+	pinctrl-1 = <&gmac0_pins_b>;
+
+	phy-mode = "rmii";
+	use_ephy25m = <0>;
+	tx-delay = <3>;
+	rx-delay = <0>;
+	phy-rst = <&pio PE 10 GPIO_ACTIVE_HIGH>;
+};
+
+
+
+/* --- SPI --- */
+&spi0 {
+	status = "okay";
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&spi0_pins_a &spi0_pins_b>;
+	pinctrl-1 = <&spi0_pins_c>;
+
+	clock-frequency = <100000000>;
+	spi_slave_mode = <0>;
+	spi0_cs_number = <1>;
+	spi0_cs_bitmap = <1>;
+
+	spi-nand@0 {
+		compatible = "spi-nand";
+		reg = <0x0>;
+
+		spi-max-frequency=<80000000>;
+		spi-rx-bus-width=<0x04>;
+		spi-tx-bus-width=<0x04>;
+
+		// TODO: It would be nice to parse boot0's configuration header
+		// to deduce these at boot
+		// NOTE: Only respected when the Linux `spi-nand` driver
+		// (MTD_SPI_NAND w/ MTD_OF_PARTS) is used.
+		// The Allwinner `spi-nand` driver (AW_MTD_SPINAND) ignores
+		// this, but generates the same partitioning internally.
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+				label = "boot0";
+				reg = <0x00000000 0x00100000>;
+				read-only;
+			};
+
+			partition@100000 {
+				label = "uboot";
+				reg = <0x00100000 0x00300000>;
+				read-only;
+			};
+
+			partition@400000 {
+				label = "secure_storage";
+				reg = <0x00400000 0x00100000>;
+				read-only;
+			};
+
+			partition@500000 {
+				label = "sys";
+				reg = <0x00500000 0x07b00000>;
+			};
+		};
+	};
+};
+
+
+
+&soc {
+	platform@45000004 {
+		reg = <0x0 0x45000004 0x0 0x0>;
+		eraseflag   = <1>;
+		next_work   = <3>;
+		debug_mode  = <8>;
+	};
+
+	target@45000008 {
+		reg = <0x0 0x45000008 0x0 0x0>;
+		boot_clock = <1008>;	/*CPU boot frequency, Unit: MHz*/
+		storage_type = <0xffffffff>; /*boot medium, 0-nand, 1-card0, 2-card2, -1(defualt)auto scan*/
+		burn_key = <0>;		/*1:support burn key; 0:not support burn key*/
+		dragonboard_test = <0>;	/*1:support card boot dragonboard; 0:not support card boot dragonboard*/
+	};
+
+	card0_boot_para@2 {
+		/*
+		 * Avoid dtc compiling warnings.
+		 * @TODO: Developer should modify this to the actual value
+		 */
+		reg = <0x0 0x2 0x0 0x0>;
+		device_type = "card0_boot_para";
+		card_ctrl = <0x0>;
+		card_high_speed = <0x1>;
+		card_line = <0x4>;
+		pinctrl-0 = <&sdc0_pins_a>;
+	};
+
+	card2_boot_para@3 {
+		/*
+		 * Avoid dtc compiling warnings.
+		 * @TODO: Developer should modify this to the actual value
+		 */
+		reg = <0x0 0x3 0x0 0x0>;
+		device_type = "card2_boot_para";
+		card_ctrl = <0x2>;
+		card_high_speed = <0x1>;
+		card_line = <0x4>;
+		pinctrl-0 = <&sdc2_pins_a>;
+		/*pinctrl-0 = <&sdc0_pins_a>;*/
+		/*sdc_ex_dly_used = <0x2>;*/
+		sdc_io_1v8 = <0x1>;
+		/*sdc_type = "tm4";*/
+		sdc_tm4_hs200_max_freq = <150>;
+		sdc_tm4_hs400_max_freq = <100>;
+		sdc_ex_dly_used = <2>;
+		/*sdc_tm4_win_th = <8>;*/
+		/*sdc_dis_host_caps = <0x180>;*/
+	};
+};
+
+
+
+/* --- USB --- */
+
+/*
+ *usb_port_type: usb mode. 0-device, 1-host, 2-otg.
+ *usb_detect_type: usb hotplug detect mode. 0-none, 1-vbus/id detect, 2-id/dpdm detect.
+ *usb_detect_mode: 0-thread scan, 1-id gpio interrupt.
+ *usb_id_gpio: gpio for id detect.
+ *usb_det_vbus_gpio: gpio for id detect. gpio or "axp_ctrl";
+ *usb_wakeup_suspend：0-SUPER_STANDBY, 1-USB_STANDBY.
+ */
+&usbc0 {
+	status = "okay";
+
+	device_type = "usbc0";
+	usb_port_type = <0x2>;
+	usb_detect_type = <0x1>;
+	usb_detect_mode = <0>;
+	usb_wakeup_suspend = <0>;
+	usb_serial_unique = <0>;
+	usb_serial_number = "20080411";
+	rndis_wceis = <1>;
+};
+
+&ehci0 {
+	status = "okay";
+
+	drvvbus-supply = <&reg_otg_vbus>;
+};
+
+&ohci0 {
+	status = "okay";
+
+	drvvbus-supply = <&reg_otg_vbus>;
+};
+
+&usbc1 {
+	status = "okay";
+
+	device_type = "usbc1";
+	usb_port_type = <0x1>;
+	sb_detect_type = <0x1>;
+	usb_regulator_io = "nocare";
+	usb_wakeup_suspend = <0>;
+};
+
+&ehci1 {
+	status = "okay";
+};
+
+&ohci1 {
+	status = "okay";
+};
+
+
+
+/* --- Disable unused peripherals --- */
+&sdc1 {
+	status = "disabled";
+	pinctrl-0;
+	pinctrl-1;
+};
+&sdc2 {
+	status = "disabled";
+	pinctrl-0;
+	pinctrl-1;
+};
+#define DISABLE_DEV(dev) \
+&dev { \
+	status = "disabled"; \
+}
+DISABLE_DEV(rtp);
+DISABLE_DEV(ve);
+DISABLE_DEV(pwm);
+DISABLE_DEV(pwm0);
+DISABLE_DEV(pwm1);
+DISABLE_DEV(pwm2);
+DISABLE_DEV(pwm3);
+DISABLE_DEV(pwm4);
+DISABLE_DEV(pwm5);
+DISABLE_DEV(pwm6);
+DISABLE_DEV(pwm7);
+DISABLE_DEV(lcd_fb0);
+DISABLE_DEV(keyboard0);
+DISABLE_DEV(gpadc);
+DISABLE_DEV(vind0);
+DISABLE_DEV(di);
+DISABLE_DEV(g2d);
+DISABLE_DEV(disp);
+DISABLE_DEV(lcd0);
+DISABLE_DEV(tv0);
+DISABLE_DEV(hdmi);
+DISABLE_DEV(codec);
+DISABLE_DEV(dummy_cpudai);
+DISABLE_DEV(sndcodec);
+DISABLE_DEV(dmic_codec);
+DISABLE_DEV(tvd);
+DISABLE_DEV(tvd0);
