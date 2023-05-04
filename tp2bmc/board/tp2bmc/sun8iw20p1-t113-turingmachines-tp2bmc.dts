@@ -74,6 +74,120 @@
 
 	};
 
+	// Voltage regulators (there are 7 main ones):
+	// - ATX PSU:
+	//   - Node 1 VRM
+	//   - Node 2 VRM
+	//   - Node 3 VRM
+	//   - Node 4 VRM
+
+	// USB power supplies for:
+	//   - External USB 5v supply
+	//   - On-board micro-B OTG port
+	reg_atx: atx-vbus {
+		compatible = "regulator-fixed";
+
+		regulator-name = "atx-vbus";
+		regulator-min-microvolt = <12000000>;
+		regulator-max-microvolt = <12000000>;
+		startup-delay-us = <250000>;
+
+		gpio = <&pio PD 3 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+	};
+
+	reg_vrm1: vrm1-vbus {
+		compatible = "regulator-fixed";
+
+		regulator-name = "vrm1-vbus";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		startup-delay-us = <100000>;
+
+		enable-active-high;
+		gpio = <&pio PD 7 GPIO_ACTIVE_HIGH>;
+
+		vin-supply = <&reg_atx>;
+	};
+
+	node1-power {
+		compatible = "regulator-output";
+		vout-supply = <&reg_vrm1>;
+	};
+
+	reg_vrm2: vrm2-vbus {
+		compatible = "regulator-fixed";
+
+		regulator-name = "vrm2-vbus";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		startup-delay-us = <100000>;
+
+		enable-active-high;
+		gpio = <&pio PD 6 GPIO_ACTIVE_HIGH>;
+
+		vin-supply = <&reg_atx>;
+	};
+
+	node2-power {
+		compatible = "regulator-output";
+		vout-supply = <&reg_vrm2>;
+	};
+
+	reg_vrm3: vrm3-vbus {
+		compatible = "regulator-fixed";
+
+		regulator-name = "vrm3-vbus";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		startup-delay-us = <100000>;
+
+		enable-active-high;
+		gpio = <&pio PD 5 GPIO_ACTIVE_HIGH>;
+
+		vin-supply = <&reg_atx>;
+	};
+
+	node3-power {
+		compatible = "regulator-output";
+		vout-supply = <&reg_vrm3>;
+	};
+
+	reg_vrm4: vrm4-vbus {
+		compatible = "regulator-fixed";
+
+		regulator-name = "vrm4-vbus";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		startup-delay-us = <100000>;
+
+		enable-active-high;
+		gpio = <&pio PD 4 GPIO_ACTIVE_HIGH>;
+
+		vin-supply = <&reg_atx>;
+	};
+
+	node4-power {
+		compatible = "regulator-output";
+		vout-supply = <&reg_vrm4>;
+	};
+
+	reg_usb_port_vbus: usb-port-vbus {
+		compatible = "regulator-fixed";
+
+		regulator-name = "usb-port-vbus";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		startup-delay-us = <50000>;
+
+		gpio = <&pio PG 4 GPIO_ACTIVE_LOW>;
+	};
+
+	usb-port-power {
+		compatible = "regulator-output";
+		vout-supply = <&reg_usb_port_vbus>;
+	};
+
 	reg_otg_vbus: otg-vbus {
 		compatible = "regulator-fixed";
 
