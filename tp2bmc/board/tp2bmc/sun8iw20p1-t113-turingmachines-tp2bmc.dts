@@ -74,6 +74,40 @@
 
 	};
 
+	// Node-management GPIOs (x4)
+	//
+	// This node is intended to be bound to the Linux GPIO Aggregator
+	// driver
+	nodes {
+		compatible = "turingmachines,tp2-nodes";
+
+		gpios = <&pio PD 11 GPIO_ACTIVE_LOW>, /* node 1 */
+			<&pio PD  0 GPIO_ACTIVE_LOW>,
+			<&pio PD 19 GPIO_ACTIVE_LOW>,
+			<&pio PD 15 GPIO_ACTIVE_LOW>,
+			<&pio PD 10 GPIO_ACTIVE_LOW>, /* node 2 */
+			<&pio PD 20 GPIO_ACTIVE_LOW>,
+			<&pio PD 18 GPIO_ACTIVE_LOW>,
+			<&pio PD 14 GPIO_ACTIVE_LOW>,
+			<&pio PD  9 GPIO_ACTIVE_LOW>, /* node 3 */
+			<&pio PD 21 GPIO_ACTIVE_LOW>,
+			<&pio PD 17 GPIO_ACTIVE_LOW>,
+			<&pio PD 12 GPIO_ACTIVE_LOW>,
+			<&pio PD  8 GPIO_ACTIVE_LOW>, /* node 4 */
+			<&pio PD 22 GPIO_ACTIVE_LOW>,
+			<&pio PD 16 GPIO_ACTIVE_LOW>,
+			<&pio PD 13 GPIO_ACTIVE_LOW>;
+
+		gpio-line-names = "node1-en", "node1-rst",
+				  "node1-usb-vbus", "node1-rpiboot",
+				  "node2-en", "node2-rst",
+				  "node2-usb-vbus", "node2-rpiboot",
+				  "node3-en", "node3-rst",
+				  "node3-usb-vbus", "node3-rpiboot",
+				  "node4-en", "node4-rst",
+				  "node4-usb-vbus", "node4-rpiboot";
+	};
+
 	// Voltage regulators (there are 7 main ones):
 	// - ATX PSU:
 	//   - Node 1 VRM
