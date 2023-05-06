@@ -19,8 +19,6 @@
 
 #include "comm_device_serial.h"
 
-#include <tpi_common.h>
-
 #define RTL_RESET GPIO_PIN_PG(13)
 #define SYS_LED GPIO_PIN_PG(8)
 #define RESET_LED GPIO_PIN_PG(9)

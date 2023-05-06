@@ -6,7 +6,7 @@ BMC_VERSION:= 1.0.0
 BMC_SITE:= $(TOPDIR)/../app/bmc
 BMC_SITE_METHOD:=local
 BMC_INSTALL_TARGET:=YES
-BMC_DEPENDENCIES = cjson tpi_common raspberrypi-usbboot
+BMC_DEPENDENCIES = cjson tpi_rs 
  
 define BMC_BUILD_CMDS
  $(MAKE) CC="$(TARGET_CC)" LD="$(TARGET_LD)" -C $(@D) all

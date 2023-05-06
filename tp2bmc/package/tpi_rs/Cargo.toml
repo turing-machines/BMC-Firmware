@@ -1,0 +1,29 @@
+[package]
+name = "tpi_rs"
+version = "0.0.0"
+edition = "2021"
+license = "Apache-2.0"
+
+[lib]
+crate-type = ["lib", "staticlib"]
+
+[dependencies]
+once_cell = "*"
+tokio = { version = "*", features = [
+    "rt-multi-thread",
+    "rt",
+    "time",
+    "macros"
+] }
+gpiod = "*"
+evdev = { version = "*", features = [
+    "tokio"
+] }
+futures = "*"
+anyhow = "*"
+async-trait = "*"
+sqlx = { version = "*", features = [
+    "runtime-tokio-rustls",
+    "sqlite"
+] }
+log = "*"
