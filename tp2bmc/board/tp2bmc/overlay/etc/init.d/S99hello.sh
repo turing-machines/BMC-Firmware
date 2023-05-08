@@ -5,11 +5,17 @@ echo "|_   _| | | |  _ \|_ _| \ | |/ ___|"
 echo "  | | | | | | |_) || ||  \| | |  _ "
 echo "  | | | |_| |  _ < | || |\  | |_| |"
 echo "  |_|  \___/|_| \_\___|_| \_|\____|"
-mount /dev/mmcblk0p1 /mnt/sdcard/
+
+if [ -f /dev/mmcblk0p1 ]; then
+    mount /dev/mmcblk0p1 /mnt/sdcard/
+elif [ -f /dev/mmcblk0 ]; then
+    mount /dev/mmcblk0 /mnt/sdcard/
+fi
+
 echo 3 4 1 7 > /proc/sys/kernel/printk
 
-sleep 1 # wait 
-/etc/setStaticNet.sh 
+sleep 1
+/etc/setStaticNet.sh
 
 bmc &
 
