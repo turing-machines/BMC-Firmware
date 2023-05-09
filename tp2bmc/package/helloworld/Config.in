@@ -1,4 +1,0 @@
-config BR2_PACKAGE_HELLOWORLD
-    bool "helloworld"
-    help
-        This is a demo for local app 
