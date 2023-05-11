@@ -175,6 +175,12 @@ config BR2_PACKAGE_LINUX_FIRMWARE_CYPRESS_CYW54XXX
 	help
 	  Firmware files for the Cypress cyw54xxx FullMAC.
 
+config BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_22000
+	bool "Intel iwlwifi 22000"
+	help
+	  Firmware files for the Intel Wifi 22000 devices supported by
+	  the iwlwifi kernel driver.
+
 config BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_22260
 	bool "Intel iwlwifi 22260"
 	help
@@ -192,6 +198,18 @@ config BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_3168
 	help
 	  Firmware files for the Intel Wifi 3168 devices supported by
 	  the iwlwifi kernel driver.
+
+config BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_3945
+	bool "Intel iwlwifi 3945"
+	help
+	  Firmware files for the Intel Wifi 3945 devices supported by
+	  the iwl3945 kernel driver.
+
+config BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_4965
+	bool "Intel iwlwifi 4965"
+	help
+	  Firmware files for the Intel Wifi 4965 devices supported by
+	  the iwl4965 kernel driver.
 
 config BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_5000
 	bool "Intel iwlwifi 5000"
@@ -249,6 +267,12 @@ config BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_9XXX
 	help
 	  Firmware files for the Intel Wifi 9xxx devices supported by
 	  the iwlwifi kernel driver.
+
+config BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_6E
+	bool "Intel iwlwifi 6/6E"
+	help
+	  Firmware files for the Intel Wi-Fi 6 and Wi-Fi 6E devices
+	  supported by the iwlwifi kernel driver.
 
 config BR2_PACKAGE_LINUX_FIRMWARE_LIBERTAS_SD8686_V8
 	bool "Libertas SD 8686 v8"

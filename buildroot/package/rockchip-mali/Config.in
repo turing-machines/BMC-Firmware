@@ -1,5 +1,6 @@
 config BR2_PACKAGE_ROCKCHIP_MALI
 	bool "rockchip-mali"
+	depends on BR2_INSTALL_LIBSTDCPP
 	depends on BR2_TOOLCHAIN_USES_GLIBC
 	depends on BR2_ARM_EABIHF || BR2_aarch64
 	# lidbrm. This would normally need a Config.in comment, but
@@ -14,7 +15,7 @@ config BR2_PACKAGE_ROCKCHIP_MALI
 	select BR2_PACKAGE_MALI_DRIVER if BR2_LINUX_KERNEL
 	help
 	  Install the binary user-space libraries for the ARM Mali GPU
-	  suitable for Rockchip platforrms. This package requires a
+	  suitable for Rockchip platforms. This package requires a
 	  kernel with the ARM Mali GPU kernel driver enabled, as found
 	  in the 'mali-driver' package.
 
@@ -30,3 +31,8 @@ config BR2_PACKAGE_PROVIDES_LIBGBM
 	default "rockchip-mali"
 
 endif
+
+comment "rockchip-mali needs a glibc toolchain w/ C++, threads"
+	depends on BR2_ARM_EABIHF || BR2_aarch64
+	depends on !BR2_INSTALL_LIBSTDCPP || \
+		!BR2_TOOLCHAIN_USES_GLIBC || !BR2_TOOLCHAIN_HAS_THREADS

@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-PCIUTILS_VERSION = 3.7.0
+PCIUTILS_VERSION = 3.8.0
 PCIUTILS_SITE = $(BR2_KERNEL_MIRROR)/software/utils/pciutils
 PCIUTILS_SOURCE = pciutils-$(PCIUTILS_VERSION).tar.xz
 PCIUTILS_INSTALL_STAGING = YES
@@ -13,7 +13,7 @@ PCIUTILS_LICENSE_FILES = COPYING
 PCIUTILS_MAKE_OPTS = \
 	CROSS_COMPILE="$(TARGET_CROSS)" \
 	HOST="$(NORMALIZED_ARCH)-linux" \
-	OPT="$(TARGET_CFLAGS)" \
+	OPT="$(TARGET_CFLAGS) -std=gnu99" \
 	LDFLAGS="$(TARGET_LDFLAGS)" \
 	DNS=no \
 	STRIP=

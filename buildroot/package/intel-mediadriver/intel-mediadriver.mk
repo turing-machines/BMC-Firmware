@@ -6,8 +6,8 @@
 
 # based on https://software.intel.com/en-us/articles/build-and-debug-open-source-media-stack
 
-INTEL_MEDIADRIVER_VERSION = 22.1.1
-INTEL_MEDIADRIVER_SITE = http://github.com/intel/media-driver/archive
+INTEL_MEDIADRIVER_VERSION = 23.1.0
+INTEL_MEDIADRIVER_SITE = https://github.com/intel/media-driver/archive
 INTEL_MEDIADRIVER_SOURCE= intel-media-$(INTEL_MEDIADRIVER_VERSION).tar.gz
 INTEL_MEDIADRIVER_LICENSE = MIT, BSD-3-Clause
 INTEL_MEDIADRIVER_LICENSE_FILES = LICENSE.md
@@ -17,6 +17,10 @@ INTEL_MEDIADRIVER_DEPENDENCIES = \
 	libpciaccess \
 	libva \
 	mesa3d
+
+ifeq ($(BR2_PACKAGE_LIBEXECINFO),y)
+INTEL_MEDIADRIVER_DEPENDENCIES += libexecinfo
+endif
 
 ifeq ($(BR2_PACKAGE_XLIB_LIBX11),y)
 INTEL_MEDIADRIVER_DEPENDENCIES += xlib_libX11

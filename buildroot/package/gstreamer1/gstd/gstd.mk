@@ -4,10 +4,10 @@
 #
 ################################################################################
 
-GSTD_VERSION = 0.13.0
+GSTD_VERSION = 0.15.0
 GSTD_SITE = $(call github,RidgeRun,gstd-1.x,v$(GSTD_VERSION))
 GSTD_LICENSE_FILES = COPYING
-GSTD_LICENSE = GPL-2.0+
+GSTD_LICENSE = LGPL-2.1+
 
 GSTD_DEPENDENCIES = \
 	$(BR2_COREUTILS_HOST_DEPENDENCY) \
@@ -15,6 +15,7 @@ GSTD_DEPENDENCIES = \
 	jansson \
 	json-glib \
 	libdaemon \
+	libedit \
 	libglib2 \
 	libsoup \
 	readline
@@ -27,6 +28,8 @@ GSTD_CONF_OPTS = \
 	-Dwith-gstd-runstatedir=/var/run/gstd \
 	-Dwith-gstd-logstatedir=/var/log/gstd \
 	-Dwith-gstd-systemddir=/usr/lib/systemd/system
+
+GSTD_CFLAGS = $(TARGET_CFLAGS) -std=gnu99
 
 ifeq ($(BR2_PACKAGE_SYSTEMD),y)
 GSTD_CONF_OPTS += -Denable-systemd=enabled -Denable-initd=disabled

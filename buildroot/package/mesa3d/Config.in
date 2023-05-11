@@ -24,19 +24,21 @@ config BR2_PACKAGE_MESA3D_NEEDS_ELFUTILS
 config BR2_PACKAGE_MESA3D_LLVM
 	bool "llvm support"
 	depends on BR2_PACKAGE_LLVM_ARCH_SUPPORTS
-	depends on BR2_TOOLCHAIN_GCC_AT_LEAST_4_8
+	depends on BR2_TOOLCHAIN_GCC_AT_LEAST_5
 	depends on BR2_TOOLCHAIN_HAS_THREADS
 	depends on BR2_INSTALL_LIBSTDCPP
 	depends on !BR2_TOOLCHAIN_HAS_GCC_BUG_64735 # std::shared_future
 	depends on !BR2_STATIC_LIBS
 	depends on BR2_USE_WCHAR # std::wstring
+	depends on BR2_HOST_GCC_AT_LEAST_5 # host-llvm
 	select BR2_PACKAGE_LLVM
 
-comment "llvm support needs a toolchain w/ wchar, threads, C++, gcc >= 4.8, dynamic library"
+comment "llvm support needs a toolchain w/ wchar, threads, C++, gcc >= 5, dynamic library, host gcc >= 5"
 	depends on BR2_PACKAGE_LLVM_ARCH_SUPPORTS
 	depends on !BR2_TOOLCHAIN_HAS_THREADS || !BR2_INSTALL_LIBSTDCPP || \
-		!BR2_TOOLCHAIN_GCC_AT_LEAST_4_8 \
-		|| BR2_STATIC_LIBS || !BR2_USE_WCHAR
+		!BR2_TOOLCHAIN_GCC_AT_LEAST_5 \
+		|| BR2_STATIC_LIBS || !BR2_USE_WCHAR \
+		|| !BR2_HOST_GCC_AT_LEAST_5
 
 comment "llvm support needs a toolchain not affected by GCC bug 64735"
 	depends on BR2_PACKAGE_LLVM_ARCH_SUPPORTS
@@ -62,16 +64,6 @@ config BR2_PACKAGE_MESA3D_DRI3
 config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER
 	bool
 	select BR2_PACKAGE_MESA3D_DRIVER
-
-config BR2_PACKAGE_MESA3D_DRI_DRIVER
-	bool
-	select BR2_PACKAGE_MESA3D_DRI3 if \
-		(BR2_PACKAGE_XORG7 && BR2_TOOLCHAIN_HAS_SYNC_4 && \
-			!BR2_RISCV_32)
-	select BR2_PACKAGE_MESA3D_DRIVER
-	select BR2_PACKAGE_MESA3D_GBM if \
-		!BR2_PACKAGE_MESA3D_OPENGL_GLX && \
-		!BR2_PACKAGE_MESA3D_OPENGL_EGL
 
 config BR2_PACKAGE_MESA3D_VULKAN_DRIVER
 	bool
@@ -134,15 +126,10 @@ config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_FREEDRENO
 config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_I915
 	bool "Gallium i915 driver"
 	depends on BR2_i386 || BR2_x86_64
-	depends on !BR2_PACKAGE_MESA3D_DRI_DRIVER_I915
 	select BR2_PACKAGE_MESA3D_GALLIUM_DRIVER
 	select BR2_PACKAGE_LIBDRM_INTEL
 	help
 	  Support for i915-based Intel GPUs.
-
-comment "Gallium i915: Only one i915 provider can be built"
-	depends on BR2_i386 || BR2_x86_64
-	depends on BR2_PACKAGE_MESA3D_DRI_DRIVER_I915
 
 config BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_IRIS
 	bool "Gallium iris driver"
@@ -312,67 +299,6 @@ comment "Gallium VDPAU state tracker needs X.org and gallium drivers r300, r600,
 		|| BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_R600 \
 		|| BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_RADEONSI)
 
-config BR2_PACKAGE_MESA3D_XVMC
-	bool "Gallium XvMC state tracker"
-	depends on BR2_i386 || BR2_x86_64
-	depends on BR2_PACKAGE_XORG7
-	depends on BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_NOUVEAU \
-		|| BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_R600
-	select BR2_PACKAGE_MESA3D_NEEDS_X11
-	select BR2_PACKAGE_XLIB_LIBXV
-	select BR2_PACKAGE_XLIB_LIBXVMC
-	help
-	  XvMC state tracker (needs r600 or nouveau gallium drivers).
-
-comment "Gallium XvMC state tracker needs X.org and gallium drivers r600 or nouveau"
-	depends on BR2_i386 || BR2_x86_64
-	depends on !BR2_PACKAGE_XORG7 || \
-		!(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_NOUVEAU \
-		|| BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_R600)
-
-comment "DRI drivers"
-
-config BR2_PACKAGE_MESA3D_DRI_DRIVER_I915
-	bool "DRI i915 driver"
-	depends on BR2_i386 || BR2_x86_64
-	select BR2_PACKAGE_MESA3D_DRI_DRIVER
-	select BR2_PACKAGE_LIBDRM_INTEL
-	help
-	  Support for i915-based Intel GPUs.
-
-config BR2_PACKAGE_MESA3D_DRI_DRIVER_I965
-	bool "DRI i965 driver"
-	depends on BR2_i386 || BR2_x86_64
-	depends on BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_17 # memfd.h
-	select BR2_PACKAGE_MESA3D_DRI_DRIVER
-	select BR2_PACKAGE_LIBDRM_INTEL
-	help
-	  Support for i965-based Intel GPUs.
-
-comment "DRI i965 driver needs a toolchain w/ headers >= 3.17"
-	depends on BR2_i386 || BR2_x86_64
-	depends on !BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_17
-
-config BR2_PACKAGE_MESA3D_DRI_DRIVER_NOUVEAU
-	bool "DRI nouveau driver"
-	select BR2_PACKAGE_MESA3D_DRI_DRIVER
-	select BR2_PACKAGE_LIBDRM_NOUVEAU
-	help
-	  Support for Nvidia-based GPUs.
-
-config BR2_PACKAGE_MESA3D_DRI_DRIVER_RADEON
-	bool "DRI radeon r100 driver"
-	depends on BR2_i386 || BR2_x86_64
-	# libdrm's radeon option depends on LIBDRM_HAS_ATOMIC. Propagating
-	# that dependency here causes a circular dependency that Kconfig
-	# can't see is just spurious. However, that dependency is about
-	# the toolchain having sync4 primitives, which is always a given
-	# for i386 and x86_64.
-	select BR2_PACKAGE_MESA3D_DRI_DRIVER
-	select BR2_PACKAGE_LIBDRM_RADEON
-	help
-	  Legacy Radeon driver for R100 series GPUs.
-
 comment "Vulkan drivers"
 
 config BR2_PACKAGE_MESA3D_VULKAN_DRIVER_INTEL
@@ -406,17 +332,16 @@ comment "OpenGL API Support"
 
 config BR2_PACKAGE_MESA3D_GBM
 	bool "gbm"
-	depends on BR2_PACKAGE_MESA3D_DRI_DRIVER \
-		|| (BR2_PACKAGE_MESA3D_GALLIUM_DRIVER && BR2_PACKAGE_MESA3D_OPENGL_EGL)
+	depends on BR2_PACKAGE_MESA3D_GALLIUM_DRIVER && \
+		BR2_PACKAGE_MESA3D_OPENGL_EGL
 	select BR2_PACKAGE_HAS_LIBGBM
 	select BR2_PACKAGE_LIBGBM_HAS_FEATURE_FORMAT_MODIFIER_PLANE_COUNT
 	select BR2_PACKAGE_LIBGBM_HAS_FEATURE_DMA_BUF
 	help
 	  Enable Generic Buffer Management (gbm)
 
-comment "gbm support needs a dri driver or a gallium driver w/ EGL support."
-	depends on !BR2_PACKAGE_MESA3D_DRI_DRIVER \
-		&& !(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER && BR2_PACKAGE_MESA3D_OPENGL_EGL)
+comment "gbm support needs a gallium driver w/ EGL support."
+	depends on !(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER && BR2_PACKAGE_MESA3D_OPENGL_EGL)
 
 config BR2_PACKAGE_MESA3D_OPENGL_GLX
 	bool "OpenGL GLX"
@@ -432,7 +357,7 @@ comment "OpenGL GLX support needs X11"
 
 config BR2_PACKAGE_MESA3D_OPENGL_EGL
 	bool "OpenGL EGL"
-	depends on BR2_PACKAGE_MESA3D_DRI_DRIVER || BR2_PACKAGE_MESA3D_GALLIUM_DRIVER
+	depends on BR2_PACKAGE_MESA3D_GALLIUM_DRIVER
 	select BR2_PACKAGE_HAS_LIBEGL if !BR2_PACKAGE_LIBGLVND
 	select BR2_PACKAGE_LIBGLVND_DISPATCH_EGL if BR2_PACKAGE_LIBGLVND
 	select BR2_PACKAGE_HAS_LIBEGL_WAYLAND
