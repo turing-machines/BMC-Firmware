@@ -5,9 +5,9 @@
 ################################################################################
 
 GDK_PIXBUF_VERSION_MAJOR = 2.42
-GDK_PIXBUF_VERSION = $(GDK_PIXBUF_VERSION_MAJOR).4
+GDK_PIXBUF_VERSION = $(GDK_PIXBUF_VERSION_MAJOR).10
 GDK_PIXBUF_SOURCE = gdk-pixbuf-$(GDK_PIXBUF_VERSION).tar.xz
-GDK_PIXBUF_SITE = http://ftp.gnome.org/pub/gnome/sources/gdk-pixbuf/$(GDK_PIXBUF_VERSION_MAJOR)
+GDK_PIXBUF_SITE = https://download.gnome.org/sources/gdk-pixbuf/$(GDK_PIXBUF_VERSION_MAJOR)
 GDK_PIXBUF_LICENSE = LGPL-2.1+
 GDK_PIXBUF_LICENSE_FILES = COPYING
 GDK_PIXBUF_CPE_ID_VENDOR = gnome
@@ -19,11 +19,13 @@ HOST_GDK_PIXBUF_DEPENDENCIES = host-libpng host-pkgconf host-libglib2
 
 GDK_PIXBUF_CONF_OPTS = \
 	-Dgio_sniffing=false \
+	-Dtests=false \
 	-Dinstalled_tests=false \
 	-Dman=false
 
 HOST_GDK_PIXBUF_CONF_OPTS = \
 	-Dgio_sniffing=false \
+	-Dtests=false \
 	-Dinstalled_tests=false \
 	-Dintrospection=disabled \
 	-Drelocatable=true \
@@ -41,30 +43,30 @@ GDK_PIXBUF_CONF_OPTS += -Dintrospection=disabled
 endif
 
 ifeq ($(BR2_PACKAGE_LIBPNG),y)
-GDK_PIXBUF_CONF_OPTS += -Dpng=true
+GDK_PIXBUF_CONF_OPTS += -Dpng=enabled
 GDK_PIXBUF_DEPENDENCIES += libpng
 else
-GDK_PIXBUF_CONF_OPTS += -Dpng=false
+GDK_PIXBUF_CONF_OPTS += -Dpng=disabled
 endif
 
 ifeq ($(BR2_PACKAGE_JPEG),y)
-GDK_PIXBUF_CONF_OPTS += -Djpeg=true
-HOST_GDK_PIXBUF_CONF_OPTS += -Djpeg=true
+GDK_PIXBUF_CONF_OPTS += -Djpeg=enabled
+HOST_GDK_PIXBUF_CONF_OPTS += -Djpeg=enabled
 GDK_PIXBUF_DEPENDENCIES += jpeg
 HOST_GDK_PIXBUF_DEPENDENCIES += host-libjpeg
 else
-GDK_PIXBUF_CONF_OPTS += -Djpeg=false
-HOST_GDK_PIXBUF_CONF_OPTS += -Djpeg=false
+GDK_PIXBUF_CONF_OPTS += -Djpeg=disabled
+HOST_GDK_PIXBUF_CONF_OPTS += -Djpeg=disabled
 endif
 
 ifeq ($(BR2_PACKAGE_TIFF),y)
-GDK_PIXBUF_CONF_OPTS += -Dtiff=true
-HOST_GDK_PIXBUF_CONF_OPTS += -Dtiff=true
+GDK_PIXBUF_CONF_OPTS += -Dtiff=enabled
+HOST_GDK_PIXBUF_CONF_OPTS += -Dtiff=enabled
 GDK_PIXBUF_DEPENDENCIES += tiff
 HOST_GDK_PIXBUF_DEPENDENCIES += host-tiff
 else
-GDK_PIXBUF_CONF_OPTS += -Dtiff=false
-HOST_GDK_PIXBUF_CONF_OPTS += -Dtiff=false
+GDK_PIXBUF_CONF_OPTS += -Dtiff=disabled
+HOST_GDK_PIXBUF_CONF_OPTS += -Dtiff=disabled
 endif
 
 # gdk-pixbuf requires the loaders.cache file populated to work properly

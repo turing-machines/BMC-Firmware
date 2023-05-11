@@ -41,7 +41,7 @@ choice
 	  Select the specific U-Boot version you want to use
 
 config BR2_TARGET_UBOOT_LATEST_VERSION
-	bool "2022.01"
+	bool "2022.04"
 
 config BR2_TARGET_UBOOT_CUSTOM_VERSION
 	bool "Custom version"
@@ -85,7 +85,7 @@ endif
 
 config BR2_TARGET_UBOOT_VERSION
 	string
-	default "2022.01"	if BR2_TARGET_UBOOT_LATEST_VERSION
+	default "2022.04"	if BR2_TARGET_UBOOT_LATEST_VERSION
 	default BR2_TARGET_UBOOT_CUSTOM_VERSION_VALUE \
 		if BR2_TARGET_UBOOT_CUSTOM_VERSION
 	default "custom"	if BR2_TARGET_UBOOT_CUSTOM_TARBALL
@@ -182,6 +182,30 @@ config BR2_TARGET_UBOOT_NEEDS_LZOP
 	  the case when the board configuration has CONFIG_SPL_LZO
 	  enabled.
 
+config BR2_TARGET_UBOOT_NEEDS_GNUTLS
+	bool "U-Boot needs gnutls"
+	help
+	  Select this option if your U-Boot board configuration
+	  requires gnutls to be available on the host. This is
+	  typically the case when the board configuration has
+	  CONFIG_TOOLS_MKEFICAPSULE enabled.
+
+config BR2_TARGET_UBOOT_NEEDS_UTIL_LINUX
+	bool "U-Boot needs util-linux"
+	help
+	  Select this option if your U-Boot board configuration
+	  requires util-linux (-luuid) to be available on the host.
+	  This is typically the case when the board configuration
+	  has CONFIG_TOOLS_MKEFICAPSULE enabled.
+
+config BR2_TARGET_UBOOT_NEEDS_XXD
+	bool "U-Boot needs xxd"
+	help
+	  Select this option if your U-Boot board configuration
+	  requires xxd to be available on the host. This is
+	  typically the case when the board configuration has
+	  CONFIG_USE_DEFAULT_ENV_FILE enabled.
+
 config BR2_TARGET_UBOOT_NEEDS_ATF_BL31
 	bool "U-Boot needs ATF BL31"
 	depends on BR2_TARGET_ARM_TRUSTED_FIRMWARE
@@ -261,7 +285,19 @@ config BR2_TARGET_UBOOT_FORMAT_NAND_BIN
 	bool "u-boot-nand.bin"
 
 config BR2_TARGET_UBOOT_FORMAT_ELF
+	bool "u-boot"
+	help
+	  Install the u-boot image, which is directly the ELF binary
+	  for the main U-Boot, potentially with debugging symbols.
+
+config BR2_TARGET_UBOOT_FORMAT_REMAKE_ELF
 	bool "u-boot.elf"
+	help
+	  Install the u-boot.elf image, which is produced when
+	  CONFIG_REMAKE_ELF=y. It is an ELF image (u-boot.elf)
+	  produced from the raw U-Boot binary (u-boot.bin), which may
+	  already have been statically relocated and may already have
+	  a device-tree appended to it.
 
 config BR2_TARGET_UBOOT_FORMAT_IMG
 	bool "u-boot.img"
@@ -414,7 +450,6 @@ endif
 
 config BR2_TARGET_UBOOT_SPL
 	bool "Install U-Boot SPL binary image"
-	depends on !BR2_TARGET_XLOADER
 	help
 	  Install the U-Boot SPL binary image to the images
 	  directory.

@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-TVHEADEND_VERSION = 1295dd2be863f5beb764290fce9317b24193dfc0
+TVHEADEND_VERSION = c9a156a25a07f1f84c2f48a1b03b481430c8257d
 TVHEADEND_SITE = $(call github,tvheadend,tvheadend,$(TVHEADEND_VERSION))
 TVHEADEND_LICENSE = GPL-3.0+
 TVHEADEND_LICENSE_FILES = LICENSE.md
@@ -47,6 +47,12 @@ TVHEADEND_DEPENDENCIES += rpi-userland
 else
 TVHEADEND_CONF_OPTS += --disable-omx
 endif
+ifeq ($(BR2_PACKAGE_LIBVPX)$(BR2_INSTALL_LIBSTDCPP),yy)
+TVHEADEND_CONF_OPTS += --enable-libvpx
+TVHEADEND_DEPENDENCIES += libvpx
+else
+TVHEADEND_CONF_OPTS += --disable-libvpx
+endif
 ifeq ($(BR2_PACKAGE_X265),y)
 TVHEADEND_CONF_OPTS += --enable-libx265
 TVHEADEND_DEPENDENCIES += x265
@@ -59,6 +65,7 @@ TVHEADEND_CONF_OPTS += \
 	--disable-libopus \
 	--disable-omx \
 	--disable-vaapi \
+	--disable-libvpx \
 	--disable-libx264 \
 	--disable-libx265
 endif

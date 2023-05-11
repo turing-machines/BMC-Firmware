@@ -11,7 +11,7 @@ ifeq ($(BINUTILS_VERSION),)
 ifeq ($(BR2_arc),y)
 BINUTILS_VERSION = arc-2020.09-release
 else
-BINUTILS_VERSION = 2.36.1
+BINUTILS_VERSION = 2.38
 endif
 endif # BINUTILS_VERSION
 
@@ -52,6 +52,7 @@ BINUTILS_CONF_OPTS = \
 	--enable-install-libiberty \
 	--enable-build-warnings=no \
 	--with-system-zlib \
+	--disable-gprofng \
 	$(BINUTILS_DISABLE_GDB_CONF_OPTS) \
 	$(BINUTILS_EXTRA_CONFIG_OPTIONS)
 
@@ -86,8 +87,17 @@ HOST_BINUTILS_CONF_OPTS = \
 	--with-sysroot=$(STAGING_DIR) \
 	--enable-poison-system-directories \
 	--without-debuginfod \
+	--enable-plugins \
+	--enable-lto \
 	$(BINUTILS_DISABLE_GDB_CONF_OPTS) \
 	$(BINUTILS_EXTRA_CONFIG_OPTIONS)
+
+ifeq ($(BR2_BINUTILS_GPROFNG),y)
+HOST_BINUTILS_DEPENDENCIES += host-bison
+HOST_BINUTILS_CONF_OPTS += --enable-gprofng
+else
+HOST_BINUTILS_CONF_OPTS += --disable-gprofng
+endif
 
 # binutils run configure script of subdirs at make time, so ensure
 # our TARGET_CONFIGURE_ARGS are taken into consideration for those
@@ -118,10 +128,6 @@ BINUTILS_POST_EXTRACT_HOOKS += BINUTILS_XTENSA_OVERLAY_EXTRACT
 BINUTILS_EXTRA_DOWNLOADS += $(ARCH_XTENSA_OVERLAY_URL)
 HOST_BINUTILS_POST_EXTRACT_HOOKS += BINUTILS_XTENSA_OVERLAY_EXTRACT
 HOST_BINUTILS_EXTRA_DOWNLOADS += $(ARCH_XTENSA_OVERLAY_URL)
-endif
-
-ifeq ($(BR2_BINUTILS_ENABLE_LTO),y)
-HOST_BINUTILS_CONF_OPTS += --enable-plugins --enable-lto
 endif
 
 # Hardlinks between binaries in different directories cause a problem

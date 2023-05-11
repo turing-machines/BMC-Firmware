@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-NFTABLES_VERSION = 1.0.1
+NFTABLES_VERSION = 1.0.5
 NFTABLES_SOURCE = nftables-$(NFTABLES_VERSION).tar.bz2
 NFTABLES_SITE = https://www.netfilter.org/projects/nftables/files
 NFTABLES_DEPENDENCIES = libmnl libnftnl host-pkgconf $(TARGET_NLS_DEPENDENCIES)
@@ -20,10 +20,17 @@ else
 NFTABLES_CONF_OPTS += --with-mini-gmp
 endif
 
-ifeq ($(BR2_PACKAGE_READLINE),y)
+ifeq ($(BR2_PACKAGE_LIBEDIT),y)
+NFTABLES_CONF_OPTS += --with-cli=editline
+NFTABLES_DEPENDENCIES += libedit
+NFTABLES_LIBS += -lncurses
+else ifeq ($(BR2_PACKAGE_READLINE),y)
 NFTABLES_CONF_OPTS += --with-cli=readline
 NFTABLES_DEPENDENCIES += readline
 NFTABLES_LIBS += -lncurses
+else ifeq ($(BR2_PACKAGE_LINENOISE),y)
+NFTABLES_CONF_OPTS += --with-cli=linenoise
+NFTABLES_DEPENDENCIES += linenoise
 else
 NFTABLES_CONF_OPTS += --without-cli
 endif
@@ -40,10 +47,6 @@ NFTABLES_CONF_OPTS += --enable-python
 NFTABLES_DEPENDENCIES += python3
 else
 NFTABLES_CONF_OPTS += --disable-python
-endif
-
-ifeq ($(BR2_STATIC_LIBS)$(BR2_PACKAGE_LIBNFTNL_JSON),yy)
-NFTABLES_LIBS += -ljansson -lm
 endif
 
 NFTABLES_CONF_ENV = LIBS="$(NFTABLES_LIBS)"

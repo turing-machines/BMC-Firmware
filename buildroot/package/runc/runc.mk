@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-RUNC_VERSION = 1.1.1
+RUNC_VERSION = 1.1.5
 RUNC_SITE = $(call github,opencontainers,runc,v$(RUNC_VERSION))
 RUNC_LICENSE = Apache-2.0, LGPL-2.1 (libseccomp)
 RUNC_LICENSE_FILES = LICENSE
@@ -23,4 +23,8 @@ RUNC_TAGS += seccomp
 RUNC_DEPENDENCIES += libseccomp host-pkgconf
 endif
 
+HOST_RUNC_LDFLAGS = $(RUNC_LDFLAGS)
+HOST_RUNC_TAGS = cgo static_build
+
 $(eval $(golang-package))
+$(eval $(host-golang-package))

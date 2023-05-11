@@ -5,7 +5,7 @@
 ################################################################################
 
 MPD_VERSION_MAJOR = 0.23
-MPD_VERSION = $(MPD_VERSION_MAJOR).6
+MPD_VERSION = $(MPD_VERSION_MAJOR).12
 MPD_SOURCE = mpd-$(MPD_VERSION).tar.xz
 MPD_SITE = https://www.musicpd.org/download/mpd/$(MPD_VERSION_MAJOR)
 MPD_DEPENDENCIES = host-pkgconf boost fmt
@@ -117,6 +117,13 @@ MPD_DEPENDENCIES += libid3tag
 MPD_CONF_OPTS += -Did3tag=enabled
 else
 MPD_CONF_OPTS += -Did3tag=disabled
+endif
+
+ifeq ($(BR2_PACKAGE_MPD_IO_URING),y)
+MPD_DEPENDENCIES += liburing
+MPD_CONF_OPTS += -Dio_uring=enabled
+else
+MPD_CONF_OPTS += -Dio_uring=disabled
 endif
 
 ifeq ($(BR2_PACKAGE_MPD_JACK2),y)

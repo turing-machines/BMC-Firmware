@@ -4,13 +4,26 @@
 #
 ################################################################################
 
-NODEJS_VERSION = 14.18.3
+NODEJS_VERSION = 16.18.1
 NODEJS_SOURCE = node-v$(NODEJS_VERSION).tar.xz
 NODEJS_SITE = http://nodejs.org/dist/v$(NODEJS_VERSION)
-NODEJS_DEPENDENCIES = host-qemu host-python3 host-nodejs c-ares \
-	libuv zlib nghttp2 \
+NODEJS_DEPENDENCIES = \
+	host-ninja \
+	host-pkgconf \
+	host-python3 \
+	host-qemu \
+	c-ares \
+	libuv \
+	nghttp2 \
+	zlib \
 	$(call qstrip,$(BR2_PACKAGE_NODEJS_MODULES_ADDITIONAL_DEPS))
-HOST_NODEJS_DEPENDENCIES = host-icu host-libopenssl host-python3 host-zlib
+HOST_NODEJS_DEPENDENCIES = \
+	host-icu \
+	host-libopenssl \
+	host-ninja \
+	host-pkgconf \
+	host-python3 \
+	host-zlib
 NODEJS_INSTALL_STAGING = YES
 NODEJS_LICENSE = MIT (core code); MIT, Apache and BSD family licenses (Bundled components)
 NODEJS_LICENSE_FILES = LICENSE
@@ -25,7 +38,8 @@ NODEJS_CONF_OPTS = \
 	--without-dtrace \
 	--without-etw \
 	--cross-compiling \
-	--dest-os=linux
+	--dest-os=linux \
+	--ninja
 
 HOST_NODEJS_MAKE_OPTS = \
 	$(HOST_CONFIGURE_OPTS) \
@@ -70,11 +84,11 @@ NODEJS_CONF_OPTS += --without-npm
 endif
 
 define HOST_NODEJS_CONFIGURE_CMDS
-	(cd $(@D); \
+	cd $(@D); \
 		$(HOST_CONFIGURE_OPTS) \
 		PATH=$(@D)/bin:$(BR_PATH) \
 		PYTHON=$(HOST_DIR)/bin/python3 \
-		$(HOST_DIR)/bin/python3 ./configure \
+		$(HOST_DIR)/bin/python3 configure.py \
 		--prefix=$(HOST_DIR) \
 		--without-dtrace \
 		--without-etw \
@@ -84,15 +98,8 @@ define HOST_NODEJS_CONFIGURE_CMDS
 		--shared-zlib \
 		--no-cross-compiling \
 		--with-intl=system-icu \
-	)
+		--ninja
 endef
-
-NODEJS_HOST_TOOLS_V8 = \
-	torque \
-	gen-regexp-special-case \
-	bytecode_builtins_list_generator
-NODEJS_HOST_TOOLS_NODE = mkcodecache
-NODEJS_HOST_TOOLS = $(NODEJS_HOST_TOOLS_V8) $(NODEJS_HOST_TOOLS_NODE)
 
 HOST_NODEJS_CXXFLAGS = $(HOST_CXXFLAGS)
 
@@ -106,10 +113,6 @@ define HOST_NODEJS_INSTALL_CMDS
 	$(HOST_MAKE_ENV) PYTHON=$(HOST_DIR)/bin/python3 \
 		$(MAKE) -C $(@D) install \
 		$(HOST_NODEJS_MAKE_OPTS)
-
-	$(foreach f,$(NODEJS_HOST_TOOLS), \
-		$(INSTALL) -m755 -D $(@D)/out/Release/$(f) $(HOST_DIR)/bin/$(f)
-	)
 endef
 
 ifeq ($(BR2_i386),y)
@@ -197,7 +200,7 @@ define NODEJS_CONFIGURE_CMDS
 		LDFLAGS="$(NODEJS_LDFLAGS)" \
 		LD="$(TARGET_CXX)" \
 		PYTHON=$(HOST_DIR)/bin/python3 \
-		$(HOST_DIR)/bin/python3 ./configure \
+		$(HOST_DIR)/bin/python3 configure.py \
 		--prefix=/usr \
 		--dest-cpu=$(NODEJS_CPU) \
 		$(if $(NODEJS_ARM_FP),--with-arm-float-abi=$(NODEJS_ARM_FP)) \
@@ -236,6 +239,7 @@ NPM = $(TARGET_CONFIGURE_OPTS) \
 # We can only call NPM if there's something to install.
 #
 ifneq ($(NODEJS_MODULES_LIST),)
+NODEJS_DEPENDENCIES += host-nodejs
 define NODEJS_INSTALL_MODULES
 	# If you're having trouble with module installation, adding -d to the
 	# npm install call below and setting npm_config_rollback=false can both

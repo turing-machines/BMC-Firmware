@@ -1,5 +1,5 @@
 # md5, sha256 from https://pypi.org/pypi/pytest/json
-md5	8bc467ebd5d571778dc51dd87ff09513  pytest-6.2.5.tar.gz
-sha256	131b36680866a76e6781d13f101efb86cf674ebb9762eb70d3082b6f29889e89  pytest-6.2.5.tar.gz
+md5  49decbade40109f9c6970df60c22a230  pytest-7.2.0.tar.gz
+sha256  c4014eb40e10f11f355ad4e3c2fb2c6c6d1919c73f3b5a433de4708202cade59  pytest-7.2.0.tar.gz
 # Locally computer sha256
-sha256	7898b9b164d4f93fd9a562fd0f592935518b48c4745303964110eb7f7fe64faf  LICENSE
+sha256  ca836a5f9ecca3b2f350230faa20a48fb8b145653b5568d784862df864706b9b  LICENSE
