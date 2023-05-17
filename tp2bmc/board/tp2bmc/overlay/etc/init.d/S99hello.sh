@@ -1,16 +1,18 @@
 #! /bin/sh
 
+mkdir -p /mnt/sdcard
+
+if [ -b /dev/mmcblk0p1 ]; then
+    mount /dev/mmcblk0p1 /mnt/sdcard
+elif [ -b /dev/mmcblk0 ]; then
+    mount /dev/mmcblk0 /mnt/sdcard
+fi
+
 echo " _____ _   _ ____  ___ _   _  ____ "
 echo "|_   _| | | |  _ \|_ _| \ | |/ ___|"
 echo "  | | | | | | |_) || ||  \| | |  _ "
 echo "  | | | |_| |  _ < | || |\  | |_| |"
 echo "  |_|  \___/|_| \_\___|_| \_|\____|"
-
-if [ -f /dev/mmcblk0p1 ]; then
-    mount /dev/mmcblk0p1 /mnt/sdcard/
-elif [ -f /dev/mmcblk0 ]; then
-    mount /dev/mmcblk0 /mnt/sdcard/
-fi
 
 echo 3 4 1 7 > /proc/sys/kernel/printk
 
