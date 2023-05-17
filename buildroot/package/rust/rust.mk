@@ -4,7 +4,9 @@
 #
 ################################################################################
 
-RUST_VERSION = 1.58.1
+# When updating this version, check whether support/download/cargo-post-process
+# still generates the same archives.
+RUST_VERSION = 1.67.1
 RUST_SOURCE = rustc-$(RUST_VERSION)-src.tar.xz
 RUST_SITE = https://static.rust-lang.org/dist
 RUST_LICENSE = Apache-2.0 or MIT
@@ -14,6 +16,7 @@ HOST_RUST_PROVIDES = host-rustc
 
 HOST_RUST_DEPENDENCIES = \
 	toolchain \
+	host-pkgconf \
 	host-python3 \
 	host-rust-bin \
 	host-openssl \

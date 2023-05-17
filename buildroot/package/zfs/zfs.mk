@@ -4,17 +4,17 @@
 #
 ################################################################################
 
-ZFS_VERSION = 2.0.5
+ZFS_VERSION = 2.1.7
 ZFS_SITE = https://github.com/openzfs/zfs/releases/download/zfs-$(ZFS_VERSION)
+ZFS_PATCH = https://github.com/openzfs/zfs/commit/bc3f12bfac152a0c28951cec92340ba14f9ccee9.patch
 ZFS_LICENSE = CDDL
 ZFS_LICENSE_FILES = LICENSE COPYRIGHT
 ZFS_CPE_ID_VENDOR = openzfs
 ZFS_CPE_ID_PRODUCT = openzfs
 
-# 0001-Correct-a-flaw-in-the-Python-3-version-checking.patch
 ZFS_AUTORECONF = YES
 
-ZFS_DEPENDENCIES = libaio openssl udev util-linux zlib
+ZFS_DEPENDENCIES = libaio openssl udev util-linux zlib libcurl
 
 # sysvinit installs only a commented-out modules-load.d/ config file
 ZFS_CONF_OPTS = \
@@ -40,7 +40,7 @@ endif
 ifeq ($(BR2_PACKAGE_PYTHON3),y)
 ZFS_DEPENDENCIES += python3 python-setuptools host-python-cffi host-python-packaging
 ZFS_CONF_ENV += \
-	PYTHON=$(HOST_DIR)/usr/bin/python3 \
+	PYTHON=$(HOST_DIR)/bin/python3 \
 	PYTHON_CPPFLAGS="`$(STAGING_DIR)/usr/bin/python3-config --includes`" \
 	PYTHON_LIBS="`$(STAGING_DIR)/usr/bin/python3-config --ldflags`" \
 	PYTHON_EXTRA_LIBS="`$(STAGING_DIR)/usr/bin/python3-config --libs --embed`" \
@@ -52,7 +52,7 @@ endif
 
 ifeq ($(BR2_PACKAGE_LINUX_PAM),y)
 ZFS_DEPENDENCIES += linux-pam
-ZFS_CONF_ENV += --enable-pam=yes
+ZFS_CONF_OPTS += --enable-pam
 else
 ZFS_CONF_OPTS += --disable-pam
 endif

@@ -35,6 +35,14 @@ define RPI_FIRMWARE_INSTALL_CONFIG
 endef
 endif
 
+RPI_FIRMWARE_CMDLINE_FILE = $(call qstrip,$(BR2_PACKAGE_RPI_FIRMWARE_CMDLINE_FILE))
+ifneq ($(RPI_FIRMWARE_CMDLINE_FILE),)
+define RPI_FIRMWARE_INSTALL_CMDLINE
+	$(INSTALL) -D -m 0644 $(RPI_FIRMWARE_CMDLINE_FILE) \
+		$(BINARIES_DIR)/rpi-firmware/cmdline.txt
+endef
+endif
+
 ifeq ($(BR2_PACKAGE_RPI_FIRMWARE_INSTALL_DTBS),y)
 define RPI_FIRMWARE_INSTALL_DTB
 	$(foreach dtb,$(wildcard $(@D)/boot/*.dtb), \
@@ -49,6 +57,7 @@ define RPI_FIRMWARE_INSTALL_DTB_OVERLAYS
 		$(INSTALL) -D -m 0644 $(ovldtb) $(BINARIES_DIR)/rpi-firmware/overlays/$(notdir $(ovldtb))
 	)
 	$(INSTALL) -D -m 0644 $(@D)/boot/overlays/overlay_map.dtb $(BINARIES_DIR)/rpi-firmware/overlays/
+	touch $(BINARIES_DIR)/rpi-firmware/overlays/README
 endef
 else
 # Still create the directory, so a genimage.cfg can include it independently of
@@ -79,9 +88,9 @@ endef
 endif # INSTALL_VCDBG
 
 define RPI_FIRMWARE_INSTALL_IMAGES_CMDS
-	$(INSTALL) -D -m 0644 package/rpi-firmware/cmdline.txt $(BINARIES_DIR)/rpi-firmware/cmdline.txt
 	$(RPI_FIRMWARE_INSTALL_BIN)
 	$(RPI_FIRMWARE_INSTALL_CONFIG)
+	$(RPI_FIRMWARE_INSTALL_CMDLINE)
 	$(RPI_FIRMWARE_INSTALL_DTB)
 	$(RPI_FIRMWARE_INSTALL_DTB_OVERLAYS)
 endef

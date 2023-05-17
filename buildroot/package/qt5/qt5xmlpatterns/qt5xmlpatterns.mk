@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-QT5XMLPATTERNS_VERSION = 189e28d0aff1f3d7960228ba318b83e3cadac98c
+QT5XMLPATTERNS_VERSION = dfcae10dec8c1c2c544ad0cd303cea113b0af51d
 QT5XMLPATTERNS_SITE = $(QT5_SITE)/qtxmlpatterns/-/archive/$(QT5XMLPATTERNS_VERSION)
 QT5XMLPATTERNS_SOURCE = qtxmlpatterns-$(QT5XMLPATTERNS_VERSION).tar.bz2
 QT5XMLPATTERNS_INSTALL_STAGING = YES
@@ -18,6 +18,10 @@ endif
 
 ifeq ($(BR2_PACKAGE_QT5BASE_EXAMPLES),y)
 QT5XMLPATTERNS_LICENSE += , BSD-3-Clause (examples)
+endif
+
+ifeq ($(BR2_TOOLCHAIN_HAS_GCC_BUG_90620),y)
+QT5XMLPATTERNS_CONF_OPTS += "QMAKE_CXXFLAGS+=-O0"
 endif
 
 $(eval $(qmake-package))

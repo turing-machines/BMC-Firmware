@@ -144,7 +144,413 @@ endif
 
 ###############################################################################
 
+comment "Legacy options removed in 2023.02"
+
+config BR2_PACKAGE_PUGIXML_HEADER_ONLY
+	bool "pugixml header-only removed"
+	select BR2_LEGACY
+	help
+	  The header-only version raises a build failure with gerbera.
+
+config BR2_PACKAGE_UCCP420WLAN
+	bool "uccp420wlan removed"
+	select BR2_LEGACY
+	help
+	  The uccp420wlan package is unmaintained and doesn't build
+	  with any "recent" kernel (e.g. >= 4.7).
+
+config BR2_PACKAGE_IMX_GPU_G2D_EXAMPLES
+	bool "imx-gpu-g2d examples removed"
+	select BR2_LEGACY
+	help
+	  The examples are not provided by NXP anymore.
+
+config BR2_KERNEL_HEADERS_6_0
+	bool "kernel headers version 6.0.x are no longer supported"
+	select BR2_LEGACY
+	help
+	  Version 6.0.x of the Linux kernel headers are no longer
+	  maintained upstream and are now removed.
+
+config BR2_KERNEL_HEADERS_4_9
+	bool "kernel headers version 4.9.x are no longer supported"
+	select BR2_LEGACY
+	help
+	  Version 4.9.x of the Linux kernel headers are no longer
+	  maintained upstream and are now removed.
+
+config BR2_PACKAGE_DOCKER_PROXY
+	bool "docker-proxy removed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_DOCKER_ENGINE
+	help
+	  docker-proxy has been dropped by upstream since version
+	  563fe8. it has been merged into docker-engine (moby).
+
+config BR2_PACKAGE_PYTHON_BUNCH
+	bool "python-bunch removed"
+	select BR2_LEGACY
+	help
+	  The python-bunch package is unmaintained and is replaced
+	  by the python-munch package.
+
+config BR2_TARGET_GUMMIBOOT
+	bool "gummiboot removed"
+	select BR2_LEGACY
+	help
+	  gummiboot has been deprecated since 2015, with no further
+	  updates. It became integrated into the systemd project as
+	  systemd-boot.
+
+config BR2_PACKAGE_IPUTILS_NINFOD
+	bool "iputils 20221126 removed ninfod"
+	select BR2_LEGACY
+	help
+	  iputils 20221126 removed ninfod.
+
+config BR2_PACKAGE_IPUTILS_RARPD
+	bool "iputils 20221126 removed rarpd"
+	select BR2_LEGACY
+	help
+	  iputils 20221126 removed rarpd.
+
+config BR2_PACKAGE_IPUTILS_RDISC
+	bool "iputils 20221126 removed rdisc"
+	select BR2_LEGACY
+	help
+	  iputils 20221126 removed rdisc.
+
+config BR2_PACKAGE_IPUTILS_RDISC_SERVER
+	bool "iputils 20221126 removed rdisc"
+	select BR2_LEGACY
+	help
+	  iputils 20221126 removed rdisc.
+
+config BR2_PACKAGE_GST1_PLUGINS_UGLY_PLUGIN_XINGMUX
+	bool "xingmux moved"
+	select BR2_LEGACY
+	select BR2_PACKAGE_GST1_PLUGINS_GOOD_PLUGIN_XINGMUX
+	help
+	  The xingmux option has been moved to gst1-plugins-good.
+
+config BR2_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_VIDEOSCALE
+	bool "videoscale removed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_VIDEOCONVERTSCALE
+	help
+	  The videoscale option has been combined with videoconvert.
+
+config BR2_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_VIDEOCONVERT
+	bool "videoconvert removed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_VIDEOCONVERTSCALE
+	help
+	  The videoconvert option has been combined with videoscale.
+
+config BR2_PACKAGE_IMX_GPU_VIV_OUTPUT_X11
+	bool "imx-gpu-viv X11 output has been removed"
+	select BR2_LEGACY
+	help
+	  The X11 output was dropped by NXP.
+
+config BR2_PACKAGE_XDRIVER_XF86_VIDEO_IMX_VIV
+	bool "xf86-video-imx-viv has been removed"
+	select BR2_LEGACY
+	help
+	  The X11 output was dropped by NXP.
+
+config BR2_PACKAGE_QEMU_CUSTOM_TARGETS
+	string "the QEMU specific targets option has been removed"
+	help
+	  This option has been replaced by a list of individual targets
+	  for the many architectures supported by QEMU.
+
+config BR2_PACKAGE_QEMU_CUSTOM_TARGETS_WRAP
+	bool
+	default y if BR2_PACKAGE_QEMU_CUSTOM_TARGETS != ""
+	select BR2_LEGACY
+
+config BR2_PACKAGE_XDRIVER_XF86_INPUT_KEYBOARD
+	bool "xf86-input-keyboard removed"
+	select BR2_LEGACY
+	help
+	  The X.org keyboard input driver no longer support Linux.
+
+config BR2_TARGET_SUN20I_D1_SPL
+	bool "sun20-d1-spl removed"
+	select BR2_LEGACY
+	help
+	  U-Boot has gained SPL support for D1, so this temporary
+	  bootloader is no longer supported.
+
+config BR2_PACKAGE_PYTHON_M2R
+	bool "python-m2r removed"
+	select BR2_LEGACY
+	help
+	  The python-m2r package is unmaintained.
+
+config BR2_PACKAGE_MESA3D_XVMC
+	bool "mesa Gallium XvMC state tracker removed"
+	select BR2_LEGACY
+	help
+	  The Gallium XvMC state tracker was removed upstream.
+
+config BR2_KERNEL_HEADERS_5_19
+	bool "kernel headers version 5.19.x are no longer supported"
+	select BR2_LEGACY
+	help
+	  Version 5.19.x of the Linux kernel headers are no longer
+	  maintained upstream and are now removed.
+
+config BR2_PACKAGE_XDRIVER_XF86_VIDEO_TGA
+	bool "xf86-video-tga removed"
+	select BR2_LEGACY
+	help
+	  The X.org xf86-video-tga package was removed.
+
+config BR2_PACKAGE_XDRIVER_XF86_VIDEO_GLINT
+	bool "xf86-video-glint removed"
+	select BR2_LEGACY
+	help
+	  The X.org xf86-video-glint package no longer builds with
+	  Xserver 21 and is unmaintained.
+
+config BR2_PACKAGE_USBREDIR_SERVER
+	bool "usbredirserver removed"
+	select BR2_LEGACY
+	help
+	  usbredirserver has been dropped by upstream since version
+	  0.13.0. usbredir tools (which include usbredirect binary) can
+	  be used as a replacement.
+
+comment "Legacy options removed in 2022.11"
+
+config BR2_BINUTILS_VERSION_2_36_X
+	bool "binutils 2.36.x has been removed"
+	select BR2_LEGACY
+	help
+	  binutils 2.36 has been removed, use a newer version.
+
+config BR2_PACKAGE_RABBITMQ_SERVER
+	bool "rabbitmq-server removed"
+	select BR2_LEGACY
+	help
+	  Package was removed because it was unmaintained and had
+	  known security issues.
+
+config BR2_PACKAGE_LIBOPENSSL_ENABLE_RC5
+	bool "libopenssl rc5 was never enabled"
+	select BR2_LEGACY
+	help
+	  The libopenssl option for rc5 never actually enabled rc5,
+	  which had always been disabled in Buildroot.
+
+config BR2_PACKAGE_LIBDCADEC
+	bool "package was deprecated upstream, use ffmpeg instead"
+	select BR2_LEGACY
+	help
+	  This decoder has been fully integrated into FFmpeg master
+	  branch and further development will continue there. Using
+	  FFmpeg for DTS decoding is now recommended.
+
+config BR2_KERNEL_HEADERS_5_17
+	bool "kernel headers version 5.17.x are no longer supported"
+	select BR2_LEGACY
+	help
+	  Version 5.17.x of the Linux kernel headers are no longer
+	  maintained upstream and are now removed.
+
+config BR2_iwmmxt
+	bool "ARM iwmmxt variant removed"
+	select BR2_LEGACY
+	help
+	  Support for the ARM iwmmxt architecture variant in GCC has
+	  bitroten and is no longer maintained. GCC maintainers
+	  recommend to no longer use it, and suggest to use "xscale"
+	  as a replacement architecture variant. See
+	  https://gcc.gnu.org/bugzilla/show_bug.cgi?id=106972
+
+config BR2_PACKAGE_UHD_N230
+	bool "uhd N230 support removed"
+	select BR2_LEGACY
+	help
+	  uhd N230 support has been dropped by upstream since version
+	  4.0.0.0.
+
+config BR2_PACKAGE_UHD_RFNOC
+	bool "uhd RFNoC support removed"
+	select BR2_LEGACY
+	help
+	  uhd RFNoC support has been dropped by upstream since version
+	  4.0.0.0.
+
+config BR2_PACKAGE_GPSD_OLDSTYLE
+	bool "gpsd oldstyle removed"
+	select BR2_LEGACY
+	help
+	  gpsd oldstyle option has been removed by upstream in 2015.
+
+config BR2_GDB_VERSION_9_2
+	bool "gdb 9.2 removed"
+	select BR2_LEGACY
+	help
+	  Support for GDB 9.2 has been removed. A new version has
+	  automatically been selected.
+
+comment "Legacy options removed in 2022.08"
+
+config BR2_ECLIPSE_REGISTER
+	bool "Eclipse integration removed"
+	select BR2_LEGACY
+	help
+	  The Buildroot integration with the Eclipse IDE has been
+	  removed, as the corresponding Eclipse plugin is no longer
+	  maintained, and is no longer usable with current versions of
+	  Eclipse.
+
+config BR2_csky
+	bool "csky architecture removed"
+	select BR2_LEGACY
+	help
+	  The csky architecture was removed, by lack of toolchain
+	  support.
+
+config BR2_PACKAGE_MESA3D_DRI_DRIVER_I915
+	bool "mesa DRI i915 driver removed"
+	select BR2_LEGACY
+	help
+	  The DRI i915 driver was removed upstream.
+
+config BR2_PACKAGE_MESA3D_DRI_DRIVER_I965
+	bool "mesa DRI i965 driver removed"
+	select BR2_LEGACY
+	help
+	  The DRI i965 driver was removed upstream.
+
+config BR2_PACKAGE_MESA3D_DRI_DRIVER_NOUVEAU
+	bool "mesa DRI nouveau driver removed"
+	select BR2_LEGACY
+	help
+	  The DRI radeon nouveau was removed upstream.
+
+config BR2_PACKAGE_MESA3D_DRI_DRIVER_RADEON
+	bool "mesa DRI radeon r100 driver removed"
+	select BR2_LEGACY
+	help
+	  The DRI radeon r100 driver was removed upstream.
+
+config BR2_GCC_VERSION_9_X
+	bool "gcc 9.x support removed"
+	select BR2_LEGACY
+	help
+	  Support for gcc version 9.x has been removed. The current
+	  default version (11.x or later) has been selected instead.
+
+config BR2_PACKAGE_PHP_EXT_WDDX
+	bool "php wddx removed"
+	select BR2_LEGACY
+	help
+	  The WDDX extension was removed from php.
+
+config BR2_nds32
+	bool "nds32 architecture removed"
+	select BR2_LEGACY
+	help
+	  Support for the nds32 architecture has been removed, due to
+	  its support being removed from the upstream Linux kernel,
+	  and its lack of maintenance in Buildroot.
+
+config BR2_PACKAGE_RTL8723BS
+	bool "rtl8723bs removed"
+	select BR2_LEGACY
+	help
+	  Package was removed because it is not compatible with latest
+	  kernels and is not maintained anymore: code has been removed
+	  in 2017 as driver is available in the linux-next tree.
+
+comment "Legacy options removed in 2022.05"
+
+config BR2_PACKAGE_KTAP
+	bool "ktap removed"
+	select BR2_LEGACY
+	help
+	  Package was removed because it is not compatible with latest
+	  kernels and is not maintained anymore (no release since 2013).
+
+config BR2_KERNEL_HEADERS_5_16
+	bool "kernel headers version 5.16.x are no longer supported"
+	select BR2_LEGACY
+	help
+	  Version 5.16.x of the Linux kernel headers are no longer
+	  maintained upstream and are now removed.
+
+config BR2_KERNEL_HEADERS_4_4
+	bool "kernel headers version 4.4.x are no longer supported"
+	select BR2_LEGACY
+	help
+	  Version 4.4.x of the Linux kernel headers are no longer
+	  maintained upstream and are now removed.
+
+config BR2_BINUTILS_VERSION_2_32_X
+	bool "binutils 2.32.x has been removed"
+	select BR2_LEGACY
+	help
+	  binutils 2.32 has been removed, use a newer version.
+
+config BR2_sh2a
+	bool "sh2a architecture support removed"
+	select BR2_LEGACY
+	help
+	  The SuperH 2A (SH2A) architecture was not maintained, and
+	  broken, so its support was dropped.
+
+config BR2_BINUTILS_VERSION_2_35_X
+	bool "binutils 2.35.x has been removed"
+	select BR2_LEGACY
+	help
+	  binutils 2.35 has been removed, use a newer version.
+
+config BR2_PACKAGE_BOOST_LAYOUT_TAGGED
+	bool "boost tagged layout removed"
+	select BR2_LEGACY
+	help
+	  Boost tagged layout isn't handled by some packages (e.g. botan
+	  or libcpprestsdk).
+
+config BR2_PACKAGE_BOOST_LAYOUT_VERSIONED
+	bool "boost versioned layout removed"
+	select BR2_LEGACY
+	help
+	  Boost versioned layout isn't handled by a number of autotools
+	  and cmake packages (e.g. azmq, cc-tool, i2pd).
+
 comment "Legacy options removed in 2022.02"
+
+config BR2_TARGET_ROOTFS_OCI_ENTRYPOINT_ARGS
+	string "entrypoint argumetns has been changed as command"
+	help
+	  The OCI image BR2_TARGET_ROOTFS_OCI_ENTRYPOINT_ARGS option
+	  has been renamed to BR2_TARGET_ROOTFS_OCI_CMD to better
+	  reflect its relation to the actual 'command' of the OCI
+	  image.
+
+	  The new semantic for BR2_TARGET_ROOTFS_OCI_CMD is slightly
+	  differnt in relation to how it is interpreted, so be sure to
+	  review the help entry for it.
+
+	  Due to this breaking change, the old value here could not be
+	  set to the new variable.
+
+config BR2_TARGET_ROOTFS_OCI_ENTRYPOINT_ARGS_WRAP
+	bool
+	default y if BR2_TARGET_ROOTFS_OCI_ENTRYPOINT_ARGS != ""
+	select BR2_LEGACY
+
+config BR2_PACKAGE_LIBCURL_LIBNSS
+	bool "libcurl NSS removed"
+	select BR2_LEGACY
+	help
+	  NSS was deprecated in libcurl 7.82.0.
 
 config BR2_PACKAGE_WESTON_DEFAULT_FBDEV
 	bool "weston fbdev removed"
@@ -424,20 +830,22 @@ config BR2_PACKAGE_SUNXI_MALI_MAINLINE
 config BR2_PACKAGE_SUNXI_MALI_MAINLINE_R6P2
 	bool "sunxi-mali-mainline-r6p2 was renamed"
 	select BR2_LEGACY
-	select BR2_PACKAGE_SUNXI_MALI_UTGARD_R6P2
 	help
 	  The sunxi-mali-mainline package has been renamed
 	  sunxi-mali-utgard, the suboptions of this package have also
 	  been renamed accordingly.
+# Note: BR2_PACKAGE_SUNXI_MALI_MAINLINE_R6P2 is still referenced from
+# package/sunxi-mali-utgard/Config.in
 
 config BR2_PACKAGE_SUNXI_MALI_MAINLINE_R8P1
 	bool "sunxi-mali-mainline-r8p1 was renamed"
 	select BR2_LEGACY
-	select BR2_PACKAGE_SUNXI_MALI_UTGARD_R8P1
 	help
 	  The sunxi-mali-mainline package has been renamed
 	  sunxi-mali-utgard, the suboptions of this package have also
 	  been renamed accordingly.
+# Note: BR2_PACKAGE_SUNXI_MALI_MAINLINE_R8P1 is still referenced from
+# package/sunxi-mali-utgard/Config.in
 
 config BR2_PACKAGE_QT5WEBKIT_EXAMPLES
 	bool "qt5webkit-examples removed"
@@ -495,18 +903,20 @@ comment "Legacy options removed in 2021.11"
 config BR2_OPENJDK_VERSION_LTS
 	bool "OpenJDK LTS version was renamed to OpenJDK 11"
 	select BR2_LEGACY
-	select BR2_PACKAGE_OPENJDK_VERSION_11
 	help
 	  The LTS version option was renamed to OpenJDK 11 to make it
 	  clear what LTS version is.
+# Note: BR2_OPENJDK_VERSION_LTS is still referenced from
+# package/openjdk/Config.in
 
 config BR2_OPENJDK_VERSION_LATEST
 	bool "OpenJDK latest version (16.x) was removed"
 	select BR2_LEGACY
-	select BR2_PACKAGE_OPENJDK_VERSION_17
 	help
 	  OpenJDK 16.x is no longer mainted, so the option has been
 	  removed. Use OpenJDK 17.x instead.
+# Note: BR2_OPENJDK_VERSION_LATEST is still referenced from
+# package/openjdk/Config.in
 
 config BR2_PACKAGE_MPD_TIDAL
 	bool "mpd tidal option removed"
@@ -1422,6 +1832,35 @@ config BR2_PACKAGE_RPI_USERLAND_START_VCFILED
 	help
 	  The vcfiled support was removed upstream.
 
+config BR2_PACKAGE_TI_SGX_KM_AM335X
+	bool "ti-sgx-km AM335X option removed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_TI_SGX_KM
+	help
+	  Starting from buildroot release 2020.02, the buildroot package
+	  only supports the target am335x.
+
+config BR2_PACKAGE_TI_SGX_KM_AM437X
+	bool "ti-sgx-km AM437X option removed"
+	select BR2_LEGACY
+	help
+	  Starting from buildroot release 2020.02, the buildroot package
+	  only supports the target am335x.
+
+config BR2_PACKAGE_TI_SGX_KM_AM4430
+	bool "ti-sgx-km AM4430 option removed"
+	select BR2_LEGACY
+	help
+	  Starting from buildroot release 2020.02, the buildroot package
+	  only supports the target am335x.
+
+config BR2_PACKAGE_TI_SGX_KM_AM5430
+	bool "ti-sgx-km AM5430 option removed"
+	select BR2_LEGACY
+	help
+	  Starting from buildroot release 2020.02, the buildroot package
+	  only supports the target am335x.
+
 comment "Legacy options removed in 2019.11"
 
 config BR2_PACKAGE_OPENVMTOOLS_PROCPS
@@ -1887,9 +2326,9 @@ config BR2_PACKAGE_FFTW_PRECISION_QUAD
 config BR2_PACKAGE_LUA_5_2
 	bool "Lua 5.2.x version removed"
 	select BR2_LEGACY
-	select BR2_PACKAGE_LUA_5_3
 	help
 	  The Lua 5.2.x version was removed.
+# Note: BR2_PACKAGE_LUA_5_2 is still referenced from package/lua/Config.in
 
 config BR2_TARGET_GENERIC_PASSWD_MD5
 	bool "target passwd md5 format support has been removed"
@@ -2387,7 +2826,7 @@ config BR2_PACKAGE_MEDIAART_BACKEND_GDK_PIXBUF
 	  BR2_PACKAGE_MEDIAART_BACKEND_GDK_PIXBUF has been renamed to
 	  BR2_PACKAGE_LIBMEDIAART_BACKEND_GDK_PIXBUF
 
-config BR2_PACKAGE_MEDIAART_BACKEND_GDK_PIXBUF
+config BR2_PACKAGE_MEDIAART_BACKEND_QT
 	bool "libmediaart qt backend option renamed"
 	select BR2_LEGACY
 	help
@@ -2395,45 +2834,34 @@ config BR2_PACKAGE_MEDIAART_BACKEND_GDK_PIXBUF
 	  BR2_PACKAGE_MEDIAART_BACKEND_QT has been renamed to
 	  BR2_PACKAGE_LIBMEDIAART_BACKEND_QT
 
-# Note: BR2_PACKAGE_TI_SGX_AM335X is still referenced from
-# package/ti-sgx-km/Config.in
 config BR2_PACKAGE_TI_SGX_AM335X
-	bool "ti-sgx-km AM335X option renamed"
+	bool "ti-sgx-km AM335X option removed"
 	select BR2_LEGACY
+	select BR2_PACKAGE_TI_SGX_KM
 	help
-	  For consistency reasons, the option
-	  BR2_PACKAGE_TI_SGX_AM335X has been renamed to
-	  BR2_PACKAGE_TI_SGX_KM_AM335X.
+	  Starting from buildroot release 2020.02, the buildroot package
+	  only supports the target am335x.
 
-# Note: BR2_PACKAGE_TI_SGX_AM437X is still referenced from
-# package/ti-sgx-km/Config.in
 config BR2_PACKAGE_TI_SGX_AM437X
-	bool "ti-sgx-km AM437X option renamed"
+	bool "ti-sgx-km AM437X option removed"
 	select BR2_LEGACY
 	help
-	  For consistency reasons, the option
-	  BR2_PACKAGE_TI_SGX_AM437X has been renamed to
-	  BR2_PACKAGE_TI_SGX_KM_AM437X.
+	  Starting from buildroot release 2020.02, the buildroot package
+	  only supports the target am335x.
 
-# Note: BR2_PACKAGE_TI_SGX_AM4430 is still referenced from
-# package/ti-sgx-km/Config.in
 config BR2_PACKAGE_TI_SGX_AM4430
-	bool "ti-sgx-km AM4430 option renamed"
+	bool "ti-sgx-km AM4430 option removed"
 	select BR2_LEGACY
 	help
-	  For consistency reasons, the option
-	  BR2_PACKAGE_TI_SGX_AM4430 has been renamed to
-	  BR2_PACKAGE_TI_SGX_KM_AM4430.
+	  Starting from buildroot release 2020.02, the buildroot package
+	  only supports the target am335x.
 
-# Note: BR2_PACKAGE_TI_SGX_AM5430 is still referenced from
-# package/ti-sgx-km/Config.in
 config BR2_PACKAGE_TI_SGX_AM5430
-	bool "ti-sgx-km AM5430 option renamed"
+	bool "ti-sgx-km AM5430 option removed"
 	select BR2_LEGACY
 	help
-	  For consistency reasons, the option
-	  BR2_PACKAGE_TI_SGX_AM5430 has been renamed to
-	  BR2_PACKAGE_TI_SGX_KM_AM5430.
+	  Starting from buildroot release 2020.02, the buildroot package
+	  only supports the target am335x.
 
 config BR2_PACKAGE_JANUS_AUDIO_BRIDGE
 	bool "janus-gateway audio-bridge option renamed"
@@ -3033,7 +3461,7 @@ config BR2_PACKAGE_POLICYCOREUTILS_RESTORECOND
 	select BR2_PACKAGE_RESTORECOND
 	help
 	  The policycoreutils package no longer offers restorecond
-	  as a option.  This package has been moved into a seperate
+	  as a option.  This package has been moved into a separate
 	  package maintained by the SELinux maintainers.
 
 config BR2_PACKAGE_SEPOLGEN
@@ -3627,7 +4055,7 @@ config BR2_GDB_VERSION_7_9
 comment "Legacy options removed in 2016.11"
 
 config BR2_PACKAGE_PHP_SAPI_CLI_CGI
-	bool "PHP CGI and CLI options are now seperate"
+	bool "PHP CGI and CLI options are now separate"
 	select BR2_PACKAGE_PHP_SAPI_CLI
 	select BR2_PACKAGE_PHP_SAPI_CGI
 	select BR2_LEGACY
@@ -3763,10 +4191,11 @@ config BR2_LINUX_KERNEL_TOOL_SELFTESTS
 config BR2_GCC_VERSION_4_8_ARC
 	bool "gcc arc option renamed"
 	select BR2_LEGACY
-	select BR2_GCC_VERSION_ARC
 	help
 	  The option that selects the gcc version for the ARC
 	  architecture has been renamed to BR2_GCC_VERSION_ARC.
+# Note: BR2_GCC_VERSION_4_8_ARC is still referenced from
+# package/gcc/Config.in.host
 
 config BR2_KERNEL_HEADERS_4_0
 	bool "kernel headers version 4.0.x are no longer supported"
@@ -3800,6 +4229,7 @@ config BR2_PACKAGE_ELEMENTARY
 
 config BR2_LINUX_KERNEL_CUSTOM_LOCAL
 	bool "Linux kernel local directory option removed"
+	select BR2_LEGACY
 	help
 	  The option to select a local directory as the source of the
 	  Linux kernel has been removed. It hurts reproducibility of
@@ -4105,19 +4535,21 @@ config BR2_PACKAGE_OPENPOWERLINK_DEBUG_LEVEL
 config BR2_PACKAGE_OPENPOWERLINK_KERNEL_MODULE
 	bool "openpowerlink package has been updated"
 	select BR2_LEGACY
-	select BR2_PACKAGE_OPENPOWERLINK_STACK_KERNEL_STACK_LIB
 	help
 	  openpowerlink kernel modules are built if the
 	  kernel stack library is selected.
+# Note: BR2_PACKAGE_OPENPOWERLINK_KERNEL_MODULE is still referenced from
+# package/openpowerlink/Config.in
 
 config BR2_PACKAGE_OPENPOWERLINK_LIBPCAP
 	bool "openpowerlink package has been updated"
 	select BR2_LEGACY
-	select BR2_PACKAGE_OPENPOWERLINK_STACK_USERSPACE_DAEMON_LIB
 	help
 	  The user space support has been split in two part:
-	  - a monolitic user space library
-	  - a user spae deamon driver
+	  - a monolithic user space library
+	  - a user space daemon driver
+# Note: BR2_PACKAGE_OPENPOWERLINK_LIBPCAP is still referenced from
+# package/openpowerlink/Config.in
 
 config BR2_LINUX_KERNEL_SAME_AS_HEADERS
 	bool "using the linux headers version for the kernel has been removed"
@@ -4656,7 +5088,7 @@ config BR2_PACKAGE_KODI_PVR_ADDONS
 	select BR2_PACKAGE_KODI_PVR_VUPLUS
 	select BR2_PACKAGE_KODI_PVR_WMC
 	help
-	  Kodi PVR addon was split into seperate modules
+	  Kodi PVR addon was split into separate modules
 
 config BR2_BINUTILS_VERSION_2_23_2
 	bool "binutils 2.23 option renamed"

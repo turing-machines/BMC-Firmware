@@ -30,13 +30,13 @@ the Linux kernel. To use it, add +O=<directory>+ to the make command
 line:
 
 --------------------
- $ make O=/tmp/build
+ $ make O=/tmp/build menuconfig
 --------------------
 
 Or:
 
 --------------------
- $ cd /tmp/build; make O=$PWD -C path/to/buildroot
+ $ cd /tmp/build; make O=$PWD -C path/to/buildroot menuconfig
 --------------------
 
 All the output files will be located under +/tmp/build+. If the +O+
@@ -416,7 +416,5 @@ effects:
   respectively. This means that during the build, those folders will
   be empty and it's only at the very end of the build that they will
   be populated.
-
-include::eclipse-integration.txt[]
 
 include::advanced.txt[]

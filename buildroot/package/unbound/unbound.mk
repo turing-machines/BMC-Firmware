@@ -4,8 +4,9 @@
 #
 ################################################################################
 
-UNBOUND_VERSION = 1.14.0
+UNBOUND_VERSION = 1.17.1
 UNBOUND_SITE = https://www.unbound.net/downloads
+UNBOUND_INSTALL_STAGING = YES
 UNBOUND_DEPENDENCIES = host-pkgconf expat libevent openssl
 UNBOUND_LICENSE = BSD-3-Clause
 UNBOUND_LICENSE_FILES = LICENSE
@@ -35,7 +36,7 @@ else
 UNBOUND_CONF_OPTS += --without-pthreads
 endif
 
-ifeq ($(BR2_GCC_ENABLE_LTO),y)
+ifeq ($(BR2_ENABLE_LTO),y)
 UNBOUND_CONF_OPTS += --enable-flto
 else
 UNBOUND_CONF_OPTS += --disable-flto

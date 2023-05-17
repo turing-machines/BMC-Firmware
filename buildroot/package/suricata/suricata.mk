@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-SURICATA_VERSION = 6.0.4
+SURICATA_VERSION = 6.0.6
 SURICATA_SITE = https://www.openinfosecfoundation.org/download
 SURICATA_LICENSE = GPL-2.0
 SURICATA_LICENSE_FILES = COPYING LICENSE
@@ -29,7 +29,7 @@ SURICATA_DEPENDENCIES = \
 
 SURICATA_CONF_ENV = \
 	ac_cv_path_HAVE_SPHINXBUILD=no \
-	CARGO_HOME=$(HOST_DIR)/share/cargo \
+	CARGO_HOME=$(BR_CARGO_HOME) \
 	RUST_TARGET=$(RUSTC_TARGET_NAME)
 
 SURICATA_CONF_OPTS = \

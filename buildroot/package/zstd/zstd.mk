@@ -38,14 +38,15 @@ endif
 # zstd will append -O3 after $(CFLAGS), use MOREFLAGS to override again
 ZSTD_OPTS += MOREFLAGS="$(TARGET_OPTIMIZATION)"
 
+ZSTD_BUILD_LIBS_BASENAMES = libzstd.pc
 ifeq ($(BR2_STATIC_LIBS),y)
-ZSTD_BUILD_LIBS = libzstd.a
+ZSTD_BUILD_LIBS_BASENAMES += libzstd.a
 ZSTD_INSTALL_LIBS = install-static
 else ifeq ($(BR2_SHARED_LIBS),y)
-ZSTD_BUILD_LIBS = lib
+ZSTD_BUILD_LIBS_BASENAMES += lib
 ZSTD_INSTALL_LIBS = install-shared
 else
-ZSTD_BUILD_LIBS = lib
+ZSTD_BUILD_LIBS_BASENAMES += lib
 ZSTD_INSTALL_LIBS = install-static install-shared
 endif
 
@@ -63,17 +64,20 @@ endif
 # purpose.
 ifeq ($(BR2_TOOLCHAIN_HAS_THREADS),y)
 ZSTD_OPTS += HAVE_THREAD=1
-ZSTD_BUILD_LIBS := $(addsuffix -mt,$(ZSTD_BUILD_LIBS))
+ZSTD_BUILD_LIBS_THREAD_SUFFIX = -mt
 else
 ZSTD_OPTS += HAVE_THREAD=0
-ZSTD_BUILD_LIBS := $(addsuffix -nomt,$(ZSTD_BUILD_LIBS))
+ZSTD_BUILD_LIBS_THREAD_SUFFIX = -nomt
 endif
 # check-package disable OverriddenVariable - override intended
-ZSTD_BUILD_LIBS := $(addsuffix -release,$(ZSTD_BUILD_LIBS))
+ZSTD_BUILD_LIBS = \
+	$(addsuffix -release, \
+		$(addsuffix $(ZSTD_BUILD_LIBS_THREAD_SUFFIX), \
+			$(ZSTD_BUILD_LIBS_BASENAMES)))
 
 define ZSTD_BUILD_CMDS
 	$(TARGET_MAKE_ENV) $(TARGET_CONFIGURE_OPTS) $(MAKE) $(ZSTD_OPTS) \
-		-C $(@D)/lib $(ZSTD_BUILD_LIBS) libzstd.pc
+		-C $(@D)/lib $(ZSTD_BUILD_LIBS)
 	$(TARGET_MAKE_ENV) $(TARGET_CONFIGURE_OPTS) $(MAKE) $(ZSTD_OPTS) \
 		-C $(@D)/programs $(ZSTD_BUILD_PROG_TARGET)
 endef
@@ -92,14 +96,18 @@ define ZSTD_INSTALL_TARGET_CMDS
 endef
 
 HOST_ZSTD_OPTS += PREFIX=$(HOST_DIR)
+HOST_ZSTD_ENV = $(HOST_MAKE_ENV) $(HOST_CONFIGURE_OPTS)
+
+# We are a ccache dependency, so we can't use ccache
+HOST_ZSTD_ENV += CC="$(HOSTCC_NOCCACHE)" CXX="$(HOSTCXX_NOCCACHE)"
 
 define HOST_ZSTD_BUILD_CMDS
-	$(HOST_MAKE_ENV) $(HOST_CONFIGURE_OPTS) $(MAKE) $(HOST_ZSTD_OPTS) \
+	$(HOST_ZSTD_ENV) $(MAKE) $(HOST_ZSTD_OPTS) \
 		-C $(@D) zstd-release lib-release
 endef
 
 define HOST_ZSTD_INSTALL_CMDS
-	$(HOST_MAKE_ENV) $(HOST_CONFIGURE_OPTS) $(MAKE) $(HOST_ZSTD_OPTS) \
+	$(HOST_ZSTD_ENV) $(MAKE) $(HOST_ZSTD_OPTS) \
 		-C $(@D) install
 endef
 

@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-DHCP_VERSION = 4.4.2-P1
+DHCP_VERSION = 4.4.3-P1
 DHCP_SITE = https://ftp.isc.org/isc/dhcp/$(DHCP_VERSION)
 DHCP_INSTALL_STAGING = YES
 DHCP_LICENSE = MPL-2.0
@@ -13,6 +13,13 @@ DHCP_DEPENDENCIES = host-gawk
 DHCP_CPE_ID_VENDOR = isc
 # internal bind does not support parallel builds.
 DHCP_MAKE = $(MAKE1)
+
+# untar internal bind so libtool patches will be applied on bind's libtool
+define DHCP_UNTAR_INTERNAL_BIND
+	$(TAR) xf $(@D)/bind/bind.tar.gz -C $(@D)/bind/
+endef
+
+DHCP_POST_EXTRACT_HOOKS = DHCP_UNTAR_INTERNAL_BIND
 
 # use libtool-enabled configure.ac
 define DHCP_LIBTOOL_AUTORECONF
@@ -23,7 +30,14 @@ DHCP_CONF_ENV = \
 	CPPFLAGS='-D_PATH_DHCPD_CONF=\"/etc/dhcp/dhcpd.conf\" \
 		-D_PATH_DHCLIENT_CONF=\"/etc/dhcp/dhclient.conf\"' \
 	CFLAGS='$(TARGET_CFLAGS) -DISC_CHECK_NONE=1'
-DHCP_BIND_EXTRA_CONFIG = BUILD_CC='$(TARGET_CC)'
+
+DHCP_BIND_EXTRA_CONFIG = \
+	BUILD_CC='$(HOSTCC)' \
+	BUILD_CFLAGS='$(HOST_CFLAGS)' \
+	BUILD_CPPFLAGS='$(HOST_CPPFLAGS)' \
+	BUILD_LDFLAGS='$(HOST_LDFLAGS)' \
+	RANLIB='$(TARGET_RANLIB)' \
+	--disable-backtrace
 
 DHCP_CONF_ENV += ac_cv_prog_AWK=$(HOST_DIR)/bin/gawk
 
@@ -48,8 +62,13 @@ else
 DHCP_BIND_EXTRA_CONFIG += --without-zlib
 endif
 
+ifeq ($(BR2_TOOLCHAIN_HAS_ATOMIC),y)
+DHCP_BIND_EXTRA_CONFIG += --enable-atomic
 ifeq ($(BR2_TOOLCHAIN_HAS_LIBATOMIC),y)
 DHCP_CONF_ENV += LIBS=-latomic
+endif
+else
+DHCP_BIND_EXTRA_CONFIG += --disable-atomic
 endif
 
 ifeq ($(BR2_STATIC_LIBS),y)
@@ -62,9 +81,18 @@ endif
 
 ifeq ($(BR2_PACKAGE_DHCP_SERVER_DELAYED_ACK),y)
 DHCP_CONF_OPTS += --enable-delayed-ack
+else
+DHCP_CONF_OPTS += --disable-delayed-ack
+endif
+
+ifeq ($(BR2_PACKAGE_DHCP_SERVER_ENABLE_PARANOIA),y)
+DHCP_CONF_OPTS += --enable-paranoia
+else
+DHCP_CONF_OPTS += --disable-paranoia
 endif
 
 define DHCP_INSTALL_LIBS
+	$(MAKE) -C $(@D)/bind install-bind DESTDIR=$(TARGET_DIR)
 	$(MAKE) -C $(@D)/common install-exec DESTDIR=$(TARGET_DIR)
 	$(MAKE) -C $(@D)/omapip install-exec DESTDIR=$(TARGET_DIR)
 endef

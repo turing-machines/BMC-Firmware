@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-LUAJIT_VERSION = a91d0d9d3bba1a936669cfac3244509a0f2ac0e3
+LUAJIT_VERSION = d0e88930ddde28ff662503f9f20facf34f7265aa
 LUAJIT_SITE = $(call github,LuaJIT,LuaJIT,$(LUAJIT_VERSION))
 LUAJIT_LICENSE = MIT
 LUAJIT_LICENSE_FILES = COPYRIGHT

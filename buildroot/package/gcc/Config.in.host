@@ -2,9 +2,10 @@ comment "GCC Options"
 
 choice
 	prompt "GCC compiler Version"
+	default BR2_GCC_VERSION_ARC if BR2_GCC_VERSION_4_8_ARC # legacy
 	default BR2_GCC_VERSION_ARC if BR2_arc
 	default BR2_GCC_VERSION_POWERPC_SPE if BR2_powerpc_SPE
-	default BR2_GCC_VERSION_10_X
+	default BR2_GCC_VERSION_11_X
 	help
 	  Select the version of gcc you wish to use.
 
@@ -21,32 +22,19 @@ config BR2_GCC_VERSION_POWERPC_SPE
 	depends on BR2_powerpc_SPE
 	select BR2_TOOLCHAIN_GCC_AT_LEAST_8
 
-config BR2_GCC_VERSION_9_X
-	bool "gcc 9.x"
-	depends on !BR2_ARCH_NEEDS_GCC_AT_LEAST_10
-	# powerpc spe support has been deprecated since gcc 8.x.
-	# https://gcc.gnu.org/ml/gcc/2018-04/msg00102.html
-	depends on !BR2_powerpc_SPE
-	# C-SKY sk610 needs abiv1, which is not supported in
-	# upstream gcc. C-SKY gcc upstream support not tested
-	# with upstream binutils and glibc.
-	depends on !BR2_csky
-	select BR2_TOOLCHAIN_GCC_AT_LEAST_9
-
 config BR2_GCC_VERSION_10_X
 	bool "gcc 10.x"
 	depends on !BR2_ARCH_NEEDS_GCC_AT_LEAST_11
 	# powerpc spe support has been deprecated since gcc 8.x.
 	# https://gcc.gnu.org/ml/gcc/2018-04/msg00102.html
 	depends on !BR2_powerpc_SPE
-	# C-SKY sk610 needs abiv1, which is not supported in
-	# upstream gcc. C-SKY gcc upstream support not tested
-	# with upstream binutils and glibc.
-	depends on !BR2_csky
+	# ARC HS48 rel 31 only supported by gcc arc fork.
+	depends on !BR2_archs4x_rel31
 	select BR2_TOOLCHAIN_GCC_AT_LEAST_10
 
 config BR2_GCC_VERSION_11_X
 	bool "gcc 11.x"
+	depends on !BR2_ARCH_NEEDS_GCC_AT_LEAST_12
 	# powerpc spe support has been deprecated since gcc 8.x.
 	# https://gcc.gnu.org/ml/gcc/2018-04/msg00102.html
 	depends on !BR2_powerpc_SPE
@@ -54,7 +42,22 @@ config BR2_GCC_VERSION_11_X
 	# that need to be reverted since gcc 8.4, 9.3 and 10.1.
 	# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=98784
 	depends on !BR2_sparc
+	# ARC HS48 rel 31 only supported by gcc arc fork.
+	depends on !BR2_archs4x_rel31
 	select BR2_TOOLCHAIN_GCC_AT_LEAST_11
+
+config BR2_GCC_VERSION_12_X
+	bool "gcc 12.x"
+	# powerpc spe support has been deprecated since gcc 8.x.
+	# https://gcc.gnu.org/ml/gcc/2018-04/msg00102.html
+	depends on !BR2_powerpc_SPE
+	# uClibc-ng broken on sparc due to recent gcc changes
+	# that need to be reverted since gcc 8.4, 9.3 and 10.1.
+	# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=98784
+	depends on !BR2_sparc
+	# ARC HS48 rel 31 only supported by gcc arc fork.
+	depends on !BR2_archs4x_rel31
+	select BR2_TOOLCHAIN_GCC_AT_LEAST_12
 
 endchoice
 
@@ -75,13 +78,17 @@ config BR2_GCC_SUPPORTS_DLANG
 	default y if BR2_riscv && !BR2_RISCV_64
 	depends on BR2_TOOLCHAIN_GCC_AT_LEAST_9
 	depends on BR2_TOOLCHAIN_USES_GLIBC
+	# "The D front-end is now itself written in D, in order to build GDC, you
+	# will need a working GDC compiler (GCC version 9.1 or later)."
+	# https://gcc.gnu.org/git/?p=gcc.git;a=commitdiff;h=5fee5ec362f7a243f459e6378fd49dfc89dc9fb5
+	depends on !BR2_TOOLCHAIN_GCC_AT_LEAST_12
 
 config BR2_GCC_VERSION
 	string
 	default "8.4.0"     if BR2_GCC_VERSION_POWERPC_SPE
-	default "9.4.0"     if BR2_GCC_VERSION_9_X
-	default "10.3.0"    if BR2_GCC_VERSION_10_X
-	default "11.2.0"    if BR2_GCC_VERSION_11_X
+	default "10.4.0"    if BR2_GCC_VERSION_10_X
+	default "11.3.0"    if BR2_GCC_VERSION_11_X
+	default "12.2.0"    if BR2_GCC_VERSION_12_X
 	default "arc-2020.09-release" if BR2_GCC_VERSION_ARC
 
 config BR2_EXTRA_GCC_CONFIG_OPTIONS
@@ -123,13 +130,6 @@ config BR2_TOOLCHAIN_BUILDROOT_DLANG
 	  Enable this option if you want your toolchain to support the
 	  D language and you want D libraries to be installed on your
 	  target system.
-
-config BR2_GCC_ENABLE_LTO
-	bool "Enable compiler link-time-optimization support"
-	select BR2_BINUTILS_ENABLE_LTO
-	help
-	  This option enables link-time optimization (LTO) support in
-	  gcc.
 
 config BR2_GCC_ENABLE_OPENMP
 	bool "Enable compiler OpenMP support"

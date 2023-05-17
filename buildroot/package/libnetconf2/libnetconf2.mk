@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-LIBNETCONF2_VERSION = 2.0.24
+LIBNETCONF2_VERSION = 2.1.28
 LIBNETCONF2_SITE = $(call github,CESNET,libnetconf2,v$(LIBNETCONF2_VERSION))
 LIBNETCONF2_INSTALL_STAGING = YES
 LIBNETCONF2_LICENSE = BSD-3-Clause
@@ -23,7 +23,7 @@ else
 LIBNETCONF2_CONF_OPTS += -DENABLE_SSH=OFF
 endif
 
-ifeq ($(BR2_PACKAGE_OPENSSL), y)
+ifeq ($(BR2_PACKAGE_LIBOPENSSL), y)
 LIBNETCONF2_CONF_OPTS += -DENABLE_TLS=ON
 LIBNETCONF2_DEPENDENCIES += openssl
 else
