@@ -1,10 +1,15 @@
 //! This module acts as a glue layer for the legacy bmc application. It exports
 //! relevant API functions over FFI. This FFI interface is temporary and will be
 //! removed as soon as the bmc application is end of life.
-use crate::{app::bmc_application::BmcApplication, middleware::NodeId};
+
+use log::LevelFilter;
 use once_cell::sync::{Lazy, OnceCell};
+use simple_logger::SimpleLogger;
 use std::{ffi::CStr, ops::Deref};
 use tokio::{runtime::Runtime, sync::Mutex};
+
+use crate::{app::bmc_application::BmcApplication, middleware::NodeId};
+use crate::middleware::usbboot::FlashingError;
 
 /// we need means to synchronize async call to the outside. This runtime
 /// enables us to execute async calls in a blocking fashion.
@@ -13,8 +18,23 @@ static RUNTIME: Lazy<Runtime> =
 static APP: OnceCell<Mutex<BmcApplication>> = OnceCell::new();
 
 #[no_mangle]
-pub extern "C" fn initialize() {
+pub extern "C" fn tpi_initialize() {
     RUNTIME.block_on(async move {
+        let level = if cfg!(debug_assertions) {
+            LevelFilter::Debug
+        } else {
+            LevelFilter::Warn
+        };
+
+        SimpleLogger::new()
+            .with_level(level)
+            .with_colors(true)
+            .env()
+            .init()
+            .expect("failed to initialize logger");
+
+        log::info!("Turing Pi BMC firmware v{}", env!("CARGO_PKG_VERSION"));
+
         APP.set(Mutex::new(
             BmcApplication::new().await.expect("unable to initialize"),
         ))
@@ -49,54 +69,42 @@ pub extern "C" fn power_system_off() {
     power_cycle_routine(NodeId::All, false);
 }
 
+#[allow(dead_code)]
 #[repr(C)]
-pub enum NodeFlashProgress {
-    UnknownError,
-    //    NodeDoesNotExist,
-    //    /// The node is already undergoing a fwupdate. Fw update request is ignored
-    //    Busy,
-    //    /// Flashing is in progress, node does not respond and any subsequent fw
-    //    /// update requests are ignored.
-    //    InProgress,
-    //    /// Cannot successfully progress the fw udate due to unsufficient storage
-    //    /// space on the host.
-    //    StorageFull,
-    //    /// The node does not respond anymore
-    //    Timeout,
-    //    /// verification step after fw update failed. Upload may be corrupted
-    //    ChecksumMismatch,
-    //    /// The fw update completed successfully.
-    Done,
+pub enum FlashingResult {
+    Success,
+    InvalidArgs,
+    Timeout,
+    ChecksumMismatch,
 }
 
-/// C callback that reports the progress of an running firmware update to one of
-/// the connected compute modules.
-///
-/// # Arguments
-///
-/// * 'status_code'   reports the state of the running firmware update. A status
-/// code [NodeFlashProgress::Done] is the end of the sequence and signals a
-/// successful update
-///
-/// * 'progress' reports the progress of the firmware update. Ranges from zero to
-/// [u32::Max], where [u32::Max] == 100%.
-type FlashProgressFn = extern "C" fn(status_code: NodeFlashProgress, progress: u32);
+impl From<Result<(), FlashingError>> for FlashingResult {
+    fn from(value: Result<(), FlashingError>) -> Self {
+        match value {
+            Ok(_) => FlashingResult::Success,
+            Err(FlashingError::InvalidArgs) => FlashingResult::InvalidArgs,
+            Err(FlashingError::Timeout) => FlashingResult::Timeout,
+            Err(FlashingError::ChecksumMismatch) => FlashingResult::ChecksumMismatch,
+        }
+    }
+}
 
 #[no_mangle]
-pub extern "C" fn flash_node(
-    nodeId: NodeId,
-    image_path: *mut std::os::raw::c_char,
-    progress_cb: FlashProgressFn,
-) {
+pub extern "C" fn tpi_flash_node(node: u32, image_path: *const std::ffi::c_char) -> FlashingResult {
     let str = unsafe { CStr::from_ptr(image_path) }.to_str().unwrap();
     let node_image = String::from(str);
+
+    let node_id = match node.try_into() {
+        Ok(value) => value,
+        Err(_) => return FlashingResult::InvalidArgs,
+    };
 
     RUNTIME.block_on(async move {
         let lock = APP.get().unwrap().lock();
         lock.await
             .deref()
-            .flash_node(nodeId, node_image)
+            .flash_node(node_id, node_image)
             .await
-            .unwrap();
-    });
+            .into()
+    })
 }

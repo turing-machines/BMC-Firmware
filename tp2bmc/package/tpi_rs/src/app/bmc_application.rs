@@ -1,6 +1,7 @@
 use crate::middleware::{
     app_persistency::ApplicationPersistency, evdev_controller::linux_event_stream,
     pin_controller::PinController, NodeId,
+    usbboot::{self, FlashingError},
 };
 use anyhow::Context;
 use std::ops::Deref;
@@ -116,8 +117,8 @@ impl BmcApplication {
     pub async fn flash_node<P: AsRef<str>>(
         &self,
         node: NodeId,
-        node_image: P,
-    ) -> anyhow::Result<()> {
-        todo!()
+        image_path: P,
+    ) -> Result<(), FlashingError> {
+        usbboot::boot_node_to_msd(node)
     }
 }

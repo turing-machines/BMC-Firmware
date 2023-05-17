@@ -33,6 +33,8 @@
 
 #include <stdbool.h>
 
+#include <tpi_rs.h>
+
 #define  SD_PATH "/mnt/sdcard"
 
 
@@ -692,6 +694,54 @@ static void uploadFirmware(Webs *wp)
 	
 }
 
+static const char* node_flashing_file = "/mnt/sdcard/imgs/raspios.img";
+
+static void req_flash_node(Webs *wp)
+{
+    WebsKey         *s;
+    WebsUpload      *up;
+
+    char    *node = NULL;
+    char    cmd[128];
+    uint8_t node_id;
+    flashing_result res;
+
+    node = websGetVar(wp, "node", NULL);
+
+    if (!node)
+    {
+        app_webS_PrintJsonErr(wp, 400, "No node specified");
+        return;
+    }
+
+    websSetStatus(wp, 200);
+    websWriteHeaders(wp, -1, 0);
+    websWriteHeader(wp, "Content-Type", "text/plain");
+
+    websWriteEndHeaders(wp);
+
+    if(!isMountSDcard("/mnt/sdcard"))
+    {
+        websWrite(wp,"{\"response\":[{\"result\":\"err:no sdcard\"}]}");
+        websDone(wp);
+        return;
+    }
+
+    // NOTE: code for uploading files (as in uploadFirmware()) omitted, because can't simply
+    // configure upload path without recompiling.
+
+    node_id = atoi(node);
+
+    res = tpi_flash_node(node_id, node_flashing_file);
+
+    if (res == FR_SUCCESS)
+        websWrite(wp,"{\"response\":[{\"result\":\"ok\"}]}");
+    else
+        websWrite(wp,"{\"response\":[{\"result\":\"flashing failure: %d\"}]}", res);
+
+    websDone(wp);
+}
+
 static void bmcdemo(Webs *wp)
 {
     char    *pOpt   = NULL;
@@ -755,6 +805,10 @@ static void bmcdemo(Webs *wp)
         if(0==strcasecmp(pType,"firmware"))
         {
             uploadFirmware(wp);
+        }
+        if(0==strcasecmp(pType,"flash"))
+        {
+            req_flash_node(wp);
         }
         if(0==strcasecmp(pType,"sdcard"))
         {

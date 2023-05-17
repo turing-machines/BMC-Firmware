@@ -11,18 +11,16 @@ typedef enum {
     All,
 } node_id_t;
 
+void tpi_initialize(void);
+
 void power_cycle_node(node_id_t node_id, bool on);
 
-typedef enum  {
-    UnknownError,
-    NodeDoesNotExist,
-    Busy,
-    InProgress,
-    StorageFull,
-    Timeout,
-    ChecksumMismatch,
-    Done,
-} node_flash_progress_t;
+typedef enum {
+    FR_SUCCESS,
+    FR_INVALID_ARGS,
+    FR_TIMEOUT,
+    FR_CHECKSUM_MISMATCH,
+} flashing_result;
 
-void flash_node(node_id_t node_id, void(*on_progress)(node_flash_progress_t, uint32_t));
+flashing_result tpi_flash_node(uint32_t node_id, const char* image_path);
 

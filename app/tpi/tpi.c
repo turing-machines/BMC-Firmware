@@ -4,6 +4,7 @@
 #include <getopt.h>
 #include <strings.h>
 #include <stdbool.h>
+#include <errno.h>
 
 #include <sys/stat.h>
 #include <sys/ioctl.h>
@@ -160,7 +161,44 @@ int download_file(char* url)
     }
 }
 
+static int flash_node(int node, const char* image_path)
+{
+    char cmd[512] = {0};
+    char line[1024] = {0};
+    int ret = -1;
 
+    if (node == -1)
+    {
+        puts("Please specify node");
+        return -1;
+    }
+
+    if (!access(image_path, F_OK) == 0)
+    {
+        printf("File '%s' not found: %s\n", image_path, strerror(errno));
+        return -1;
+    }
+
+    sprintf(cmd, "curl 'http://%s/api/bmc?opt=set&type=flash&node=%d'", host, node);
+
+    FILE *pp = popen(cmd, "r");
+    if (!pp)
+    {
+        puts("Failed to upload image");
+        return -1;
+    }
+
+    while (fgets(line, 1024, pp)) {
+        if (strstr(line, "\"result\":\"ok\"") ) {
+            ret = 0;
+            break;
+        }
+    }
+
+    pclose(pp);
+
+    return ret;
+}
 
 int Socket(int domain, int type, int protocol)
 {
@@ -292,7 +330,7 @@ void usage(void)
     printf("\t-U, --uart         uart opt get or set\n");
     printf("\t-C, --cmd          uart set cmd\n");
     printf("\t-F, --upgrade      upgrade fw\n");
-    printf("\t-f, --flash        todo\n");
+    printf("\t-f, --flash        flash an image to a specified node\n");
     printf("\t-h, --help         usage\n");
     printf("example: \n");
     printf("\t$ tpi -p on //power on\n");
@@ -407,6 +445,13 @@ int main(int argc, char *argv[])
             {
                 mode = 4;
                 strcpy(up_file,optarg);
+                break;
+            }
+            case 'f':
+            {
+                mode = 5;
+                strcpy(up_file,optarg);
+                break;
             }
             case 'C':
             {
@@ -463,6 +508,12 @@ int main(int argc, char *argv[])
         case 4:
         {
             download_file(up_file);
+            break;
+        }
+        case 5:
+        {
+            flash_node(node, up_file);
+            break;
         }
         default:
             usage();

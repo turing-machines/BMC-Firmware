@@ -22,8 +22,10 @@ evdev = { version = "*", features = [
 futures = "*"
 anyhow = "*"
 async-trait = "*"
+log = "0.4.17"
+rustpiboot = { git = "https://github.com/ruslashev/rustpiboot.git" }
+simple_logger = { version = "4.1.0", default-features = false, features = ["colors"] }
 sqlx = { version = "*", features = [
     "runtime-tokio-rustls",
     "sqlite"
 ] }
-log = "*"

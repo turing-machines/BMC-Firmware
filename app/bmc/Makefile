@@ -1,5 +1,5 @@
 CPPFLAGS += 
-LDLIBS += -L./lib/ -lpthread -lgo -lcjson -ltpi_rs -ldl -lm -lrt
+LDLIBS += -L./lib/ -lpthread -lgo -lcjson -ltpi_rs -ldl -lm -lrt -lusb-1.0
  
 all: bmc
  

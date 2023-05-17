@@ -14,14 +14,16 @@ pub enum NodeId {
     All,
 }
 
-impl From<u32> for NodeId {
-    fn from(v: u32) -> Self {
-        match v {
-            0 => NodeId::Node1,
-            1 => NodeId::Node2,
-            2 => NodeId::Node3,
-            3 => NodeId::Node4,
-            x => panic!("node id {} does not exist", x),
+impl TryFrom<u32> for NodeId {
+    type Error = String;
+
+    fn try_from(value: u32) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(NodeId::Node1),
+            1 => Ok(NodeId::Node2),
+            2 => Ok(NodeId::Node3),
+            3 => Ok(NodeId::Node4),
+            x => Err(format!("node id {} does not exist", x)),
         }
     }
 }

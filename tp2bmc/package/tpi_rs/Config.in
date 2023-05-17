@@ -1,6 +1,8 @@
 config BR2_PACKAGE_TPI_RS
 	bool "tpi_rs"
-	depends on BR2_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS || BR2_PACKAGE_SQLITE
+	depends on BR2_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS
+	depends on BR2_PACKAGE_SQLITE
 	select BR2_PACKAGE_HOST_RUSTC
+	select BR2_PACKAGE_LIBUSB
 	help
 	  development of the rust version of the tp2

@@ -19,6 +19,8 @@
 
 #include "comm_device_serial.h"
 
+#include <tpi_rs.h>
+
 #define RTL_RESET GPIO_PIN_PG(13)
 #define SYS_LED GPIO_PIN_PG(8)
 #define RESET_LED GPIO_PIN_PG(9)
@@ -682,6 +684,9 @@ int main(int argc, char *argv[])
 {
     printf("Hello bmc start build time = %s-%s\n", __TIME__, __DATE__);
     printf("bmc version:v%s\n", BMCVERSION);
+
+    tpi_initialize();
+
     int ret = -1;
     int i;
     pthread_t pid, piduart;
