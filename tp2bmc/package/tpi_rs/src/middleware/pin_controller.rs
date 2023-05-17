@@ -1,5 +1,7 @@
 use super::gpio_definitions::*;
 use super::NodeId;
+use anyhow::Context;
+use gpiod::Active;
 use gpiod::AsValuesMut;
 use gpiod::{Chip, Lines, Masked, Options, Output};
 use std::io::ErrorKind;
@@ -26,43 +28,48 @@ pub struct PinController {
 
 /// small helper macro which handles the code duplication of declaring lines.
 macro_rules! create_output_lines {
-    ($chip:ident, $(($name:ident, $pins: expr, $description: literal)),+) => {
+    ($chip:ident, $(($name:ident, $pins: expr, $active: expr, $description: literal)),+) => {
         $(let $name = $chip
-            .request_lines(Options::output($pins).consumer($description))
-            ?;
+            .request_lines(Options::output($pins).active($active))
+            .context(concat!("error intializing ", stringify!($name), " pins"))?;
         )*
     };
 }
 
 impl PinController {
     /// create a new Pin controller
-    pub async fn new() -> std::io::Result<Self> {
-        let chip = Chip::new("gpiochip0")?;
+    pub async fn new() -> anyhow::Result<Self> {
+        let chip = Chip::new("/dev/gpiochip0").context("gpiod device")?;
         create_output_lines!(
             chip,
             (
-                usb_mux,
-                [USB_SEL1, USB_OE1, USB_SEL2, USB_OE2],
-                "usb channel switcher"
-            ),
-            (
                 rpi_boot,
                 [PORT1_RPIBOOT, PORT2_RPIBOOT, PORT3_RPIBOOT, PORT4_RPIBOOT],
+                Active::Low,
                 "rpi boot"
+            ),
+            (
+                usb_mux,
+                [USB_SEL1, USB_OE1, USB_SEL2, USB_OE2],
+                Active::High,
+                "usb channel switcher"
             ),
             (
                 mode,
                 [MODE1_EN, MODE2_EN, MODE3_EN, MODE4_EN, POWER_EN],
+                Active::High,
                 "5v power enable"
             ),
             (
                 enable,
                 [PORT1_EN, PORT2_EN, PORT3_EN, PORT4_EN],
+                Active::Low,
                 "power on/off signal"
             ),
             (
                 reset,
                 [PORT1_RST, PORT2_RST, PORT3_RST, PORT4_RST],
+                Active::High,
                 "reset group"
             )
         );
@@ -78,7 +85,7 @@ impl PinController {
 
     pub async fn atx_power(&self, on: bool) -> std::io::Result<()> {
         self.mode
-            .get_values(Masked::<u8>::default().with(4, Some(on)))?;
+            .set_values(Masked::<u8>::default().with(4, Some(on)))?;
         sleep(Duration::from_secs(1)).await;
         Ok(())
     }

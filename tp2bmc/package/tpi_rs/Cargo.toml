@@ -15,7 +15,7 @@ tokio = { version = "*", features = [
     "time",
     "macros"
 ] }
-gpiod = "*"
+gpiod = { version = "*", default-features = false }
 evdev = { version = "*", features = [
     "tokio"
 ] }

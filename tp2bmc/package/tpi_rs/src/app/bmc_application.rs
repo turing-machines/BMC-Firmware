@@ -16,15 +16,15 @@ pub struct BmcApplication {
 
 impl BmcApplication {
     pub async fn new() -> anyhow::Result<Self> {
-        let pin_controller = Arc::new(PinController::new().await?);
-        let app_db = ApplicationPersistency::new().await?;
+        let pin_controller = Arc::new(PinController::new().await.context("pin controller")?);
+        let app_db = ApplicationPersistency::new().await.context("persistency")?;
 
         let instance = Self {
             pin_controller,
             app_db,
         };
 
-        instance.initialize().await?;
+        instance.initialize().await.context("initialize")?;
         Ok(instance)
     }
 
@@ -43,7 +43,7 @@ impl BmcApplication {
         tokio::spawn(async move {
             let mut event_stream = linux_event_stream().unwrap();
             while let Ok(event) = event_stream.next_event().await {
-                todo!()
+                println!("got event: {:?}", event);
             }
         });
     }

@@ -18,16 +18,16 @@ TPI_RS_INSTALL_TARGET = NO
 define TPI_RS_BUILD_CMDS
 	cd $(TPI_RS_SRCDIR) && \
 	$(TARGET_MAKE_ENV) \
-		$$(PKG_CARGO_ENV) \
+		$(PKG_CARGO_ENV) \
 		cargo build \
 			$(if $(BR2_ENABLE_DEBUG),,--release) \
 			--manifest-path Cargo.toml \
-			--target $(RUSTC_TARGET_NAME)
+			--target $(RUSTC_TARGET_NAME) \
 			--locked
 endef
 
 define TPI_RS_INSTALL_STAGING_CMDS
- $(INSTALL) -D -m 0644 $(@D)/target/$(RUSTC_TARGET_NAME)/release/libtpi_rs.a $(STAGING_DIR)/lib
+ $(INSTALL) -D -m 0644 $(@D)/target/$(RUSTC_TARGET_NAME)/$(if $(BR2_ENABLE_DEBUG),debug,release)/libtpi_rs.a $(STAGING_DIR)/lib
  $(INSTALL) -D -m 0644 $(@D)/tpi_rs.h $(STAGING_DIR)/usr/include
 endef
 
