@@ -21,6 +21,10 @@ cp $BOARD_DIR/../tina-pack-tools/* -rfvd  $BINARIES_DIR
 #cd buildroot/output/images/
 cd $BINARIES_DIR
 
+# Patch boot_package.cfg to refer to the new dtb filename.
+# This should be removed once the br2t113pro directory is deleted.
+sed -i s/sun8iw20p1-t113-100ask-t113-pro/sun8iw20p1-t113-turingmachines-tp2bmc/ boot_package.cfg
+
 #build env.fex bootargs.
 mkenvimage -r -p 0x00 -s 0x20000 -o env.fex env-spinand.cfg
 
