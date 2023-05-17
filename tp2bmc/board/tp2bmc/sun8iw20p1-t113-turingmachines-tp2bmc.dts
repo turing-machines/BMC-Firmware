@@ -32,7 +32,6 @@
 	// This is currently disabled; userspace wants to manage the GPIOs
 	// directly for now.
 	leds {
-		status = "disabled";
 		compatible = "gpio-leds";
 
 		sys {
@@ -49,7 +48,6 @@
 	// The keys are also GPIO lines.
 	// This is also disabled, for the same reason as above.
 	keys {
-		status = "disabled";
 		compatible = "gpio-keys";
 
 		// Part of the front-panel connector
