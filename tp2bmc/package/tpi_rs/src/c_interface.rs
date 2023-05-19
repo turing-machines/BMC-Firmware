@@ -8,8 +8,8 @@ use simple_logger::SimpleLogger;
 use std::{ffi::CStr, ops::Deref};
 use tokio::{runtime::Runtime, sync::Mutex};
 
-use crate::{app::bmc_application::BmcApplication, middleware::NodeId};
 use crate::middleware::usbboot::FlashingError;
+use crate::{app::bmc_application::BmcApplication, middleware::NodeId};
 
 /// we need means to synchronize async call to the outside. This runtime
 /// enables us to execute async calls in a blocking fashion.
@@ -94,9 +94,8 @@ pub extern "C" fn tpi_flash_node(node: u32, image_path: *const std::ffi::c_char)
     let str = unsafe { CStr::from_ptr(image_path) }.to_str().unwrap();
     let node_image = String::from(str);
 
-    let node_id = match node.try_into() {
-        Ok(value) => value,
-        Err(_) => return FlashingResult::InvalidArgs,
+    let Ok(node_id) = node.try_into() else {
+        return FlashingResult::InvalidArgs
     };
 
     RUNTIME.block_on(async move {

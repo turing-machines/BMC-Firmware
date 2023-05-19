@@ -5,11 +5,12 @@ use log::info;
 use sqlx::Row;
 use sqlx::Sqlite;
 use sqlx::SqlitePool;
-use std::path::Path;
 use std::path::PathBuf;
 
 /// directory on target which the sqlite database is written to.
 const DATABASE: &str = concat!("/var/lib/", env!("CARGO_PKG_NAME"), "/bmc.db");
+
+const VERSION: u32 = 1;
 
 /// [ApplicationPersistency] is a simple key-value store that stores application state. Decided is
 /// to go for a sqlite implementation. Its stable and there are enough tools available for it.
@@ -27,7 +28,7 @@ impl ApplicationPersistency {
     /// error when the database version is not supported.
     pub async fn new() -> anyhow::Result<Self> {
         let path = PathBuf::from(DATABASE);
-        let sql_db = format!("sqlite:{}", DATABASE);
+        let sql_db = format!("sqlite://{}", DATABASE);
 
         let connection = if !path.exists() {
             info!(
@@ -53,7 +54,7 @@ impl ApplicationPersistency {
             .await?;
 
         let version: u32 = result.get::<u32, usize>(0);
-        if version != 1 {
+        if version != VERSION {
             bail!("database version {} is not supported {}", version, DATABASE);
         }
         Ok(connection)
@@ -61,12 +62,15 @@ impl ApplicationPersistency {
 
     async fn setup_new(db: &str) -> anyhow::Result<SqlitePool> {
         let connection = SqlitePool::connect(db).await?;
-        let sql = r"
-            PRAGMA user_version = 1; 
+        let sql = format!(
+            r"
+            PRAGMA user_version = {};
             CREATE TABLE IF NOT EXISTS keyvalue (key TEXT PRIMARY KEY, value blob);
-            ";
+            ",
+            VERSION
+        );
 
-        Ok(sqlx::query(sql)
+        Ok(sqlx::query(&sql)
             .execute(&connection)
             .await
             .map(|_| connection)?)
@@ -108,7 +112,7 @@ mod tests {
     async fn test_wrong_version_check() {
         let connection = SqlitePool::connect("sqlite::memory:").await.unwrap();
         let sql = r"
-            PRAGMA user_version = 3; 
+            PRAGMA user_version = 3;
             ";
 
         sqlx::query(sql).execute(&connection).await.unwrap();

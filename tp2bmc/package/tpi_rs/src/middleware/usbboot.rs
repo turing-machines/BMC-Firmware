@@ -12,9 +12,13 @@ pub enum FlashingError {
 impl fmt::Display for FlashingError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            FlashingError::InvalidArgs => write!(f, "A specified node does not exist or image is not valid"),
+            FlashingError::InvalidArgs => {
+                write!(f, "A specified node does not exist or image is not valid")
+            }
             FlashingError::Timeout => write!(f, "The node did not respond in a long time"),
-            FlashingError::ChecksumMismatch => write!(f, "Failed to verify image after writing to the node"),
+            FlashingError::ChecksumMismatch => {
+                write!(f, "Failed to verify image after writing to the node")
+            }
         }
     }
 }
