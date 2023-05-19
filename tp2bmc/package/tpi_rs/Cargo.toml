@@ -29,3 +29,8 @@ sqlx = { version = "*", features = [
     "runtime-tokio-rustls",
     "sqlite"
 ] }
+
+[profile.release]
+lto = "thin"
+opt-level = "z"
+strip = true
