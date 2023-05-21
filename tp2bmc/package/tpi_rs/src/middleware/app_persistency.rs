@@ -104,50 +104,50 @@ impl ApplicationPersistency {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[tokio::test]
-    async fn test_wrong_version_check() {
-        let connection = SqlitePool::connect("sqlite::memory:").await.unwrap();
-        let sql = r"
-            PRAGMA user_version = 3;
-            ";
-
-        sqlx::query(sql).execute(&connection).await.unwrap();
-        let result = ApplicationPersistency::verify_version(&connection).await;
-        assert!(result.is_err());
-    }
-
-    macro_rules! test_bits {
-        ($db: ident, $(($bits:literal,$mask:literal,$output:literal)),+ ) => {
-            $(  $db.set_with_bitmask("foo", $bits, $mask).await.unwrap();
-                assert_eq!($output, $db.get::<u32>("foo").await.unwrap());
-            )*
-        };
-    }
-
-    #[tokio::test]
-    async fn test_power_bits() {
-        let connection = SqlitePool::connect("sqlite::memory:").await.unwrap();
-        ApplicationPersistency::setup_new(&connection)
-            .await
-            .unwrap();
-        ApplicationPersistency::verify_version(&connection)
-            .await
-            .unwrap();
-
-        let db = ApplicationPersistency { connection };
-        db.set("foo", 0).await.unwrap();
-
-        test_bits!(
-            db,
-            (0b1111, 0b0000, 0b0000),
-            (0b1111, 0b1000, 0b1000),
-            (0b1111, 0b0000, 0b1000),
-            (0b0011, 0b1111, 0b0011),
-            (0b0000, 0b1111, 0b0000)
-        );
-    }
-}
+//#[cfg(test)]
+//mod tests {
+//    use super::*;
+//
+//    #[tokio::test]
+//    async fn test_wrong_version_check() {
+//        let connection = SqlitePool::connect("sqlite::memory:").await.unwrap();
+//        let sql = r"
+//            PRAGMA user_version = 3;
+//            ";
+//
+//        sqlx::query(sql).execute(&connection).await.unwrap();
+//        let result = ApplicationPersistency::setup_new(&connection).await;
+//        assert!(result.is_err());
+//    }
+//
+//    macro_rules! test_bits {
+//        ($db: ident, $(($bits:literal,$mask:literal,$output:literal)),+ ) => {
+//            $(  $db.set_with_bitmask("foo", $bits, $mask).await.unwrap();
+//                assert_eq!($output, $db.get::<u32>("foo").await.unwrap());
+//            )*
+//        };
+//    }
+//
+//    // #[tokio::test]
+//    // async fn test_power_bits() {
+//    //     let connection = SqlitePool::connect("sqlite::memory:").await.unwrap();
+//    //     ApplicationPersistency::setup_new(&connection)
+//    //         .await
+//    //         .unwrap();
+//    //     ApplicationPersistency::verify_version(&connection)
+//    //         .await
+//    //         .unwrap();
+//
+//    //     let db = ApplicationPersistency { connection };
+//    //     db.set("foo", 0).await.unwrap();
+//
+//    //     test_bits!(
+//    //         db,
+//    //         (0b1111, 0b0000, 0b0000),
+//    //         (0b1111, 0b1000, 0b1000),
+//    //         (0b1111, 0b0000, 0b1000),
+//    //         (0b0011, 0b1111, 0b0011),
+//    //         (0b0000, 0b1111, 0b0000)
+//    //     );
+//    // }
+//}

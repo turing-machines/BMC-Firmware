@@ -1,47 +1,66 @@
 use super::gpio_definitions::*;
 use super::NodeId;
+use super::UsbMode;
+use super::UsbRoute;
 use anyhow::Context;
 use gpiod::Active;
-use gpiod::AsValuesMut;
-use gpiod::{Chip, Lines, Masked, Options, Output};
+use gpiod::{Chip, Lines, Options, Output};
+use log::trace;
 use std::io::ErrorKind;
 use std::time::Duration;
 use tokio::time::sleep;
 
-#[derive(Debug, Eq, PartialEq)]
-pub enum UsbMode {
-    BMC,
-    UsbA,
-}
+const NODE_COUNT: u8 = 4;
 
 /// This middleware is responsible for managing the switching of nodes on the
 /// board, including power regulators and USB multiplexers. Due to hardware
 /// limitations, only one node can be connected over the USB bus at a time. This
 /// structure the GPIOD device library internally.
 pub struct PinController {
+    usb_vbus: Lines<Output>,
     usb_mux: Lines<Output>,
+    usb_en: Lines<Output>,
     rpi_boot: Lines<Output>,
     mode: Lines<Output>,
     enable: Lines<Output>,
     reset: Lines<Output>,
+    atx: Lines<Output>,
 }
 
 /// small helper macro which handles the code duplication of declaring lines.
 macro_rules! create_output_lines {
-    ($chip:ident, $(($name:ident, $pins: expr, $active: expr, $description: literal)),+) => {
-        $(let $name = $chip
-            .request_lines(Options::output($pins).active($active))
-            .context(concat!("error intializing ", stringify!($name), " pins"))?;
-        )*
+    ($chip: literal, $(($name:ident, $pins: expr, $active: expr, $description: literal)),+) => {
+        {
+            let chip = Chip::new($chip).context("gpiod device")?;
+            $(let $name = chip
+                .request_lines(Options::output($pins).active($active))
+                .context(concat!("error intializing ", stringify!($name), " pins"))?;
+                )*
+
+
+            PinController {
+                $($name),+
+            }
+        }
     };
 }
 
 impl PinController {
     /// create a new Pin controller
     pub async fn new() -> anyhow::Result<Self> {
-        let chip = Chip::new("/dev/gpiochip0").context("gpiod device")?;
-        create_output_lines!(
-            chip,
+        let instance = create_output_lines!(
+            "gpiochip0",
+            (
+                usb_vbus,
+                [
+                    PORT1_USB_VBUS,
+                    PORT2_USB_VBUS,
+                    PORT3_USB_VBUS,
+                    PORT4_USB_VBUS
+                ],
+                Active::High,
+                "usb vbus"
+            ),
             (
                 rpi_boot,
                 [PORT1_RPIBOOT, PORT2_RPIBOOT, PORT3_RPIBOOT, PORT4_RPIBOOT],
@@ -55,8 +74,14 @@ impl PinController {
                 "usb channel switcher"
             ),
             (
+                usb_en,
+                [USB_PWEN, USB_SWITCH],
+                Active::High,
+                "usb channel switcher"
+            ),
+            (
                 mode,
-                [MODE1_EN, MODE2_EN, MODE3_EN, MODE4_EN, POWER_EN],
+                [MODE1_EN, MODE2_EN, MODE3_EN, MODE4_EN],
                 Active::High,
                 "5v power enable"
             ),
@@ -71,95 +96,86 @@ impl PinController {
                 [PORT1_RST, PORT2_RST, PORT3_RST, PORT4_RST],
                 Active::High,
                 "reset group"
-            )
+            ),
+            (atx, [POWER_EN, SYS_LED], Active::High, "atx line")
         );
+        instance.usb_vbus.set_values(0b1111u8)?;
 
-        Ok(Self {
-            usb_mux,
-            rpi_boot,
-            mode,
-            enable,
-            reset,
-        })
+        Ok(instance)
     }
 
-    pub async fn atx_power(&self, on: bool) -> std::io::Result<()> {
-        self.mode
-            .set_values(Masked::<u8>::default().with(4, Some(on)))?;
+    pub async fn set_atx_power(&self, on: bool) -> std::io::Result<()> {
+        let mut values: u8 = 0b10;
+        if on {
+            values = !values;
+        }
+
+        self.atx.set_values(values)?;
         sleep(Duration::from_secs(1)).await;
         Ok(())
     }
 
     /// changes the configuration in such a way that
-    pub async fn switch_usb(&self, node: NodeId, connect_to: UsbMode) -> std::io::Result<()> {
+    pub fn select_usb(&self, node: NodeId) -> std::io::Result<()> {
         let values: u8 = match node {
-            NodeId::Node1 => 0b0011,
-            NodeId::Node2 => 0b1011,
-            NodeId::Node3 => 0b1100,
-            NodeId::Node4 => 0b1110,
+            NodeId::Node1 => 0b1100,
+            NodeId::Node2 => 0b1101,
+            NodeId::Node3 => 0b0011,
+            NodeId::Node4 => 0b0111,
             NodeId::All => return Err(std::io::Error::from(ErrorKind::Unsupported)),
         };
-
-        if connect_to == UsbMode::BMC {
-        } else {
-        }
-
         self.usb_mux.set_values(values)
     }
 
-    /// Set given node into usb boot mode. When powering the node on with this usb_boot mode
-    /// enabled, the given node will boot into USB mode. Typically means that booting of eMMC is
-    /// disabled.
-    pub async fn usb_boot(&self, node: NodeId, on: bool) -> std::io::Result<()> {
-        let mut bits = as_bits(node);
-        if !on {
-            bits = !bits;
-        }
+    pub fn set_usb_route(&self, route: UsbRoute, mode: UsbMode) -> std::io::Result<()> {
+        let route_bits: u8 = if route == UsbRoute::BMC { 0b1 } else { 0b0 };
+        let mode_bits: u8 = if mode == UsbMode::Slave { 0b1 } else { 0b0 };
 
-        let mask = Masked {
-            bits,
-            mask: as_bits(node),
-        };
-        self.rpi_boot.set_values(mask)
+        let values: u8 = mode_bits | (route_bits << 1);
+        trace!("set_route {:#04b}", values);
+        self.usb_en.set_values(values)
     }
 
-    pub async fn power_node(&self, bits: u8, mask: u8) -> std::io::Result<()> {
-        for n in 0..4 {
-            let output_mask = mask & (1 << n);
-            // continue if bit is not to be written
-            if output_mask == 0 {
+    /// Set given nodes into usb boot mode. When powering the node on with this usb_boot mode
+    /// enabled, the given node will boot into USB mode. Typically means that booting of eMMC is
+    /// disabled.
+    pub async fn set_usb_boot(&self, node_state: u8) -> std::io::Result<()> {
+        self.rpi_boot.set_values(node_state)
+    }
+
+    pub async fn set_power_node(
+        &self,
+        mut current_node_state: u8,
+        new_node_state: u8,
+    ) -> std::io::Result<()> {
+        let mut prev_node_state = current_node_state;
+        for n in 0..NODE_COUNT {
+            let masked_new = new_node_state & (1 << n);
+            current_node_state = (current_node_state & !(1 << n)) | masked_new;
+            if current_node_state == prev_node_state {
                 continue;
             }
 
-            let masked = Masked {
-                bits,
-                mask: output_mask,
-            };
-            self.mode.set_values(masked)?;
+            trace!("set_power_node {:#4b}", current_node_state);
+            self.mode.set_values(&current_node_state)?;
             sleep(Duration::from_millis(100)).await;
-            self.enable.set_values(masked)?;
-            sleep(Duration::from_secs(1)).await;
+            self.enable.set_values(&current_node_state)?;
+            sleep(Duration::from_millis(100)).await;
+            if n != 4 {
+                self.reset.set_values(&current_node_state)?;
+                sleep(Duration::from_secs(1)).await;
+            }
+
+            prev_node_state = current_node_state;
         }
         Ok(())
     }
 
     pub async fn reset(&self, node: NodeId) -> std::io::Result<()> {
-        let mut mask = Masked {
-            bits: as_bits(node),
-            mask: as_bits(node),
-        };
-        self.reset.set_values(mask)?;
+        let value = node.to_bitfield();
+        self.reset.set_values(&value)?;
         sleep(Duration::from_secs(1)).await;
-        mask.bits = !mask.bits;
-        self.reset.set_values(mask)
-    }
-}
-
-fn as_bits(node: NodeId) -> u8 {
-    if node == NodeId::All {
-        15
-    } else {
-        1 << node as u8
+        self.reset.set_values(0u8)
     }
 }
 

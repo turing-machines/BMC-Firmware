@@ -14,10 +14,10 @@ pub enum NodeId {
     All,
 }
 
-impl TryFrom<u32> for NodeId {
+impl TryFrom<i32> for NodeId {
     type Error = String;
 
-    fn try_from(value: u32) -> Result<Self, Self::Error> {
+    fn try_from(value: i32) -> Result<Self, Self::Error> {
         match value {
             0 => Ok(NodeId::Node1),
             1 => Ok(NodeId::Node2),
@@ -28,10 +28,56 @@ impl TryFrom<u32> for NodeId {
     }
 }
 
+impl NodeId {
+    pub fn to_bitfield(&self) -> u8 {
+        if self == &NodeId::All {
+            15
+        } else {
+            1 << *self as u8
+        }
+    }
+}
+
 #[repr(C)]
 #[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub enum NodeType {
     RaspberryPi4,
     JetsonTx2,
     RK1,
+}
+
+#[derive(Debug, Eq, PartialEq)]
+pub enum UsbRoute {
+    BMC,
+    UsbA,
+}
+
+impl TryFrom<i32> for UsbRoute {
+    type Error = String;
+
+    fn try_from(value: i32) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(UsbRoute::BMC),
+            1 => Ok(UsbRoute::UsbA),
+            x => Err(format!("usb route{} does not exist", x)),
+        }
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+pub enum UsbMode {
+    Slave,
+    Master,
+}
+
+impl TryFrom<i32> for UsbMode {
+    type Error = String;
+
+    fn try_from(value: i32) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(UsbMode::Slave),
+            1 => Ok(UsbMode::Master),
+            x => Err(format!("usb mode {} does not exist", x)),
+        }
+    }
 }
