@@ -19,29 +19,18 @@ jobs:
       - name: configure
         run: |
           cd buildroot
-          make BR2_EXTERNAL="../br2t113pro" 100ask_t113-pro_spinand_core_defconfig
-          cd ..
-          mkdir -p buildroot/output/build/linux-5112fdd843715f1615703ca5ce2a06c1abe5f9ee/arch/arm/boot/dts/
-          mkdir -p buildroot/output/build/swupdate-2021.11
-          mkdir -p buildroot/output/images/
-          cp bmc4tpi/config/sun8iw20p1* buildroot/output/build/linux-5112fdd843715f1615703ca5ce2a06c1abe5f9ee/arch/arm/boot/dts/
-          cp bmc4tpi/config/kernelconfig buildroot/output/build/linux-5112fdd843715f1615703ca5ce2a06c1abe5f9ee/.config
-          cp bmc4tpi/config/swupdateconfig buildroot/output/build/swupdate-2021.11/.config
-          cp bmc4tpi/swupdate/sw-description bmc4tpi/swupdate/genSWU.sh bmc4tpi/swupdate/env*.fex buildroot/output/images/
+          make BR2_EXTERNAL=../tp2bmc tp2bmc_defconfig
 
       - name: build
         run: |
           cd buildroot
-          make cjson
           make
 
       - name: build swupdate
         run: |
           cd buildroot/output/images/
+          cp -ra ../../../tp2bmc/swupdate/* .
           ./genSWU.sh dev-${{ github.sha }}
-
-      - name: run mkfw
-        run: ./mkfw.sh 0.0.0
 
       - name: upload
         uses: actions/upload-artifact@v2
