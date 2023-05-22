@@ -43,5 +43,5 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: bmc-fw-dev-${{ github.sha }}
-          path: build
+          path: buildroot/output/images/turingpi_dev-${{ github.sha }}.swu
           if-no-files-found: error 
