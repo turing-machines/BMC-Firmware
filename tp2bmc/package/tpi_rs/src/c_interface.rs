@@ -147,6 +147,8 @@ pub extern "C" fn tpi_flash_node(
         return FlashingResult::InvalidArgs
     };
 
+    log::debug!("using file '{}'", node_image);
+
     RUNTIME.block_on(async move {
         let lock = APP.get().unwrap().lock();
         lock.await

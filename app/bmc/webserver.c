@@ -694,23 +694,27 @@ static void uploadFirmware(Webs *wp)
 	
 }
 
-static const char* node_flashing_file = "/mnt/sdcard/imgs/raspios.img";
-
 static void req_flash_node(Webs *wp)
 {
     WebsKey         *s;
     WebsUpload      *up;
 
     char    *node = NULL;
-    char    cmd[128];
+    char    *node_flashing_file = NULL;
     uint8_t node_id;
     flashing_result res;
 
     node = websGetVar(wp, "node", NULL);
-
     if (!node)
     {
         app_webS_PrintJsonErr(wp, 400, "No node specified");
+        return;
+    }
+
+    node_flashing_file = websGetVar(wp, "file", NULL);
+    if (!node_flashing_file)
+    {
+        app_webS_PrintJsonErr(wp, 400, "No file specified");
         return;
     }
 
@@ -720,7 +724,7 @@ static void req_flash_node(Webs *wp)
 
     websWriteEndHeaders(wp);
 
-    if(!isMountSDcard("/mnt/sdcard"))
+    if (!isMountSDcard("/mnt/sdcard"))
     {
         websWrite(wp,"{\"response\":[{\"result\":\"err:no sdcard\"}]}");
         websDone(wp);

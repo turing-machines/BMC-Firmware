@@ -161,10 +161,45 @@ int download_file(char* url)
     }
 }
 
-static int flash_node(int node, const char* image_path)
+// An incomplete, PoC-level percent-encoding of a URL. In the Rust release, this should either be
+// done in a proper way, or the feature of using local files for flashing be outright removed.
+static int url_encode(const char *in, char *out, size_t outlen)
+{
+    size_t w = 0;
+
+    for (const char *p = in; *p; ++p)
+    {
+        if (w >= outlen)
+        {
+            return 1;
+        }
+
+        if (*p == ' ')
+        {
+            out[w++] = '%';
+            out[w++] = '2';
+            out[w++] = '0';
+        }
+        else if (*p == '/')
+        {
+            out[w++] = '%';
+            out[w++] = '2';
+            out[w++] = 'F';
+        }
+        else
+        {
+            out[w++] = *p;
+        }
+    }
+
+    return 0;
+}
+
+static int flash_node(int node, const char* image_path, int is_localfile)
 {
     char cmd[512] = {0};
     char line[1024] = {0};
+    char img_urlencoded[512] = { 0 };
     int ret = -1;
 
     if (node == -1)
@@ -173,13 +208,28 @@ static int flash_node(int node, const char* image_path)
         return -1;
     }
 
-    if (!access(image_path, F_OK) == 0)
+    if (access(image_path, F_OK))
     {
         printf("File '%s' not found: %s\n", image_path, strerror(errno));
         return -1;
     }
 
-    sprintf(cmd, "curl 'http://%s/api/bmc?opt=set&type=flash&node=%d'", host, node);
+    if (is_localfile)
+    {
+        if (url_encode(image_path, img_urlencoded, sizeof(img_urlencoded)))
+        {
+            printf("Failed to URL-encode path '%s'\n", image_path);
+            return -1;
+        }
+
+        sprintf(cmd, "curl 'http://%s/api/bmc?opt=set&type=flash&file=%s&node=%d'", host, img_urlencoded, node);
+    }
+    else
+    {
+        puts("Warning: large files will very likely to fail to be uploaded in the current version");
+
+        sprintf(cmd, "curl -F 'file=@%s' 'http://%s/api/bmc?opt=set&type=flash&node=%d'", image_path, host, node);
+    }
 
     FILE *pp = popen(cmd, "r");
     if (!pp)
@@ -331,6 +381,7 @@ void usage(void)
     printf("\t-C, --cmd          uart set cmd\n");
     printf("\t-F, --upgrade      upgrade fw\n");
     printf("\t-f, --flash        flash an image to a specified node\n");
+    printf("\t-l, --localfile    when flashing (-f), the specified file will be loaded locally from the device\n");
     printf("\t-h, --help         usage\n");
     printf("example: \n");
     printf("\t$ tpi -p on //power on\n");
@@ -350,6 +401,7 @@ static struct option long_options[] =
     {"usb", optional_argument, NULL, 'u'},
     {"node", optional_argument, NULL, 'n'},
     {"flash", optional_argument, NULL, 'f'},
+    {"localfile", no_argument, NULL, 'l'},
     {"resetsw", no_argument, NULL, 'r'},
     {"uart", optional_argument, NULL, 'U'},
     {"upgrade", optional_argument, NULL, 'F'},
@@ -373,6 +425,7 @@ int main(int argc, char *argv[])
     int usb_mode = -1;
     int node = -1;
     int uart_mode = -1;
+    int flashing_localfile = 0;
     while ((opt = getopt_long_only(argc, argv, string, long_options, &option_index)) != -1)
     {
         switch(opt)
@@ -453,6 +506,11 @@ int main(int argc, char *argv[])
                 strcpy(up_file,optarg);
                 break;
             }
+            case 'l':
+            {
+                flashing_localfile = 1;
+                break;
+            }
             case 'C':
             {
                 strcpy(uart_cmd,optarg);
@@ -480,6 +538,12 @@ int main(int argc, char *argv[])
             usage();
         }
 
+    }
+
+    if (flashing_localfile && mode != 5)
+    {
+        puts("Argument '--localfile' makes sense only for '--flash' operation");
+        usage();
     }
 
     switch(mode)
@@ -512,7 +576,7 @@ int main(int argc, char *argv[])
         }
         case 5:
         {
-            flash_node(node, up_file);
+            flash_node(node, up_file, flashing_localfile);
             break;
         }
         default:
