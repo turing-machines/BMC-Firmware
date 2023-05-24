@@ -44,7 +44,6 @@ jobs:
       - name: Create pull request
         uses: peter-evans/create-pull-request@v3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "Update Buildroot to ${{ env.latest_version }}"
           title: "Update Buildroot to ${{ env.latest_version }}"
           branch: buildroot-update-${{ env.latest_version }}
@@ -53,6 +52,3 @@ jobs:
             Upgrading from ${{ env.buildroot_version }} to ${{ env.latest_version }}
 
             See CHANGES file for changelog
-          base: main
-          head: ${{ github.ref }}
-          path: buildroot
