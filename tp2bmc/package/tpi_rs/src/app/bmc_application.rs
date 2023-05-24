@@ -1,18 +1,19 @@
+use super::bits_trait::ToBits;
 use crate::middleware::{
     app_persistency::ApplicationPersistency,
-    evdev_controller::linux_event_stream,
+    evdev_controller::EventListener,
     pin_controller::PinController,
     usbboot::{self, FlashingError},
     NodeId, UsbMode, UsbRoute,
 };
 use anyhow::Context;
-use log::{debug, warn};
+use evdev::Key;
+use log::debug;
 use std::sync::Arc;
 
 const POWER_STATE_KEY: &str = "power_state";
-const USB_MODE_KEY: &str = "usb_mode_state";
-const USB_ROUTE_KEY: &str = "usb_route_state";
-const USB_NODE_KEY: &str = "usb_node_state";
+const USB_NODE_KEY: &str = "usb_node";
+const USB_STATE_KEY: &str = "usb_state";
 
 #[derive(Debug)]
 pub struct BmcApplication {
@@ -31,13 +32,27 @@ impl BmcApplication {
         });
 
         instance.initialize().await?;
-        Self::run_event_listener(instance.clone());
+
+        EventListener::new(instance.clone())
+            .add_action_async(Key::KEY_1, 1, |app| {
+                Box::pin(Self::toggle_power_states(app.clone()))
+            })
+            .add_action_async(Key::KEY_POWER, 1, |app| todo!())
+            .add_action_async(Key::KEY_RESTART, 1, |app| todo!())
+            .run()?;
+
         Ok(instance)
     }
 
+    async fn toggle_power_states(app: Arc<BmcApplication>) -> anyhow::Result<()> {
+        let state = app.app_db.get::<u8>(POWER_STATE_KEY).await?;
+        // calling node power with on == false, inverts the passed state bits.
+        app.power_node(state, false).await
+    }
+
     async fn initialize(&self) -> anyhow::Result<()> {
-        self.initialize_power().await?;
-        self.initialize_usb_mode().await
+        self.initialize_usb_mode().await?;
+        self.initialize_power().await
     }
 
     async fn initialize_power(&self) -> anyhow::Result<()> {
@@ -49,27 +64,21 @@ impl BmcApplication {
         }
     }
 
-    async fn initialize_usb_mode(&self) -> anyhow::Result<()> {
-        self.usb_mode(UsbMode::Slave, NodeId::Node1)?;
-        Ok(())
-    }
+    async fn initialize_usb_mode(&self) -> std::io::Result<()> {
+        let node = self
+            .app_db
+            .get::<NodeId>(USB_NODE_KEY)
+            .await
+            .unwrap_or(NodeId::Node1);
+        let res = self.pin_controller.select_usb(node);
 
-    /// A small controller that listens for the KEY_1 press and acts
-    /// accordingly.
-    fn run_event_listener(app: Arc<BmcApplication>) {
-        tokio::spawn(async move {
-            let mut event_stream = linux_event_stream().unwrap();
-            let mut state = false;
-            while let Ok(event) = event_stream.next_event().await {
-                match (event.kind(), event.value()) {
-                    (evdev::InputEventKind::Key(evdev::Key::KEY_1), 1) => {
-                        state = !state;
-                        app.power_node(NodeId::All, state).await.unwrap();
-                    }
-                    _ => debug!("event omitted {:?}", event),
-                }
-            }
-        });
+        let (route, mode) = self
+            .app_db
+            .get::<(UsbRoute, UsbMode)>(USB_STATE_KEY)
+            .await
+            .unwrap_or((UsbRoute::UsbA, UsbMode::Slave));
+        let res2 = self.pin_controller.set_usb_route(route, mode);
+        res.and(res2)
     }
 
     /// Helper function that calls power function of the nodes while checking
@@ -106,18 +115,17 @@ impl BmcApplication {
 
     pub async fn get_node_power(&self, node: NodeId) -> anyhow::Result<bool> {
         let state = self.app_db.get::<u8>(POWER_STATE_KEY).await?;
-        Ok(state & node.to_bitfield() != 0)
+        Ok(state & node.to_bits() != 0)
     }
 
     /// Power on or off a given node. Nodes are switched with a small delay to
     /// protect the hardware. The state of the nodes are persisted to disk.
-    pub async fn power_node(&self, node: NodeId, on: bool) -> anyhow::Result<()> {
-        let mut bits = node.to_bitfield();
+    pub async fn power_node<N: ToBits>(&self, node: N, on: bool) -> anyhow::Result<()> {
+        let mut bits = node.to_bits();
         if !on {
             bits = !bits;
         }
-        let mask = node.to_bitfield();
-
+        let mask = node.to_bits();
         let power_state = self.app_db.get::<u8>(POWER_STATE_KEY).await?;
         let new_power_state = (power_state & !mask) | (bits & mask);
 
@@ -135,9 +143,15 @@ impl BmcApplication {
         self.app_db.set(POWER_STATE_KEY, new_power_state).await
     }
 
-    pub fn usb_mode(&self, mode: UsbMode, node: NodeId) -> std::io::Result<()> {
+    pub async fn usb_mode(&self, mode: UsbMode, node: NodeId) -> anyhow::Result<()> {
         self.pin_controller.select_usb(node)?;
-        self.pin_controller.set_usb_route(UsbRoute::BMC, mode)
+        self.app_db.set(USB_NODE_KEY, node).await?;
+        self.pin_controller.set_usb_route(UsbRoute::BMC, mode)?;
+        self.app_db.set(USB_STATE_KEY, (UsbRoute::BMC, mode)).await
+    }
+
+    pub async fn rtl_reset(&self) -> anyhow::Result<()> {
+        self.pin_controller.rtl_reset().await.context("rtl error")
     }
 
     pub async fn flash_node<P: AsRef<str>>(

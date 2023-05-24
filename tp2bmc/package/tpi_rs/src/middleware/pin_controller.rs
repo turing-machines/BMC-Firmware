@@ -25,6 +25,7 @@ pub struct PinController {
     enable: Lines<Output>,
     reset: Lines<Output>,
     atx: Lines<Output>,
+    rtl_reset: Lines<Output>,
 }
 
 /// small helper macro which handles the code duplication of declaring lines.
@@ -97,7 +98,8 @@ impl PinController {
                 Active::High,
                 "reset group"
             ),
-            (atx, [POWER_EN, SYS_LED], Active::High, "atx line")
+            (atx, [POWER_EN, SYS_LED], Active::High, "atx line"),
+            (rtl_reset, [RTL_RESET], Active::Low, "Realtek switch reset")
         );
         instance.usb_vbus.set_values(0b1111u8)?;
 
@@ -163,9 +165,9 @@ impl PinController {
             sleep(Duration::from_millis(100)).await;
             if n != 4 {
                 self.reset.set_values(&current_node_state)?;
-                sleep(Duration::from_secs(1)).await;
             }
 
+            sleep(Duration::from_secs(1)).await;
             prev_node_state = current_node_state;
         }
         Ok(())
@@ -176,6 +178,12 @@ impl PinController {
         self.reset.set_values(&value)?;
         sleep(Duration::from_secs(1)).await;
         self.reset.set_values(0u8)
+    }
+
+    pub async fn rtl_reset(&self) -> std::io::Result<()> {
+        self.rtl_reset.set_values(1u8)?;
+        sleep(Duration::from_secs(1)).await;
+        self.rtl_reset.set_values(0u8)
     }
 }
 

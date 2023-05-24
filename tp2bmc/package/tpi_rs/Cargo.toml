@@ -29,6 +29,8 @@ sqlx = { version = "*", features = [
     "runtime-tokio-rustls",
     "sqlite"
 ] }
+serde = { version = "*", features = ["derive"] }
+bincode = "*"
 
 [profile.release]
 lto = "thin"

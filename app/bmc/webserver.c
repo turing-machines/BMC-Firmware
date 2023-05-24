@@ -222,7 +222,7 @@ static int set_usbmode(Webs* wp)
     usb->mode = atoi(mode);
     usb->node = atoi(node);
     set_env_usb(usb);
-    ctrl_usbconnet(usb->mode,usb->node);
+    tpi_usb_mode(usb->mode,usb->node);
     return 0;
 }
 
@@ -237,10 +237,10 @@ static int get_nodepower(Webs* wp)
 
     /*--json body--*/
     pItem = cJSON_CreateObject();
-	cJSON_AddNumberToObject(pItem, "node1", get_node_power(0));  
-	cJSON_AddNumberToObject(pItem, "node2", get_node_power(1));  
-    cJSON_AddNumberToObject(pItem, "node3", get_node_power(2));  
-	cJSON_AddNumberToObject(pItem, "node4", get_node_power(3));  
+	cJSON_AddNumberToObject(pItem, "node1", tpi_get_node_power(0));  
+	cJSON_AddNumberToObject(pItem, "node2", tpi_get_node_power(1));  
+    cJSON_AddNumberToObject(pItem, "node3", tpi_get_node_power(2));  
+	cJSON_AddNumberToObject(pItem, "node4", tpi_get_node_power(3));  
     cJSON_AddItemToArray(pArray, pItem);
 
 
@@ -483,9 +483,9 @@ static int set_nodepower(Webs* wp)
     {
         node = NULL;
         node = websGetVar(wp, var[i], NULL);
-        if(NULL!=node && atoi(node)!=get_node_power(i))
+        if(NULL!=node && atoi(node)!=tpi_get_node_power(i))
         {
-            node_power(i,atoi(node));
+            tpi_node_power(i,atoi(node));
             printf("set node %d,var = %d\n",i,atoi(node));        
         }
     }
@@ -500,7 +500,7 @@ static int set_network(Webs* wp)
     {
         if(0==strcmp(cmd,"reset"))
         {
-            RTL_Reset();
+            tpi_rtl_reset();
         }
     }
     

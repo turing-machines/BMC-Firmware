@@ -20,16 +20,9 @@
 #include "comm_device_serial.h"
 
 #include <tpi_rs.h>
-#define RESET_LED GPIO_PIN_PG(9)
-#define SYS_RESET GPIO_PIN_PG(11)
-#define POWER_DETECT GPIO_PIN_PG(10)
-#define POWER_BOARD GPIO_PIN_PG(15)
 char nodeType[4][128] = {"unknown", "unknown", "unknown", "unknown"};
 
-#define NEW_USB 
-
 NODE_CTX_t g_node_ctx[4];
-
 
 /**
  * @brief 0- unknown

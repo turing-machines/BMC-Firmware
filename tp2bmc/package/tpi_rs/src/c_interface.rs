@@ -1,10 +1,7 @@
 //! This module acts as a glue layer for the legacy bmc application. It exports
 //! relevant API functions over FFI. This FFI interface is temporary and will be
 //! removed as soon as the bmc application is end of life.
-
-use anyhow::Context;
 use futures::future::BoxFuture;
-use futures::Future;
 use log::{error, LevelFilter};
 use once_cell::sync::{Lazy, OnceCell};
 use simple_logger::SimpleLogger;
@@ -59,8 +56,8 @@ where
 }
 
 #[no_mangle]
-pub extern "C" fn node_power(num: core::ffi::c_int, status: core::ffi::c_int) {
-    let Ok(node_id) = num.try_into().map_err(|e| log::error!("{}", e)) else {
+pub extern "C" fn tpi_node_power(num: core::ffi::c_int, status: core::ffi::c_int) {
+    let Ok(node_id): Result<NodeId,()> = num.try_into().map_err(|e| log::error!("{}", e)) else {
         return;
     };
 
@@ -68,34 +65,29 @@ pub extern "C" fn node_power(num: core::ffi::c_int, status: core::ffi::c_int) {
 }
 
 #[no_mangle]
-pub extern "C" fn poweron() {
+pub extern "C" fn tpi_power_on() {
     execute_routine(|bmc| Box::pin(bmc.power_node(NodeId::All, true)))
 }
 
 #[no_mangle]
-pub extern "C" fn poweroff() {
+pub extern "C" fn tpi_power_off() {
     execute_routine(|bmc| Box::pin(bmc.power_node(NodeId::All, false)))
 }
 
 #[no_mangle]
-pub extern "C" fn ctrl_usbconnet(
-    mode: core::ffi::c_int,
-    node: core::ffi::c_int,
-) -> core::ffi::c_int {
+pub extern "C" fn tpi_usb_mode(mode: core::ffi::c_int, node: core::ffi::c_int) -> core::ffi::c_int {
     let Ok(node_id) = node.try_into().map_err(|e| log::error!("{}", e)) else {
         return -1;
     };
     let Ok(mode) = mode.try_into().map_err(|e| log::error!("{}", e)) else {
         return -1;
     };
-    execute_routine(|bmc| {
-        Box::pin(async move { bmc.usb_mode(mode, node_id).context("usb_mode error") })
-    });
+    execute_routine(|bmc| Box::pin(bmc.usb_mode(mode, node_id)));
     0
 }
 
 #[no_mangle]
-pub extern "C" fn get_node_power(node: core::ffi::c_int) -> core::ffi::c_int {
+pub extern "C" fn tpi_get_node_power(node: core::ffi::c_int) -> core::ffi::c_int {
     let Ok(node_id) = node.try_into().map_err(|e| log::error!("{}", e)) else {
         return -1;
     };
@@ -111,8 +103,8 @@ pub extern "C" fn get_node_power(node: core::ffi::c_int) -> core::ffi::c_int {
 }
 
 #[no_mangle]
-pub extern "C" fn RTL_Reset() {
-    todo!()
+pub extern "C" fn tpi_rtl_reset() {
+    execute_routine(|bmc| Box::pin(bmc.rtl_reset()))
 }
 
 #[allow(dead_code)]

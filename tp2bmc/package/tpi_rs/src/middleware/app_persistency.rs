@@ -1,9 +1,7 @@
 use anyhow::bail;
 use anyhow::Context;
-
 use log::info;
 use sqlx::Row;
-use sqlx::Sqlite;
 use sqlx::SqlitePool;
 use std::path::PathBuf;
 
@@ -18,6 +16,9 @@ const VERSION: u32 = 1;
 /// moment of writing are the current available crates not convincing enough to go down the route
 /// of having a propiatary memory layout. The downside is that sqlite's size on flash is more
 /// significant.
+///
+/// Databases are versioned with sqlite's user_version property. When you break the format, make
+/// sure to implement a migration path and update the VERSION number.
 #[derive(Debug)]
 pub struct ApplicationPersistency {
     connection: SqlitePool,
@@ -77,77 +78,31 @@ impl ApplicationPersistency {
     }
 
     /// get value by key
-    pub async fn get<T: Send + sqlx::Type<Sqlite> + for<'a> sqlx::Decode<'a, Sqlite>>(
-        &self,
-        key: &str,
-    ) -> anyhow::Result<T> {
+    pub async fn get<T>(&self, key: &str) -> anyhow::Result<T>
+    where
+        for<'a> T: Send + serde::Deserialize<'a>,
+    {
         let result = sqlx::query("SELECT value FROM keyvalue WHERE key = ?")
             .bind(key)
             .fetch_one(&self.connection)
-            .await?;
-        Ok(result.get::<T, &str>("value"))
+            .await?
+            .get::<Vec<u8>, &str>("value");
+        bincode::deserialize(&result).context("deserialize error")
     }
 
     /// Set a value given a key. a value can be anything that can be encoded to a sqlite object.
     /// i.e. implements the [sqlx::Encode] trait.
     pub async fn set<T>(&self, key: &str, value: T) -> anyhow::Result<()>
     where
-        T: Send + sqlx::Type<Sqlite> + for<'a> sqlx::Encode<'a, Sqlite>,
+        T: Send + serde::Serialize,
     {
+        let encoded = bincode::serialize(&value)?;
         sqlx::query("INSERT OR REPLACE INTO keyvalue (key, value) VALUES (?,?)")
             .bind(key)
-            .bind(value)
+            .bind(encoded)
             .execute(&self.connection)
             .await
             .map(|_| ())
             .context("sqlite error")
     }
 }
-
-//#[cfg(test)]
-//mod tests {
-//    use super::*;
-//
-//    #[tokio::test]
-//    async fn test_wrong_version_check() {
-//        let connection = SqlitePool::connect("sqlite::memory:").await.unwrap();
-//        let sql = r"
-//            PRAGMA user_version = 3;
-//            ";
-//
-//        sqlx::query(sql).execute(&connection).await.unwrap();
-//        let result = ApplicationPersistency::setup_new(&connection).await;
-//        assert!(result.is_err());
-//    }
-//
-//    macro_rules! test_bits {
-//        ($db: ident, $(($bits:literal,$mask:literal,$output:literal)),+ ) => {
-//            $(  $db.set_with_bitmask("foo", $bits, $mask).await.unwrap();
-//                assert_eq!($output, $db.get::<u32>("foo").await.unwrap());
-//            )*
-//        };
-//    }
-//
-//    // #[tokio::test]
-//    // async fn test_power_bits() {
-//    //     let connection = SqlitePool::connect("sqlite::memory:").await.unwrap();
-//    //     ApplicationPersistency::setup_new(&connection)
-//    //         .await
-//    //         .unwrap();
-//    //     ApplicationPersistency::verify_version(&connection)
-//    //         .await
-//    //         .unwrap();
-//
-//    //     let db = ApplicationPersistency { connection };
-//    //     db.set("foo", 0).await.unwrap();
-//
-//    //     test_bits!(
-//    //         db,
-//    //         (0b1111, 0b0000, 0b0000),
-//    //         (0b1111, 0b1000, 0b1000),
-//    //         (0b1111, 0b0000, 0b1000),
-//    //         (0b0011, 0b1111, 0b0011),
-//    //         (0b0000, 0b1111, 0b0000)
-//    //     );
-//    // }
-//}

@@ -5,7 +5,7 @@ pub mod pin_controller;
 pub mod usbboot;
 
 #[repr(C)]
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, serde::Serialize, serde::Deserialize)]
 pub enum NodeId {
     Node1,
     Node2,
@@ -39,14 +39,14 @@ impl NodeId {
 }
 
 #[repr(C)]
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, serde::Serialize, serde::Deserialize)]
 pub enum NodeType {
     RaspberryPi4,
     JetsonTx2,
     RK1,
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum UsbRoute {
     BMC,
     UsbA,
@@ -64,7 +64,7 @@ impl TryFrom<i32> for UsbRoute {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, serde::Serialize, serde::Deserialize)]
 pub enum UsbMode {
     Slave,
     Master,
