@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" class="configure">
+<html lang="en" class="configure">
 
 <head>
 
