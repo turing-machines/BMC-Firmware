@@ -10,8 +10,12 @@ use anyhow::Context;
 use evdev::Key;
 use log::debug;
 use std::sync::Arc;
+use tokio::sync::Mutex;
 
-const POWER_STATE_KEY: &str = "power_state";
+/// Stores which slots are actually used. This information is used to determine
+/// for instance, which nodes need to be powered on, when such command is given
+const NODE_ENABLED_KEY: &str = "node_enabled";
+/// stores to which node the usb multiplexer is configured to.
 const USB_NODE_KEY: &str = "usb_node";
 const USB_STATE_KEY: &str = "usb_state";
 
@@ -19,6 +23,7 @@ const USB_STATE_KEY: &str = "usb_state";
 pub struct BmcApplication {
     pin_controller: PinController,
     app_db: ApplicationPersistency,
+    power_state: Mutex<u8>,
 }
 
 impl BmcApplication {
@@ -29,6 +34,7 @@ impl BmcApplication {
         let instance = Arc::new(Self {
             pin_controller,
             app_db,
+            power_state: Mutex::new(0),
         });
 
         instance.initialize().await?;
@@ -37,7 +43,9 @@ impl BmcApplication {
             .add_action_async(Key::KEY_1, 1, |app| {
                 Box::pin(Self::toggle_power_states(app.clone()))
             })
-            .add_action_async(Key::KEY_POWER, 1, |app| todo!())
+            .add_action_async(Key::KEY_POWER, 1, |app| {
+                Box::pin(Self::toggle_power_states(app.clone()))
+            })
             .add_action_async(Key::KEY_RESTART, 1, |app| todo!())
             .run()?;
 
@@ -45,9 +53,9 @@ impl BmcApplication {
     }
 
     async fn toggle_power_states(app: Arc<BmcApplication>) -> anyhow::Result<()> {
-        let state = app.app_db.get::<u8>(POWER_STATE_KEY).await?;
-        // calling node power with on == false, inverts the passed state bits.
-        app.power_node(state, false).await
+        let mut lock = app.power_state.lock().await;
+        *lock = !*lock;
+        app.power_node(*lock).await
     }
 
     async fn initialize(&self) -> anyhow::Result<()> {
@@ -57,10 +65,11 @@ impl BmcApplication {
 
     async fn initialize_power(&self) -> anyhow::Result<()> {
         // power on nodes
-        if let Ok(power_state) = self.app_db.get::<u8>(POWER_STATE_KEY).await {
-            self.node_power_internal(0, power_state).await
+        if let Ok(enabled_nodes) = self.app_db.get::<u8>(NODE_ENABLED_KEY).await {
+            self.power_node(enabled_nodes).await
         } else {
-            self.app_db.set::<u8>(POWER_STATE_KEY, 0).await
+            // default, given a new app persistency
+            self.app_db.set::<u8>(NODE_ENABLED_KEY, 0).await
         }
     }
 
@@ -81,24 +90,6 @@ impl BmcApplication {
         res.and(res2)
     }
 
-    /// Helper function that calls power function of the nodes while checking
-    /// if atx power is in the correct state.
-    async fn node_power_internal(
-        &self,
-        current_node_state: u8,
-        new_node_state: u8,
-    ) -> anyhow::Result<()> {
-        if let Some(on) = Self::need_atx_change(current_node_state, new_node_state) {
-            debug!("changing state of atx to {}", on);
-            self.pin_controller.set_atx_power(on).await?;
-        }
-
-        self.pin_controller
-            .set_power_node(current_node_state, new_node_state)
-            .await
-            .context("pin controller error")
-    }
-
     /// Helper function that returns the new state of ATX power
     fn need_atx_change(current_node_state: u8, next_node_state: u8) -> Option<bool> {
         if current_node_state == 0 && next_node_state > 0 {
@@ -114,33 +105,68 @@ impl BmcApplication {
     }
 
     pub async fn get_node_power(&self, node: NodeId) -> anyhow::Result<bool> {
-        let state = self.app_db.get::<u8>(POWER_STATE_KEY).await?;
-        Ok(state & node.to_bits() != 0)
+        let state = self.power_state.lock().await;
+        Ok(*state & node.to_bits() != 0)
     }
 
-    /// Power on or off a given node. Nodes are switched with a small delay to
-    /// protect the hardware. The state of the nodes are persisted to disk.
-    pub async fn power_node<N: ToBits>(&self, node: N, on: bool) -> anyhow::Result<()> {
-        let mut bits = node.to_bits();
-        if !on {
-            bits = !bits;
-        }
+    /// This function is used to active a given node. Call this function if a
+    /// module is inserted at that slot. Failing to call this method means that
+    /// this slot is not considered for power up and power down commands.
+    pub async fn activate_slot(&self, node: NodeId, on: bool) -> anyhow::Result<()> {
         let mask = node.to_bits();
-        let power_state = self.app_db.get::<u8>(POWER_STATE_KEY).await?;
-        let new_power_state = (power_state & !mask) | (bits & mask);
+        let bits = if on { node.to_bits() } else { !node.to_bits() };
+        let mut state = self.app_db.get::<u8>(NODE_ENABLED_KEY).await?;
+        state = (state & !mask) | (bits & mask);
+        self.app_db.set::<u8>(NODE_ENABLED_KEY, state).await?;
+        debug!("node enable bits updated. going to state {:#04b}", state);
+
+        self.power_node(node).await?;
+        Ok(())
+    }
+
+    pub async fn power_on(&self) -> anyhow::Result<()> {
+        self.power_node(0b1111).await
+    }
+
+    pub async fn power_off(&self) -> anyhow::Result<()> {
+        self.power_node(0).await
+    }
+
+    async fn power_node<N: ToBits>(&self, node: N) -> anyhow::Result<()> {
+        let mask = self.app_db.get::<u8>(NODE_ENABLED_KEY).await?;
+        let mut lock = self.power_state.lock().await;
+        let power_state = *lock;
+
+        let mut new_power_state = 0;
+        if node.to_bits() != 0 {
+            new_power_state = (power_state & !node.to_bits()) | (node.to_bits() & mask);
+        }
+
+        if power_state == new_power_state {
+            debug!(
+                "requested powerstate {:#04b} is already active. enabled={:#04b}",
+                power_state, mask
+            );
+            return Ok(());
+        }
 
         debug!(
-            "power_node {:#04b} {}. current state={:#08b}, new state={:#08b}",
-            bits,
-            if on { "on" } else { "off" },
-            power_state,
-            new_power_state
+            "applying change in power state. current state={:#04b}, new state={:#04b}",
+            power_state, new_power_state
         );
 
-        self.node_power_internal(power_state, new_power_state)
-            .await?;
+        if let Some(on) = Self::need_atx_change(power_state, new_power_state) {
+            debug!("changing state of atx to {}", on);
+            self.pin_controller.set_atx_power(on).await?;
+        }
 
-        self.app_db.set(POWER_STATE_KEY, new_power_state).await
+        self.pin_controller
+            .set_power_node(power_state, new_power_state)
+            .await
+            .context("pin controller error")?;
+
+        *lock = new_power_state;
+        Ok(())
     }
 
     pub async fn usb_mode(&self, mode: UsbMode, node: NodeId) -> anyhow::Result<()> {

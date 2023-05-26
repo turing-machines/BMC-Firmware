@@ -61,17 +61,17 @@ pub extern "C" fn tpi_node_power(num: core::ffi::c_int, status: core::ffi::c_int
         return;
     };
 
-    execute_routine(|bmc| Box::pin(bmc.power_node(node_id, status != 0)))
+    execute_routine(|bmc| Box::pin(bmc.activate_slot(node_id, status != 0)))
 }
 
 #[no_mangle]
 pub extern "C" fn tpi_power_on() {
-    execute_routine(|bmc| Box::pin(bmc.power_node(NodeId::All, true)))
+    execute_routine(|bmc| Box::pin(bmc.power_on()))
 }
 
 #[no_mangle]
 pub extern "C" fn tpi_power_off() {
-    execute_routine(|bmc| Box::pin(bmc.power_node(NodeId::All, false)))
+    execute_routine(|bmc| Box::pin(bmc.power_off()))
 }
 
 #[no_mangle]
