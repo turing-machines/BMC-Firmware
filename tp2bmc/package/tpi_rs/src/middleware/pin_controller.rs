@@ -131,7 +131,7 @@ impl PinController {
 
     pub fn set_usb_route(&self, route: UsbRoute, mode: UsbMode) -> std::io::Result<()> {
         let route_bits: u8 = if route == UsbRoute::BMC { 0b1 } else { 0b0 };
-        let mode_bits: u8 = if mode == UsbMode::Slave { 0b1 } else { 0b0 };
+        let mode_bits: u8 = if mode == UsbMode::Device { 0b1 } else { 0b0 };
 
         let values: u8 = mode_bits | (route_bits << 1);
         trace!("set_route {:#04b}", values);

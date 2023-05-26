@@ -66,8 +66,8 @@ impl TryFrom<i32> for UsbRoute {
 
 #[derive(Debug, Eq, PartialEq, Clone, Copy, serde::Serialize, serde::Deserialize)]
 pub enum UsbMode {
-    Slave,
-    Master,
+    Host,
+    Device,
 }
 
 impl TryFrom<i32> for UsbMode {
@@ -75,8 +75,8 @@ impl TryFrom<i32> for UsbMode {
 
     fn try_from(value: i32) -> Result<Self, Self::Error> {
         match value {
-            0 => Ok(UsbMode::Slave),
-            1 => Ok(UsbMode::Master),
+            0 => Ok(UsbMode::Host),
+            1 => Ok(UsbMode::Device),
             x => Err(format!("usb mode {} does not exist", x)),
         }
     }

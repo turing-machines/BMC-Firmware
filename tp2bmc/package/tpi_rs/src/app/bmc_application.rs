@@ -88,7 +88,7 @@ impl BmcApplication {
             .app_db
             .get::<(UsbRoute, UsbMode)>(USB_STATE_KEY)
             .await
-            .unwrap_or((UsbRoute::UsbA, UsbMode::Slave));
+            .unwrap_or((UsbRoute::UsbA, UsbMode::Device));
         let res2 = self.pin_controller.set_usb_route(route, mode);
         res.and(res2)
     }
