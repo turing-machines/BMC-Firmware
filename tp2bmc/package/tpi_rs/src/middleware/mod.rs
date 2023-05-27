@@ -1,5 +1,5 @@
 pub mod app_persistency;
-pub mod evdev_controller;
+pub mod event_listener;
 mod gpio_definitions;
 pub mod pin_controller;
 pub mod usbboot;

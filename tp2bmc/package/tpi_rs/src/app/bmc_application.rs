@@ -1,12 +1,12 @@
 use super::bits_trait::ToBits;
 use crate::middleware::{
     app_persistency::ApplicationPersistency,
-    evdev_controller::EventListener,
+    event_listener::EventListener,
     pin_controller::PinController,
     usbboot::{self, FlashingError},
     NodeId, UsbMode, UsbRoute,
 };
-use anyhow::Context;
+use anyhow::{ensure, Context};
 use evdev::Key;
 use log::debug;
 use std::sync::Arc;
@@ -28,8 +28,8 @@ pub struct BmcApplication {
 
 impl BmcApplication {
     pub async fn new() -> anyhow::Result<Arc<Self>> {
-        let pin_controller = PinController::new().await.context("pin controller")?;
-        let app_db = ApplicationPersistency::new().await.context("persistency")?;
+        let pin_controller = PinController::new().await?;
+        let app_db = ApplicationPersistency::new().await?;
 
         let instance = Arc::new(Self {
             pin_controller,
@@ -39,6 +39,7 @@ impl BmcApplication {
 
         instance.initialize().await?;
 
+        // start listening for device events.
         EventListener::new(instance.clone())
             .add_action_async(Key::KEY_1, 1, |app| {
                 Box::pin(Self::toggle_power_states(app.clone()))
@@ -46,7 +47,9 @@ impl BmcApplication {
             .add_action_async(Key::KEY_POWER, 1, |app| {
                 Box::pin(Self::toggle_power_states(app.clone()))
             })
-            .add_action_async(Key::KEY_RESTART, 1, |app| todo!())
+            .add_action_async(Key::KEY_RESTART, 1, |_| {
+                Box::pin(async { system_shutdown::reboot().context("reboot") })
+            })
             .run()?;
 
         Ok(instance)
@@ -113,6 +116,8 @@ impl BmcApplication {
     /// module is inserted at that slot. Failing to call this method means that
     /// this slot is not considered for power up and power down commands.
     pub async fn activate_slot(&self, node: NodeId, on: bool) -> anyhow::Result<()> {
+        ensure!(node.to_bits() != 0);
+
         let mask = node.to_bits();
         let bits = if on { node.to_bits() } else { !node.to_bits() };
         let mut state = self.app_db.get::<u8>(NODE_ENABLED_KEY).await?;
