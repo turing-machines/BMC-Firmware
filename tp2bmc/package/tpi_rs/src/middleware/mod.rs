@@ -36,6 +36,14 @@ impl NodeId {
             1 << *self as u8
         }
     }
+
+    pub fn to_inverse_bitfield(&self) -> u8 {
+        if self == &NodeId::All {
+            0
+        } else {
+            0b1111 & !(1 << *self as u8)
+        }
+    }
 }
 
 #[repr(C)]
@@ -46,7 +54,7 @@ pub enum NodeType {
     RK1,
 }
 
-#[derive(Debug, Eq, PartialEq, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, serde::Serialize, serde::Deserialize)]
 pub enum UsbRoute {
     BMC,
     UsbA,

@@ -17,7 +17,8 @@ use tokio::sync::Mutex;
 const NODE_ENABLED_KEY: &str = "node_enabled";
 /// stores to which node the usb multiplexer is configured to.
 const USB_NODE_KEY: &str = "usb_node";
-const USB_STATE_KEY: &str = "usb_state";
+const USB_ROUTE_KEY: &str = "usb_route";
+const USB_MODE_KEY: &str = "usb_mode";
 
 #[derive(Debug)]
 pub struct BmcApplication {
@@ -84,13 +85,17 @@ impl BmcApplication {
             .unwrap_or(NodeId::Node1);
         let res = self.pin_controller.select_usb(node);
 
-        let (route, mode) = self
+        let route = self
             .app_db
-            .get::<(UsbRoute, UsbMode)>(USB_STATE_KEY)
+            .get::<UsbRoute>(USB_ROUTE_KEY)
             .await
-            .unwrap_or((UsbRoute::UsbA, UsbMode::Device));
-        let res2 = self.pin_controller.set_usb_route(route, mode);
-        res.and(res2)
+            .unwrap_or(UsbRoute::UsbA);
+        let res2 = self.pin_controller.set_usb_route(route);
+
+        let mode = self.app_db.get::<u8>(USB_MODE_KEY).await.unwrap_or(0b1111);
+        let res3 = self.pin_controller.inner_set_usb_mode(mode);
+
+        res.and(res2).and(res3)
     }
 
     /// Helper function that returns the new state of ATX power
@@ -177,8 +182,24 @@ impl BmcApplication {
     pub async fn usb_mode(&self, mode: UsbMode, node: NodeId) -> anyhow::Result<()> {
         self.pin_controller.select_usb(node)?;
         self.app_db.set(USB_NODE_KEY, node).await?;
-        self.pin_controller.set_usb_route(UsbRoute::BMC, mode)?;
-        self.app_db.set(USB_STATE_KEY, (UsbRoute::BMC, mode)).await
+
+        self.pin_controller.set_usb_route(UsbRoute::UsbA)?;
+        self.app_db.set(USB_ROUTE_KEY, UsbRoute::UsbA).await?;
+
+        let prev_mode = self.app_db.get::<u8>(USB_MODE_KEY).await.unwrap_or(0b1111);
+
+        let new_mode = self.pin_controller.set_usb_mode(node, mode, prev_mode)?;
+        self.app_db.set(USB_MODE_KEY, new_mode).await?;
+
+        // Hack: as in the previous version of the firmware, set RPIBOOT pins of a node when the
+        // selected mode is "device", because users execute a command such as `tpi -n 1 -u device`
+        // and expect device to be flash-able via rpiboot.
+        match mode {
+            UsbMode::Host => self.pin_controller.clear_usb_boot()?,
+            UsbMode::Device => self.pin_controller.set_usb_boot(node)?,
+        }
+
+        Ok(())
     }
 
     pub async fn rtl_reset(&self) -> anyhow::Result<()> {

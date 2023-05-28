@@ -19,7 +19,8 @@ const NODE_COUNT: u8 = 4;
 pub struct PinController {
     usb_vbus: Lines<Output>,
     usb_mux: Lines<Output>,
-    usb_en: Lines<Output>,
+    usb_pwen: Lines<Output>,
+    usb_switch: Lines<Output>,
     rpi_boot: Lines<Output>,
     mode: Lines<Output>,
     enable: Lines<Output>,
@@ -60,7 +61,7 @@ impl PinController {
                     PORT4_USB_VBUS
                 ],
                 Active::High,
-                "usb vbus"
+                "USB ports Host/Device mode switch"
             ),
             (
                 rpi_boot,
@@ -75,10 +76,16 @@ impl PinController {
                 "usb channel switcher"
             ),
             (
-                usb_en,
-                [USB_PWEN, USB_SWITCH],
+                usb_pwen,
+                [USB_PWEN],
+                Active::Low,
+                "USB-A 5V power output enable"
+            ),
+            (
+                usb_switch,
+                [USB_SWITCH],
                 Active::High,
-                "usb channel switcher"
+                "USB channel control"
             ),
             (
                 mode,
@@ -101,6 +108,7 @@ impl PinController {
             (atx, [POWER_EN, SYS_LED], Active::High, "atx line"),
             (rtl_reset, [RTL_RESET], Active::Low, "Realtek switch reset")
         );
+
         instance.usb_vbus.set_values(0b1111u8)?;
 
         Ok(instance)
@@ -117,7 +125,7 @@ impl PinController {
         Ok(())
     }
 
-    /// changes the configuration in such a way that
+    /// Select which node is active in the multiplexer (see PORTx in `set_usb_route()`)
     pub fn select_usb(&self, node: NodeId) -> std::io::Result<()> {
         let values: u8 = match node {
             NodeId::Node1 => 0b1100,
@@ -129,20 +137,55 @@ impl PinController {
         self.usb_mux.set_values(values)
     }
 
-    pub fn set_usb_route(&self, route: UsbRoute, mode: UsbMode) -> std::io::Result<()> {
-        let route_bits: u8 = if route == UsbRoute::BMC { 0b1 } else { 0b0 };
-        let mode_bits: u8 = if mode == UsbMode::Device { 0b1 } else { 0b0 };
+    /// Set which way the USB is routed: USB-A ↔ PORTx (`UsbRoute::UsbA`) or BMC ↔ PORTx
+    /// (`UsbRoute::BMC`)
+    pub fn set_usb_route(&self, route: UsbRoute) -> std::io::Result<()> {
+        match route {
+            UsbRoute::UsbA => {
+                self.usb_switch.set_values(0_u8)?;
+                self.usb_pwen.set_values(1_u8)?;
+            }
+            UsbRoute::BMC => {
+                self.usb_switch.set_values(1_u8)?;
+                self.usb_pwen.set_values(0_u8)?;
+            }
+        }
 
-        let values: u8 = mode_bits | (route_bits << 1);
-        trace!("set_route {:#04b}", values);
-        self.usb_en.set_values(values)
+        Ok(())
+    }
+
+    /// Set which role a node has (`UsbMode::Host` or `UsbMode::Device`)
+    pub fn set_usb_mode(&self, node: NodeId, mode: UsbMode, prev_mode: u8) -> std::io::Result<u8> {
+        if node == NodeId::All {
+            return Err(std::io::Error::from(ErrorKind::Unsupported));
+        }
+
+        let new_mode = match mode {
+            UsbMode::Host => prev_mode & node.to_inverse_bitfield(),
+            UsbMode::Device => prev_mode | node.to_bitfield(),
+        };
+
+        self.usb_vbus.set_values(new_mode)?;
+
+        Ok(new_mode)
+    }
+
+    /// Set the bitmask value of USB Device/Host mode of nodes (0 being Host, and 1 being Device).
+    /// For example, 0b1101 equates to node 2 acting as a Host, and the rest as Devices.
+    pub fn inner_set_usb_mode(&self, values: u8) -> std::io::Result<()> {
+        self.usb_vbus.set_values(values)
     }
 
     /// Set given nodes into usb boot mode. When powering the node on with this usb_boot mode
     /// enabled, the given node will boot into USB mode. Typically means that booting of eMMC is
     /// disabled.
-    pub async fn set_usb_boot(&self, node_state: u8) -> std::io::Result<()> {
-        self.rpi_boot.set_values(node_state)
+    pub fn set_usb_boot(&self, node: NodeId) -> std::io::Result<()> {
+        self.rpi_boot.set_values(node.to_bitfield())
+    }
+
+    /// Clear USB boot mode of all nodes
+    pub fn clear_usb_boot(&self) -> std::io::Result<()> {
+        self.rpi_boot.set_values(0_u8)
     }
 
     pub async fn set_power_node(
