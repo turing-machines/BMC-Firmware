@@ -1,0 +1,54 @@
+name: Check for Buildroot Updates
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  buildroot:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Check if Buildroot directory
+        run: |
+          if [ ! -f "buildroot/Makefile" ]; then
+            echo "The specified directory is not a Buildroot directory."
+            exit 1
+          fi
+
+      - name: Get Buildroot version
+        id: get_buildroot_version
+        run: echo buildroot_version=$(grep "export BR2_VERSION" "buildroot/Makefile" | sed 's/.*:= //' | cut -d' ' -f1 | head -n 1) >> $GITHUB_ENV
+
+      - name: Get latest Buildroot version
+        id: get_latest_buildroot_version
+        run: |
+          echo latest_version=$(curl -s https://api.github.com/repos/buildroot/buildroot/tags \
+            | jq -r '.[].name' \
+            | grep -E '^[0-9]+(\.[0-9]+)+$' \
+            | sort -V \
+            | tail -n 1) >> $GITHUB_ENV
+
+      - name: Remove old buildroot
+        run: rm -Rf buildroot
+
+      - name: Unpack new Buildroot version
+        uses: actions/checkout@v3
+        with:
+          repository: 'buildroot/buildroot'
+          ref: ${{ env.latest_version }}
+          path: buildroot
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          commit-message: "Update Buildroot to ${{ env.latest_version }}"
+          title: "Update Buildroot to ${{ env.latest_version }}"
+          branch: buildroot-update-${{ env.latest_version }}
+          delete-branch: true
+          body: |
+            Upgrading from ${{ env.buildroot_version }} to ${{ env.latest_version }}
+
+            See CHANGES file for changelog

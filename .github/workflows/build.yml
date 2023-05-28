@@ -1,0 +1,83 @@
+name: CI
+on:
+  pull_request:
+    branches: ["master"]
+  push:
+    branches: ["master"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: get version
+        run: echo "BUILD_VERSION=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
+
+      - name: install build host packages
+        run: |
+          sudo apt-get update &&\
+          sudo apt-get install \
+          build-essential \
+          bc \
+          subversion \
+          git-core \
+          libncurses5-dev \
+          zlib1g-dev \
+          gawk \
+          flex \
+          quilt \
+          libssl-dev \
+          xsltproc \
+          libxml-parser-perl \
+          mercurial \
+          bzr \
+          ecj \
+          cvs \
+          unzip \
+          lib32z1 \
+          lib32z1-dev \
+          lib32stdc++6 \
+          libstdc++6 \
+          libncurses-dev \
+          u-boot-tools \
+          mkbootimg \
+          cpio \
+          rsync \
+          xxd -y
+
+      - name: retrieve ccache
+        uses: actions/cache@v3
+        with:
+          key: ${{ runner.os }}-ccache-${{ env.BUILD_VERSION }}
+          path: ~/.buildroot-ccache
+          restore-keys: ${{ runner.os }}-ccache-
+
+      - name: configure
+        run: |
+          cd buildroot
+          make BR2_EXTERNAL=../tp2bmc BR2_CCACHE=y tp2bmc_defconfig
+
+      - name: build
+        run: |
+          cd buildroot
+          make BR2_CCACHE=y
+
+      - name: build swupdate
+        run: |
+          cd buildroot/output/images/
+          cp -ra ../../../tp2bmc/swupdate/* .
+          ./genSWU.sh ${{ env.BUILD_VERSION }}
+
+      - name: upload
+        uses: actions/upload-artifact@v3
+        with:
+          if-no-files-found: error 
+          name: tp2-bmc-${{ env.BUILD_VERSION }}
+          path: |
+            buildroot/output/images/turingpi_${{ env.BUILD_VERSION }}.swu
+            buildroot/output/images/buildroot_linux_nand_uart3.img
+            buildroot/output/images/zImage
+            buildroot/output/images/sun8iw20p1-t113-turingmachines-tp2bmc.dtb
+
