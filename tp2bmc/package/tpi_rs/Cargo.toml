@@ -23,6 +23,7 @@ futures = "0.*"
 anyhow = "1.*"
 async-trait = "0.1.*"
 log = "0.4.17"
+rusb = "0.6.5"
 rustpiboot = { git = "https://github.com/ruslashev/rustpiboot.git" }
 simple_logger = { version = "4.1.0", default-features = false, features = ["colors"] }
 sqlx = { version = "0.6.*", features = [

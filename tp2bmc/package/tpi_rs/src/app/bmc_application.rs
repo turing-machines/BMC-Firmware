@@ -1,16 +1,15 @@
 use super::bits_trait::ToBits;
 use crate::middleware::{
-    app_persistency::ApplicationPersistency,
-    event_listener::EventListener,
-    pin_controller::PinController,
-    usbboot::{self, FlashingError},
-    NodeId, UsbMode, UsbRoute,
+    app_persistency::ApplicationPersistency, event_listener::EventListener,
+    pin_controller::PinController, usbboot, NodeId, UsbMode, UsbRoute,
 };
 use anyhow::{ensure, Context};
 use evdev::Key;
 use log::debug;
 use std::sync::Arc;
+use std::time::Duration;
 use tokio::sync::Mutex;
+use tokio::time::sleep;
 
 /// Stores which slots are actually used. This information is used to determine
 /// for instance, which nodes need to be powered on, when such command is given
@@ -186,10 +185,7 @@ impl BmcApplication {
         self.pin_controller.set_usb_route(UsbRoute::UsbA)?;
         self.app_db.set(USB_ROUTE_KEY, UsbRoute::UsbA).await?;
 
-        let prev_mode = self.app_db.get::<u8>(USB_MODE_KEY).await.unwrap_or(0b1111);
-
-        let new_mode = self.pin_controller.set_usb_mode(node, mode, prev_mode)?;
-        self.app_db.set(USB_MODE_KEY, new_mode).await?;
+        self.set_usb_mode(node, mode).await?;
 
         // Hack: as in the previous version of the firmware, set RPIBOOT pins of a node when the
         // selected mode is "device", because users execute a command such as `tpi -n 1 -u device`
@@ -202,6 +198,13 @@ impl BmcApplication {
         Ok(())
     }
 
+    async fn set_usb_mode(&self, node: NodeId, mode: UsbMode) -> anyhow::Result<()> {
+        let prev_mode = self.app_db.get::<u8>(USB_MODE_KEY).await.unwrap_or(0b1111);
+        let new_mode = self.pin_controller.set_usb_mode(node, mode, prev_mode)?;
+
+        self.app_db.set(USB_MODE_KEY, new_mode).await
+    }
+
     pub async fn rtl_reset(&self) -> anyhow::Result<()> {
         self.pin_controller.rtl_reset().await.context("rtl error")
     }
@@ -210,7 +213,31 @@ impl BmcApplication {
         &self,
         node: NodeId,
         _image_path: P,
-    ) -> Result<(), FlashingError> {
-        usbboot::boot_node_to_msd(node)
+    ) -> anyhow::Result<()> {
+        self.activate_slot(node, false).await?;
+        self.pin_controller.clear_usb_boot()?;
+
+        // arbitrary number
+        sleep(Duration::from_millis(500)).await;
+
+        self.pin_controller.select_usb(node)?;
+        self.pin_controller.set_usb_boot(node)?;
+        self.pin_controller.set_usb_route(UsbRoute::BMC)?;
+
+        self.set_usb_mode(node, UsbMode::Device).await?;
+
+        self.activate_slot(node, true).await?;
+
+        // also arbitrary
+        sleep(Duration::from_secs(2)).await;
+
+        let allowed_devices = [
+            (0x0a5c, 0x2711), // Raspberry Pi Compute module 4
+        ];
+        usbboot::check_only_one_device_present(&allowed_devices)?;
+
+        // usbboot::boot_node_to_msd(node)?;
+
+        Ok(())
     }
 }

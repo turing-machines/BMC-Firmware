@@ -1694,6 +1694,7 @@ dependencies = [
  "gpiod",
  "log",
  "once_cell",
+ "rusb",
  "rustpiboot",
  "serde",
  "simple_logger",

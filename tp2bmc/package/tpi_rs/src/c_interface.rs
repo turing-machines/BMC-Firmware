@@ -112,17 +112,23 @@ pub extern "C" fn tpi_rtl_reset() {
 pub enum FlashingResult {
     Success,
     InvalidArgs,
+    DeviceNotFound,
+    GpioError,
+    UsbError,
     Timeout,
     ChecksumMismatch,
+    Other,
 }
 
-impl From<Result<(), FlashingError>> for FlashingResult {
-    fn from(value: Result<(), FlashingError>) -> Self {
+impl From<&FlashingError> for FlashingResult {
+    fn from(value: &FlashingError) -> Self {
         match value {
-            Ok(_) => FlashingResult::Success,
-            Err(FlashingError::InvalidArgs) => FlashingResult::InvalidArgs,
-            Err(FlashingError::Timeout) => FlashingResult::Timeout,
-            Err(FlashingError::ChecksumMismatch) => FlashingResult::ChecksumMismatch,
+            FlashingError::InvalidArgs => FlashingResult::InvalidArgs,
+            FlashingError::DeviceNotFound => FlashingResult::DeviceNotFound,
+            FlashingError::GpioError => FlashingResult::GpioError,
+            FlashingError::UsbError => FlashingResult::UsbError,
+            FlashingError::Timeout => FlashingResult::Timeout,
+            FlashingError::ChecksumMismatch => FlashingResult::ChecksumMismatch,
         }
     }
 }
@@ -143,10 +149,17 @@ pub extern "C" fn tpi_flash_node(
 
     RUNTIME.block_on(async move {
         let lock = APP.get().unwrap().lock();
-        lock.await
-            .deref()
-            .flash_node(node_id, node_image)
-            .await
-            .into()
+        let res = lock.await.deref().flash_node(node_id, node_image).await;
+
+        match res {
+            Ok(_) => FlashingResult::Success,
+            Err(cause) => {
+                if let Some(flashing_err) = cause.downcast_ref::<FlashingError>() {
+                    flashing_err.into()
+                } else {
+                    FlashingResult::Other
+                }
+            }
+        }
     })
 }

@@ -61,7 +61,7 @@ bool usb_ctrl(int mode,int node)
     if(mode==2)
         sprintf(cmd,"curl 'http://%s/api/bmc?opt=get&type=usb'",host);
     else 
-        sprintf(cmd,"curl 'http://%s/api/bmc?opt=set&type=usb&mode=%d&node=%d'",host,mode,node-1);
+        sprintf(cmd,"curl 'http://%s/api/bmc?opt=set&type=usb&mode=%d&node=%d'",host,mode,node);
     system(cmd);
 }
 
@@ -472,8 +472,9 @@ int main(int argc, char *argv[])
             {
                 if(optarg)
                     node = atoi(optarg);
-                if(node<0||node>4)
+                if (node < 1 || node > 4)
                     usage();
+                --node;
                 break;
             }
             case 'r':
