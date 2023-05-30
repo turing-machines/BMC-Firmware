@@ -1,0 +1,12 @@
+diff --git a/Makefile b/Makefile
+index a8a7956..b399f91 100644
+--- a/Makefile
++++ b/Makefile
+@@ -383,7 +383,6 @@ KBUILD_CPPFLAGS := -D__KERNEL__ -D__UBOOT__
+ KBUILD_CFLAGS   := -Wall -Wstrict-prototypes \
+ 		   -Wno-format-security \
+ 		   -fno-builtin -ffreestanding\
+-		   -Werror\
+ 		   -Wno-packed-bitfield-compat
+ KBUILD_CFLAGS	+= -fshort-wchar
+ KBUILD_AFLAGS   := -D__ASSEMBLY__
