@@ -2,5 +2,4 @@ menu "tpi2 app packages"
 	source "$BR2_EXTERNAL_TP2BMC_PATH/package/bmc/Config.in"
 	source "$BR2_EXTERNAL_TP2BMC_PATH/package/tpi/Config.in"
 	source "$BR2_EXTERNAL_TP2BMC_PATH/package/tpi_rs/Config.in"
-	source "$BR2_EXTERNAL_TP2BMC_PATH/package/raspberrypi-usbboot/Config.in"
 endmenu
