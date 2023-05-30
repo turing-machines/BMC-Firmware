@@ -23,6 +23,7 @@ define TPI_RS_BUILD_CMDS
 	$(TARGET_MAKE_ENV) \
 		$(PKG_CARGO_ENV) \
 		$(TPI_RS_CARGO_ENV) \
+		env CC_armv7-unknown-linux-gnueabi="arm-linux-gcc" \
 		cargo build \
 			$(if $(BR2_ENABLE_DEBUG),,--release) \
 			--manifest-path Cargo.toml
