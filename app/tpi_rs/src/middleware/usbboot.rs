@@ -1,4 +1,5 @@
 use crate::middleware::NodeId;
+use std::path::PathBuf;
 use std::{fmt, fs};
 
 #[derive(Debug)]
@@ -79,7 +80,7 @@ pub(crate) fn check_only_one_device_present(supported: &[(u16, u16)]) -> Result<
     }
 }
 
-pub(crate) fn get_device_path(allowed_vendors: &[&str]) -> Result<String, FlashingError> {
+pub(crate) fn get_device_path(allowed_vendors: &[&str]) -> Result<PathBuf, FlashingError> {
     let contents = fs::read_dir("/dev/disk/by-id").map_err(|err| {
         log::error!("Failed to list devices: {}", err);
         FlashingError::IoError
@@ -138,11 +139,8 @@ pub(crate) fn get_device_path(allowed_vendors: &[&str]) -> Result<String, Flashi
         }
     };
 
-    match fs::canonicalize(format!("/dev/disk/by-id/{}", symlink)) {
-        Ok(path) => Ok(path.to_string_lossy().to_string()),
-        Err(err) => {
-            log::error!("Failed to read link: {}", err);
-            Err(FlashingError::IoError)
-        }
-    }
+    fs::canonicalize(format!("/dev/disk/by-id/{}", symlink)).map_err(|err| {
+        log::error!("Failed to read link: {}", err);
+        FlashingError::IoError
+    })
 }

@@ -5,6 +5,7 @@ use futures::future::BoxFuture;
 use log::{error, LevelFilter};
 use once_cell::sync::{Lazy, OnceCell};
 use simple_logger::SimpleLogger;
+use std::path::PathBuf;
 use std::sync::Arc;
 use std::{ffi::CStr, ops::Deref};
 use tokio::{runtime::Runtime, sync::Mutex};
@@ -22,9 +23,9 @@ static APP: OnceCell<Mutex<Arc<BmcApplication>>> = OnceCell::new();
 pub extern "C" fn tpi_initialize() {
     RUNTIME.block_on(async move {
         let level = if cfg!(debug_assertions) {
-            LevelFilter::Debug
+            LevelFilter::Trace
         } else {
-            LevelFilter::Warn
+            LevelFilter::Info
         };
 
         SimpleLogger::new()
@@ -141,14 +142,15 @@ pub extern "C" fn tpi_flash_node(
     node: core::ffi::c_int,
     image_path: *const core::ffi::c_char,
 ) -> FlashingResult {
-    let str = unsafe { CStr::from_ptr(image_path) }.to_str().unwrap();
-    let node_image = String::from(str);
+    let cstr = unsafe { CStr::from_ptr(image_path) };
+    let Ok(bstr) = cstr.to_str() else {
+        return FlashingResult::InvalidArgs;
+    };
+    let node_image = PathBuf::from(bstr);
 
     let Ok(node_id) = node.try_into() else {
         return FlashingResult::InvalidArgs
     };
-
-    log::debug!("using file '{}'", node_image);
 
     RUNTIME.block_on(async move {
         let lock = APP.get().unwrap().lock();

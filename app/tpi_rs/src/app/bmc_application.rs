@@ -6,6 +6,7 @@ use crate::middleware::{
 use anyhow::{ensure, Context};
 use evdev::Key;
 use log::debug;
+use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::sync::Mutex;
@@ -209,12 +210,8 @@ impl BmcApplication {
         self.pin_controller.rtl_reset().await.context("rtl error")
     }
 
-    pub async fn flash_node<P: AsRef<str>>(
-        &self,
-        node: NodeId,
-        _image_path: P,
-    ) -> anyhow::Result<()> {
-        log::trace!("Powering off node {}...", node as u8);
+    pub async fn flash_node(&self, node: NodeId, image_path: PathBuf) -> anyhow::Result<()> {
+        log::info!("Powering off node {}...", node as u8);
 
         self.activate_slot(node, false).await?;
         self.pin_controller.clear_usb_boot()?;
@@ -228,32 +225,33 @@ impl BmcApplication {
 
         self.set_usb_mode(node, UsbMode::Device).await?;
 
-        log::trace!("Prerequisite settings toggled, powering on...");
+        log::info!("Prerequisite settings toggled, powering on...");
 
         self.activate_slot(node, true).await?;
 
         // also arbitrary
         sleep(Duration::from_secs(2)).await;
 
-        log::trace!("Checking for presence of a USB device...");
+        log::info!("Checking for presence of a USB device...");
 
         let allowed_devices = [
             (0x0a5c, 0x2711), // Raspberry Pi Compute module 4
         ];
         usbboot::check_only_one_device_present(&allowed_devices)?;
 
-        log::trace!("Rebooting as a USB mass storage device...");
+        log::info!("Rebooting as a USB mass storage device...");
 
         usbboot::boot_node_to_msd(node)?;
 
         sleep(Duration::from_secs(3)).await;
 
-        log::trace!("Checking for presense of a device file...");
+        log::info!("Checking for presense of a device file...");
 
         let allowed_vendors = ["RPi-MSD-"];
-        let path = usbboot::get_device_path(&allowed_vendors)?;
+        let device_path = usbboot::get_device_path(&allowed_vendors)?;
 
-        log::trace!("path = {}", path);
+        log::trace!("image_path = {:?}", image_path);
+        log::trace!("device_path = {:?}", device_path);
 
         Ok(())
     }
