@@ -5,7 +5,7 @@
 ###########################################################
 
 TPI_RS_VERSION = 0.0.0
-TPI_RS_SITE = $(TOPDIR)/../tp2bmc/package/tpi_rs
+TPI_RS_SITE = $(TOPDIR)/../app/tpi_rs
 TPI_RS_SITE_METHOD = local
 TPI_RS_LICENSE = Apache-2.0
 TPI_RS_LICENSE_FILES = LICENSE
