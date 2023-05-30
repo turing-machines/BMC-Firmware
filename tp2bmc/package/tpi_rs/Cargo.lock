@@ -1259,7 +1259,7 @@ dependencies = [
 [[package]]
 name = "rustpiboot"
 version = "0.2.0"
-source = "git+https://github.com/ruslashev/rustpiboot.git#87fd71a9ca4d0f50a135ad662529209502a47d1c"
+source = "git+https://github.com/ruslashev/rustpiboot.git#f1dd596e9739a127a5326477102e3b0e73ad8c74"
 dependencies = [
  "log",
  "rusb",

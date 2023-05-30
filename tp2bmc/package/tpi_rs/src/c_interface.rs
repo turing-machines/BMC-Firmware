@@ -29,6 +29,7 @@ pub extern "C" fn tpi_initialize() {
 
         SimpleLogger::new()
             .with_level(level)
+            .with_module_level("sqlx", LevelFilter::Warn)
             .with_colors(true)
             .env()
             .init()
@@ -115,6 +116,7 @@ pub enum FlashingResult {
     DeviceNotFound,
     GpioError,
     UsbError,
+    IoError,
     Timeout,
     ChecksumMismatch,
     Other,
@@ -127,6 +129,7 @@ impl From<&FlashingError> for FlashingResult {
             FlashingError::DeviceNotFound => FlashingResult::DeviceNotFound,
             FlashingError::GpioError => FlashingResult::GpioError,
             FlashingError::UsbError => FlashingResult::UsbError,
+            FlashingError::IoError => FlashingResult::IoError,
             FlashingError::Timeout => FlashingResult::Timeout,
             FlashingError::ChecksumMismatch => FlashingResult::ChecksumMismatch,
         }
