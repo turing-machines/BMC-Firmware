@@ -1689,6 +1689,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "bincode",
+ "crc",
  "evdev",
  "futures",
  "gpiod",

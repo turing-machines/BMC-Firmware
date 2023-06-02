@@ -1,6 +1,14 @@
-use crate::middleware::NodeId;
 use std::path::PathBuf;
 use std::{fmt, fs};
+
+use anyhow::{bail, Result};
+use crc::{Crc, CRC_64_REDIS};
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
+
+use crate::middleware::NodeId;
+
+const BUF_SIZE: usize = 2 * 1024 * 1024;
+const PROGRESS_REPORT_PERCENT: u64 = 5;
 
 #[derive(Debug)]
 pub enum FlashingError {
@@ -9,7 +17,6 @@ pub enum FlashingError {
     GpioError,
     UsbError,
     IoError,
-    Timeout,
     ChecksumMismatch,
 }
 
@@ -23,7 +30,6 @@ impl fmt::Display for FlashingError {
             FlashingError::GpioError => write!(f, "Error toggling GPIO lines"),
             FlashingError::UsbError => write!(f, "Error enumerating USB devices"),
             FlashingError::IoError => write!(f, "File IO error"),
-            FlashingError::Timeout => write!(f, "The node did not respond in a long time"),
             FlashingError::ChecksumMismatch => {
                 write!(f, "Failed to verify image after writing to the node")
             }
@@ -143,4 +149,132 @@ pub(crate) fn get_device_path(allowed_vendors: &[&str]) -> Result<PathBuf, Flash
         log::error!("Failed to read link: {}", err);
         FlashingError::IoError
     })
+}
+
+pub(crate) async fn write_to_device(
+    image_path: PathBuf,
+    device_path: &PathBuf,
+) -> Result<(u64, u64)> {
+    let img_file = tokio::fs::File::open(image_path).await?;
+    let img_len = img_file.metadata().await?.len();
+    let mut reader = tokio::io::BufReader::with_capacity(BUF_SIZE, img_file);
+
+    let dev_file = tokio::fs::OpenOptions::new()
+        .write(true)
+        .open(device_path)
+        .await?;
+    let mut writer = tokio::io::BufWriter::with_capacity(BUF_SIZE, dev_file);
+
+    let mut buffer = vec![0; BUF_SIZE];
+    let mut total_read = 0;
+
+    let progress_interval = img_len / 100 * PROGRESS_REPORT_PERCENT;
+    let mut progress_counter = 0;
+
+    let img_crc = Crc::<u64>::new(&CRC_64_REDIS);
+    let mut img_digest = img_crc.digest();
+
+    log::info!("Image size: {} B", img_len);
+
+    while let Ok(num_read) = reader.read(&mut buffer).await {
+        if num_read == 0 {
+            break;
+        }
+
+        total_read += num_read as u64;
+
+        progress_counter += num_read as u64;
+        if progress_counter > progress_interval {
+            progress_counter -= progress_interval;
+
+            log::info!("Progress: {}%", 100 * total_read / img_len);
+        }
+
+        img_digest.update(&buffer[..num_read]);
+
+        let mut pos = 0;
+
+        while pos < num_read {
+            let num_written = writer.write(&buffer[pos..num_read]).await?;
+            pos += num_written;
+        }
+    }
+
+    if total_read < img_len {
+        log::error!(
+            "Partial read of image file: total {} B, read {} B",
+            img_len,
+            total_read
+        );
+        bail!(FlashingError::IoError);
+    }
+
+    writer.flush().await?;
+
+    Ok((img_len, img_digest.finalize()))
+}
+
+pub(crate) async fn verify_checksum(
+    img_checksum: u64,
+    img_len: u64,
+    device_path: &PathBuf,
+) -> Result<()> {
+    flush_file_caches().await?;
+
+    let dev_checksum = calc_file_checksum(device_path, img_len).await?;
+
+    if img_checksum == dev_checksum {
+        Ok(())
+    } else {
+        log::error!(
+            "Source and destination checksum mismatch: {:#x} != {:#x}",
+            img_checksum,
+            dev_checksum
+        );
+        bail!(FlashingError::ChecksumMismatch)
+    }
+}
+
+async fn flush_file_caches() -> tokio::io::Result<()> {
+    let mut file = tokio::fs::OpenOptions::new()
+        .write(true)
+        .open("/proc/sys/vm/drop_caches")
+        .await?;
+
+    // Free reclaimable slab objects and page cache
+    file.write_u8(b'3').await
+}
+
+// This function and `write_to_device()` could be merged into one with an optional callback for
+// every chunk read, but async closures are unstable and async blocks seem to require a Mutex.
+async fn calc_file_checksum(path: &PathBuf, to_read: u64) -> Result<u64> {
+    let file = tokio::fs::File::open(path).await?;
+    let mut reader = tokio::io::BufReader::with_capacity(BUF_SIZE, file);
+
+    let mut buffer = vec![0; BUF_SIZE];
+    let mut total_read = 0;
+
+    let crc = Crc::<u64>::new(&CRC_64_REDIS);
+    let mut digest = crc.digest();
+
+    while let Ok(num_read) = reader.read(&mut buffer).await {
+        total_read += num_read as u64;
+
+        if num_read == 0 || total_read > to_read {
+            break;
+        }
+
+        digest.update(&buffer[..num_read]);
+    }
+
+    if total_read < to_read {
+        log::error!(
+            "Partial read of file: total {} B, read {} B",
+            to_read,
+            total_read
+        );
+        bail!(FlashingError::IoError);
+    }
+
+    Ok(digest.finalize())
 }

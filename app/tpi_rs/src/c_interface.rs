@@ -109,7 +109,6 @@ pub extern "C" fn tpi_rtl_reset() {
     execute_routine(|bmc| Box::pin(bmc.rtl_reset()))
 }
 
-#[allow(dead_code)]
 #[repr(C)]
 pub enum FlashingResult {
     Success,
@@ -118,7 +117,6 @@ pub enum FlashingResult {
     GpioError,
     UsbError,
     IoError,
-    Timeout,
     ChecksumMismatch,
     Other,
 }
@@ -131,7 +129,6 @@ impl From<&FlashingError> for FlashingResult {
             FlashingError::GpioError => FlashingResult::GpioError,
             FlashingError::UsbError => FlashingResult::UsbError,
             FlashingError::IoError => FlashingResult::IoError,
-            FlashingError::Timeout => FlashingResult::Timeout,
             FlashingError::ChecksumMismatch => FlashingResult::ChecksumMismatch,
         }
     }

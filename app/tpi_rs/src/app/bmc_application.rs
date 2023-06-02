@@ -245,13 +245,22 @@ impl BmcApplication {
 
         sleep(Duration::from_secs(3)).await;
 
-        log::info!("Checking for presense of a device file...");
+        log::info!("Checking for presence of a device file...");
 
         let allowed_vendors = ["RPi-MSD-"];
         let device_path = usbboot::get_device_path(&allowed_vendors)?;
 
-        log::trace!("image_path = {:?}", image_path);
-        log::trace!("device_path = {:?}", device_path);
+        log::info!("Writing {:?} to {:?}", image_path, device_path);
+
+        let (img_len, img_checksum) = usbboot::write_to_device(image_path, &device_path).await?;
+
+        log::info!("Verifying checksum...");
+
+        usbboot::verify_checksum(img_checksum, img_len, &device_path).await?;
+
+        log::info!("Flashing successful");
+
+        self.pin_controller.clear_usb_boot()?;
 
         Ok(())
     }
