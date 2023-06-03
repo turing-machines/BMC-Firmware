@@ -5,6 +5,11 @@ on:
     - "**/Cargo.lock"
     - "**/Cargo.toml"
     - "**/*.rs"
+  pull_request:
+    paths:
+    - "**/Cargo.lock"
+    - "**/Cargo.toml"
+    - "**/*.rs"
 
 # Make sure CI fails on all warnings, including Clippy lints
 # env:
