@@ -2,9 +2,6 @@
 
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/turing-machines/BMC-firmware/build.yml?style=for-the-badge)
 
-> Latest firmware version can be downloaded
-> [here](https://github.com/wenyi0421/turing-pi/releases)
-
 Welcome to the new home of the Turing Pi firmware. The Turing Pi is a compact AI
 & edge computing cluster purposed to run cloud stacks and AI inference at the
 edge. Find out more on our [website](turingpi.com).
@@ -37,7 +34,7 @@ There are two ways to upgrade the firmware on your current board.
 2. Using an OTA package. This package can be uploaded to the board via the web UI. (This method does not update the kernel).
 
 The required images can be found in one of our release packages. get the latest
-[here](https://github.com/wenyi0421/turing-pi/releases).
+[here](https://github.com/turing-machines/BMC-firmware/releases).
 
 On our
 [website](https://help.turingpi.com/hc/en-us/articles/8686945524893-Baseboard-Management-Controller-BMC-)
