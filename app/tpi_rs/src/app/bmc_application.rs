@@ -211,13 +211,15 @@ impl BmcApplication {
     }
 
     pub async fn flash_node(&self, node: NodeId, image_path: PathBuf) -> anyhow::Result<()> {
-        log::info!("Powering off node {}...", node as u8);
+        // arbitrary number, this sleep may not even be required
+        let reboot_delay = Duration::from_millis(500);
+
+        log::info!("Powering off node {}...", node as u8 + 1);
 
         self.activate_slot(node, false).await?;
         self.pin_controller.clear_usb_boot()?;
 
-        // arbitrary number
-        sleep(Duration::from_millis(500)).await;
+        sleep(reboot_delay).await;
 
         self.pin_controller.select_usb(node)?;
         self.pin_controller.set_usb_boot(node)?;
@@ -229,7 +231,6 @@ impl BmcApplication {
 
         self.activate_slot(node, true).await?;
 
-        // also arbitrary
         sleep(Duration::from_secs(2)).await;
 
         log::info!("Checking for presence of a USB device...");
@@ -258,9 +259,16 @@ impl BmcApplication {
 
         usbboot::verify_checksum(img_checksum, img_len, &device_path).await?;
 
-        log::info!("Flashing successful");
+        log::info!("Flashing successful, restarting device...");
 
+        self.activate_slot(node, false).await?;
         self.pin_controller.clear_usb_boot()?;
+
+        sleep(reboot_delay).await;
+
+        self.activate_slot(node, true).await?;
+
+        log::info!("Done");
 
         Ok(())
     }

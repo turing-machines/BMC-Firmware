@@ -1,4 +1,5 @@
 use std::path::PathBuf;
+use std::time::Instant;
 use std::{fmt, fs};
 
 use anyhow::{bail, Result};
@@ -174,7 +175,7 @@ pub(crate) async fn write_to_device(
     let img_crc = Crc::<u64>::new(&CRC_64_REDIS);
     let mut img_digest = img_crc.digest();
 
-    log::info!("Image size: {} B", img_len);
+    let start_time = Instant::now();
 
     while let Ok(num_read) = reader.read(&mut buffer).await {
         if num_read == 0 {
@@ -187,7 +188,7 @@ pub(crate) async fn write_to_device(
         if progress_counter > progress_interval {
             progress_counter -= progress_interval;
 
-            log::info!("Progress: {}%", 100 * total_read / img_len);
+            print_progress(total_read, img_len, start_time);
         }
 
         img_digest.update(&buffer[..num_read]);
@@ -212,6 +213,28 @@ pub(crate) async fn write_to_device(
     writer.flush().await?;
 
     Ok((img_len, img_digest.finalize()))
+}
+
+fn print_progress(total_read: u64, img_len: u64, start_time: Instant) {
+    let read_percent = 100 * total_read / img_len;
+
+    let duration = start_time.elapsed();
+
+    #[allow(clippy::cast_precision_loss)] // This affects files > 4 exabytes long
+    let read_proportion = (total_read as f64) / (img_len as f64);
+
+    let estimated_end = duration.div_f64(read_proportion);
+    let estimated_left = estimated_end - duration;
+
+    let est_seconds = estimated_left.as_secs() % 60;
+    let est_minutes = (estimated_left.as_secs() / 60) % 60;
+
+    log::info!(
+        "Progress: {:>2}%, estimated time left: {:02}:{:02}",
+        read_percent,
+        est_minutes,
+        est_seconds
+    );
 }
 
 pub(crate) async fn verify_checksum(
