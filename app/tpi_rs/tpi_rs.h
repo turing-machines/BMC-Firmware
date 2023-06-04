@@ -12,8 +12,10 @@ typedef enum {
 } node_id_t;
 
 void tpi_initialize(void);
-
-void power_cycle_node(node_id_t node_id, bool on);
+void tpi_node_power(int num, int status);
+int tpi_usb_mode(int mode, int node);
+int tpi_get_node_power(int node);
+void tpi_rtl_reset();
 
 typedef enum {
     FR_SUCCESS,
@@ -27,5 +29,5 @@ typedef enum {
     FR_OTHER,
 } flashing_result;
 
-flashing_result tpi_flash_node(uint32_t node_id, const char* image_path);
+flashing_result tpi_flash_node(int node_id, const char* image_path);
 

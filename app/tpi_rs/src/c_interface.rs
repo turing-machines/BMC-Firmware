@@ -67,16 +67,6 @@ pub extern "C" fn tpi_node_power(num: c_int, status: c_int) {
 }
 
 #[no_mangle]
-pub extern "C" fn tpi_power_on() {
-    execute_routine(|bmc| Box::pin(bmc.power_on()));
-}
-
-#[no_mangle]
-pub extern "C" fn tpi_power_off() {
-    execute_routine(|bmc| Box::pin(bmc.power_off()));
-}
-
-#[no_mangle]
 pub extern "C" fn tpi_usb_mode(mode: c_int, node: c_int) -> c_int {
     let Ok(node_id) = node.try_into().map_err(|e| log::error!("{}", e)) else {
         return -1;
