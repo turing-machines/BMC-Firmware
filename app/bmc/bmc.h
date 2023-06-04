@@ -36,6 +36,8 @@ typedef struct _NODE_CTX_t
 
 char* get_nodeType(int num);
 
+int get_buff(int index,char* data,int len);
+
 int uart_write(int index,char *data,int len);
 
 #endif // !__BMC_H__

@@ -39,6 +39,6 @@ env_ctx_t* env_get_ctx(void);
 void init_env(void);
 int set_env_usb(env_usb_t* usb); 
 int get_env_usb(env_usb_t* usb);
-
+int set_env_nodeInfo(env_nodeInfo_t *info);
 
 #endif // !__PARAM_H__

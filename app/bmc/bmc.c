@@ -20,6 +20,7 @@
 #include "comm_device_serial.h"
 
 #include <tpi_rs.h>
+
 char nodeType[4][128] = {"unknown", "unknown", "unknown", "unknown"};
 
 NODE_CTX_t g_node_ctx[4];
@@ -37,38 +38,9 @@ char *allNodeType[] =
         "raspberry pi",
         "jetson"};
 
-int allNodeInfo[4] = {0};
-
 char *serail_path[4] = {"/dev/ttyS2", "/dev/ttyS1", "/dev/ttyS4", "/dev/ttyS5"};
 
 char *dev_keys[] = {"raspberry", "ttyTHS"};
-
-int analysis_nodeType(int fd, int num)
-{
-    if (fd < 0)
-        return 0;
-    int ret;
-    char *tmp = NULL;
-    char buff[256];
-    memset(buff, 0, sizeof(buff));
-    ret = read(fd, buff, sizeof(buff));
-    printf("recv num:%d,len:%d,buff=%s\n", num, ret, buff);
-    if (strstr(buff, dev_keys[0]))
-    {
-        allNodeInfo[num] = 1;
-        sprintf(nodeType[num], "[raspberry pi]");
-        printf("get raspberry dev\n");
-    }
-    if ((tmp = strstr(buff, dev_keys[1])))
-    {
-        *tmp = 0;
-        allNodeInfo[num] = 2;
-        sprintf(nodeType[num], "[jetson]-%s", buff);
-        printf("get jetson dev\n");
-    }
-    return 0;
-}
-
 
 int analysis_nodeType_proc(char *data, int num)
 {
@@ -79,89 +51,17 @@ int analysis_nodeType_proc(char *data, int num)
     strcpy(buff,data);
     if (strstr(buff, dev_keys[0]))
     {
-        allNodeInfo[num] = 1;
         sprintf(nodeType[num], "[raspberry pi]");
         printf("get raspberry dev\n");
     }
     if ((tmp = strstr(buff, dev_keys[1])))
     {
         *tmp = 0;
-        allNodeInfo[num] = 2;
         sprintf(nodeType[num], "[jetson]-%s", buff);
         printf("get jetson dev\n");
     }
     return 0;
 }
-
-
-void *sigle_uart_thread(void *arg)
-{
-    pthread_detach(pthread_self());
-
-    int nodenum = *(int *)arg;
-    // printf("arg = %d\n",nodenum);
-    printf("start uart thread node num = %d----\n", nodenum);
-
-    fd_set sfd;
-    int i;
-    int fd = 0;
-    bool serial_status = false;
-    env_nodeInfo_t *nodeInfo = &env_get_ctx()->nodeen;
-    sleep(1);
-    while (true)
-    {
-        // get uart enable
-        if (nodeInfo->enable)
-        {
-            if (!serial_status) // open serial
-            {
-                if (0 != common_device_UartOpen(&fd, serail_path[nodenum]))
-                {
-                    fd = -1;
-                    printf("open %s faild\n", serail_path[nodenum]);
-                    return;
-                    // continue;
-                }
-                common_device_UartSetAttr(fd, 115200, 8, 'n', 1);
-                serial_status = true;
-            }
-            else // check login info
-            {
-                int ret = 0;
-                FD_ZERO(&sfd);
-
-                FD_SET(fd, &sfd);
-                struct timeval tt;
-                tt.tv_sec = 1;
-                tt.tv_usec = 0;
-                ret = select(fd + 1, &sfd, NULL, NULL, &tt);
-                if (ret > 0)
-                {
-                    if (FD_ISSET(fd, &sfd))
-                    {
-                        analysis_nodeType(fd, nodenum);
-                    }
-                }
-            }
-        }
-        else
-        {
-            if (serial_status)
-            {
-                if (fd > 0)
-                {
-                    common_device_UartClose(fd);
-                }
-                serial_status = false;
-                sprintf(nodeType[nodenum], "unknown");
-            }
-            usleep(100 * 1000);
-        }
-    }
-    return;
-}
-
-
 
 int add_buff(NODE_BUFF_CTX_t* bctx,char* data)
 {
@@ -245,7 +145,7 @@ void *sigle_uart_thread_proc(void *arg)
     if(fd<0)
     {
         printf("fd < 0\n");
-        return ;
+        return NULL;
     }
     int ret = 0;
     sleep(1);
@@ -270,12 +170,11 @@ void *sigle_uart_thread_proc(void *arg)
             }
         }
     }
-    return;
+    return NULL;
 }
 
 char *get_nodeType(int num)
 {
-    // return allNodeType[allNodeInfo[num]];
     return nodeType[num];
 }
 

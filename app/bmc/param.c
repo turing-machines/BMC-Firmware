@@ -22,6 +22,8 @@
 #define NODEINFOEN_FILE_PATH "nodeinfoen.json"
 /**********************/
 
+int get_env_nodeInfo(env_nodeInfo_t *info);
+
 static env_ctx_t g_env_ctx;
 env_ctx_t* env_get_ctx(void)
 {
