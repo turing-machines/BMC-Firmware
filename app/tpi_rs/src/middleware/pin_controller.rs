@@ -49,7 +49,7 @@ macro_rules! create_output_lines {
 
 impl PinController {
     /// create a new Pin controller
-    pub async fn new() -> anyhow::Result<Self> {
+    pub fn new() -> anyhow::Result<Self> {
         let instance = create_output_lines!(
             "gpiochip0",
             (
@@ -176,9 +176,8 @@ impl PinController {
         self.usb_vbus.set_values(values)
     }
 
-    /// Set given nodes into usb boot mode. When powering the node on with this usb_boot mode
-    /// enabled, the given node will boot into USB mode. Typically means that booting of eMMC is
-    /// disabled.
+    /// Set given nodes into usb boot mode. When powering the node on with this mode enabled, the
+    /// given node will boot into USB mode. Typically means that booting of eMMC is disabled.
     pub fn set_usb_boot(&self, node: NodeId) -> std::io::Result<()> {
         self.rpi_boot.set_values(node.to_bitfield())
     }
@@ -202,12 +201,12 @@ impl PinController {
             }
 
             trace!("set_power_node {:#4b}", current_node_state);
-            self.mode.set_values(&current_node_state)?;
+            self.mode.set_values(current_node_state)?;
             sleep(Duration::from_millis(100)).await;
-            self.enable.set_values(&current_node_state)?;
+            self.enable.set_values(current_node_state)?;
             sleep(Duration::from_millis(100)).await;
             if n != 4 {
-                self.reset.set_values(&current_node_state)?;
+                self.reset.set_values(current_node_state)?;
             }
 
             sleep(Duration::from_secs(1)).await;
@@ -218,7 +217,7 @@ impl PinController {
 
     pub async fn reset(&self, node: NodeId) -> std::io::Result<()> {
         let value = node.to_bitfield();
-        self.reset.set_values(&value)?;
+        self.reset.set_values(value)?;
         sleep(Duration::from_secs(1)).await;
         self.reset.set_values(0u8)
     }

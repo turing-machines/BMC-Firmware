@@ -10,14 +10,14 @@ const DATABASE: &str = concat!("/var/lib/", env!("CARGO_PKG_NAME"), "/bmc.db");
 
 const VERSION: u32 = 1;
 
-/// [ApplicationPersistency] is a simple key-value store that stores application state. Decided is
-/// to go for a sqlite implementation. Its stable and there are enough tools available for it.
+/// [`ApplicationPersistency`] is a simple key-value store that stores application state. Decided is
+/// to go for a sqlite implementation. It's stable and there are enough tools available for it.
 /// Preferably we would like to have a binary representation that we could sync to disk. At the
 /// moment of writing are the current available crates not convincing enough to go down the route
-/// of having a propiatary memory layout. The downside is that sqlite's size on flash is more
-/// significant.
+/// of having a propiatary memory layout. The downside is that sqlite's size and wear on flash is
+/// more significant.
 ///
-/// Databases are versioned with sqlite's user_version property. When you break the format, make
+/// Databases are versioned with sqlite's `user_version` property. When you break the format, make
 /// sure to implement a migration path and update the VERSION number.
 #[derive(Debug)]
 pub struct ApplicationPersistency {
@@ -31,7 +31,9 @@ impl ApplicationPersistency {
         let path = PathBuf::from(DATABASE);
         let sql_db = format!("sqlite://{}", DATABASE);
 
-        let connection = if !path.exists() {
+        let connection = if path.exists() {
+            Self::connect(&sql_db).await?
+        } else {
             info!(
                 "Database {} does not exist. creating new one..",
                 path.to_string_lossy()
@@ -41,8 +43,6 @@ impl ApplicationPersistency {
                 tokio::fs::File::create(path).await?;
             }
             Self::setup_new(&sql_db).await?
-        } else {
-            Self::connect(&sql_db).await?
         };
 
         Ok(Self { connection })
@@ -91,7 +91,7 @@ impl ApplicationPersistency {
     }
 
     /// Set a value given a key. a value can be anything that can be encoded to a sqlite object.
-    /// i.e. implements the [sqlx::Encode] trait.
+    /// i.e. implements the [`sqlx::Encode`] trait.
     pub async fn set<T>(&self, key: &str, value: T) -> anyhow::Result<()>
     where
         T: Send + serde::Serialize,

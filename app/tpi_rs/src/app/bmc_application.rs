@@ -29,7 +29,7 @@ pub struct BmcApplication {
 
 impl BmcApplication {
     pub async fn new() -> anyhow::Result<Arc<Self>> {
-        let pin_controller = PinController::new().await?;
+        let pin_controller = PinController::new()?;
         let app_db = ApplicationPersistency::new().await?;
 
         let instance = Arc::new(Self {

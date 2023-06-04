@@ -7,7 +7,7 @@ use log::{error, warn};
 
 const DEVICE_PATH: &str = "/dev/input/event0";
 
-/// Structure that listens for incoming device events on device [DEVICE_PATH]
+/// Structure that listens for incoming device events on device [`DEVICE_PATH`]
 /// Using a simple callback mechanism.
 pub struct EventListener<T> {
     map: HashMap<

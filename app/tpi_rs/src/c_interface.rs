@@ -5,9 +5,9 @@ use futures::future::BoxFuture;
 use log::{error, LevelFilter};
 use once_cell::sync::{Lazy, OnceCell};
 use simple_logger::SimpleLogger;
+use std::ffi::{c_char, c_int, CStr};
 use std::path::PathBuf;
 use std::sync::Arc;
-use std::{ffi::CStr, ops::Deref};
 use tokio::{runtime::Runtime, sync::Mutex};
 
 use crate::middleware::usbboot::FlashingError;
@@ -51,33 +51,33 @@ where
 {
     RUNTIME.block_on(async move {
         let lock = APP.get().unwrap().lock();
-        if let Err(e) = func(lock.await.deref()).await {
+        if let Err(e) = func(&*lock.await).await {
             error!("{}", e);
         }
-    })
+    });
 }
 
 #[no_mangle]
-pub extern "C" fn tpi_node_power(num: core::ffi::c_int, status: core::ffi::c_int) {
+pub extern "C" fn tpi_node_power(num: c_int, status: c_int) {
     let Ok(node_id): Result<NodeId,()> = num.try_into().map_err(|e| log::error!("{}", e)) else {
         return;
     };
 
-    execute_routine(|bmc| Box::pin(bmc.activate_slot(node_id, status != 0)))
+    execute_routine(|bmc| Box::pin(bmc.activate_slot(node_id, status != 0)));
 }
 
 #[no_mangle]
 pub extern "C" fn tpi_power_on() {
-    execute_routine(|bmc| Box::pin(bmc.power_on()))
+    execute_routine(|bmc| Box::pin(bmc.power_on()));
 }
 
 #[no_mangle]
 pub extern "C" fn tpi_power_off() {
-    execute_routine(|bmc| Box::pin(bmc.power_off()))
+    execute_routine(|bmc| Box::pin(bmc.power_off()));
 }
 
 #[no_mangle]
-pub extern "C" fn tpi_usb_mode(mode: core::ffi::c_int, node: core::ffi::c_int) -> core::ffi::c_int {
+pub extern "C" fn tpi_usb_mode(mode: c_int, node: c_int) -> c_int {
     let Ok(node_id) = node.try_into().map_err(|e| log::error!("{}", e)) else {
         return -1;
     };
@@ -89,24 +89,25 @@ pub extern "C" fn tpi_usb_mode(mode: core::ffi::c_int, node: core::ffi::c_int) -
 }
 
 #[no_mangle]
-pub extern "C" fn tpi_get_node_power(node: core::ffi::c_int) -> core::ffi::c_int {
+pub extern "C" fn tpi_get_node_power(node: c_int) -> c_int {
     let Ok(node_id) = node.try_into().map_err(|e| log::error!("{}", e)) else {
         return -1;
     };
 
     RUNTIME.block_on(async move {
-        let lock = APP.get().unwrap().lock();
-        if lock.await.deref().get_node_power(node_id).await.unwrap() {
-            1
-        } else {
-            0
+        let lock = APP.get().unwrap().lock().await;
+        let status = lock.get_node_power(node_id).await;
+
+        match status {
+            Ok(st) => c_int::from(st),
+            Err(_) => -1,
         }
     })
 }
 
 #[no_mangle]
 pub extern "C" fn tpi_rtl_reset() {
-    execute_routine(|bmc| Box::pin(bmc.rtl_reset()))
+    execute_routine(|bmc| Box::pin(bmc.rtl_reset()));
 }
 
 #[repr(C)]
@@ -135,10 +136,7 @@ impl From<&FlashingError> for FlashingResult {
 }
 
 #[no_mangle]
-pub extern "C" fn tpi_flash_node(
-    node: core::ffi::c_int,
-    image_path: *const core::ffi::c_char,
-) -> FlashingResult {
+pub extern "C" fn tpi_flash_node(node: c_int, image_path: *const c_char) -> FlashingResult {
     let cstr = unsafe { CStr::from_ptr(image_path) };
     let Ok(bstr) = cstr.to_str() else {
         return FlashingResult::InvalidArgs;
@@ -151,7 +149,7 @@ pub extern "C" fn tpi_flash_node(
 
     RUNTIME.block_on(async move {
         let lock = APP.get().unwrap().lock();
-        let res = lock.await.deref().flash_node(node_id, node_image).await;
+        let res = lock.await.flash_node(node_id, node_image).await;
 
         match res {
             Ok(_) => FlashingResult::Success,
