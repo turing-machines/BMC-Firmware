@@ -547,6 +547,14 @@ int main(int argc, char *argv[])
         usage();
     }
 
+#ifndef __arm__
+    if (flashing_localfile)
+    {
+        puts("Argument '--localfile' can be used only on the BMC");
+        usage();
+    }
+#endif
+
     switch(mode)
     {
         case 0:
