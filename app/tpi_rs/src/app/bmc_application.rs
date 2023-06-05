@@ -249,7 +249,7 @@ impl BmcApplication {
         log::info!("Checking for presence of a device file...");
 
         let allowed_vendors = ["RPi-MSD-"];
-        let device_path = usbboot::get_device_path(&allowed_vendors)?;
+        let device_path = usbboot::get_device_path(&allowed_vendors).await?;
 
         log::info!("Writing {:?} to {:?}", image_path, device_path);
 
@@ -262,7 +262,7 @@ impl BmcApplication {
         log::info!("Flashing successful, restarting device...");
 
         self.activate_slot(node, false).await?;
-        self.pin_controller.clear_usb_boot()?;
+        self.usb_mode(UsbMode::Host, node).await?;
 
         sleep(reboot_delay).await;
 

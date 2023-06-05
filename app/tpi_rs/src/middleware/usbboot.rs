@@ -1,14 +1,15 @@
+use std::fmt;
 use std::path::PathBuf;
 use std::time::Instant;
-use std::{fmt, fs};
 
 use anyhow::{bail, Result};
 use crc::{Crc, CRC_64_REDIS};
-use tokio::io::{AsyncReadExt, AsyncWriteExt};
+use tokio::fs;
+use tokio::io::{self, AsyncReadExt, AsyncWriteExt};
 
 use crate::middleware::NodeId;
 
-const BUF_SIZE: usize = 2 * 1024 * 1024;
+const BUF_SIZE: usize = 8 * 1024;
 const PROGRESS_REPORT_PERCENT: u64 = 5;
 
 #[derive(Debug)]
@@ -87,8 +88,8 @@ pub(crate) fn check_only_one_device_present(supported: &[(u16, u16)]) -> Result<
     }
 }
 
-pub(crate) fn get_device_path(allowed_vendors: &[&str]) -> Result<PathBuf, FlashingError> {
-    let contents = fs::read_dir("/dev/disk/by-id").map_err(|err| {
+pub(crate) async fn get_device_path(allowed_vendors: &[&str]) -> Result<PathBuf, FlashingError> {
+    let mut contents = fs::read_dir("/dev/disk/by-id").await.map_err(|err| {
         log::error!("Failed to list devices: {}", err);
         FlashingError::IoError
     })?;
@@ -100,15 +101,10 @@ pub(crate) fn get_device_path(allowed_vendors: &[&str]) -> Result<PathBuf, Flash
 
     let mut matching_devices = vec![];
 
-    for entry in contents {
-        let entry = match entry {
-            Ok(entry) => entry,
-            Err(err) => {
-                log::warn!("Intermittent IO error while listing devices: {}", err);
-                continue;
-            }
-        };
-
+    while let Some(entry) = contents.next_entry().await.map_err(|err| {
+        log::warn!("Intermittent IO error while listing devices: {}", err);
+        FlashingError::IoError
+    })? {
         let Ok(file_name) = entry.file_name().into_string() else {
             continue;
         };
@@ -146,25 +142,24 @@ pub(crate) fn get_device_path(allowed_vendors: &[&str]) -> Result<PathBuf, Flash
         }
     };
 
-    fs::canonicalize(format!("/dev/disk/by-id/{}", symlink)).map_err(|err| {
-        log::error!("Failed to read link: {}", err);
-        FlashingError::IoError
-    })
+    fs::canonicalize(format!("/dev/disk/by-id/{}", symlink))
+        .await
+        .map_err(|err| {
+            log::error!("Failed to read link: {}", err);
+            FlashingError::IoError
+        })
 }
 
 pub(crate) async fn write_to_device(
     image_path: PathBuf,
     device_path: &PathBuf,
 ) -> Result<(u64, u64)> {
-    let img_file = tokio::fs::File::open(image_path).await?;
+    let img_file = fs::File::open(image_path).await?;
     let img_len = img_file.metadata().await?.len();
-    let mut reader = tokio::io::BufReader::with_capacity(BUF_SIZE, img_file);
+    let mut reader = io::BufReader::with_capacity(BUF_SIZE, img_file);
 
-    let dev_file = tokio::fs::OpenOptions::new()
-        .write(true)
-        .open(device_path)
-        .await?;
-    let mut writer = tokio::io::BufWriter::with_capacity(BUF_SIZE, dev_file);
+    let dev_file = fs::OpenOptions::new().write(true).open(device_path).await?;
+    let mut writer = io::BufWriter::with_capacity(BUF_SIZE, dev_file);
 
     let mut buffer = vec![0; BUF_SIZE];
     let mut total_read = 0;
@@ -258,8 +253,8 @@ pub(crate) async fn verify_checksum(
     }
 }
 
-async fn flush_file_caches() -> tokio::io::Result<()> {
-    let mut file = tokio::fs::OpenOptions::new()
+async fn flush_file_caches() -> io::Result<()> {
+    let mut file = fs::OpenOptions::new()
         .write(true)
         .open("/proc/sys/vm/drop_caches")
         .await?;
@@ -271,8 +266,8 @@ async fn flush_file_caches() -> tokio::io::Result<()> {
 // This function and `write_to_device()` could be merged into one with an optional callback for
 // every chunk read, but async closures are unstable and async blocks seem to require a Mutex.
 async fn calc_file_checksum(path: &PathBuf, to_read: u64) -> Result<u64> {
-    let file = tokio::fs::File::open(path).await?;
-    let mut reader = tokio::io::BufReader::with_capacity(BUF_SIZE, file);
+    let file = fs::File::open(path).await?;
+    let mut reader = io::BufReader::with_capacity(BUF_SIZE, file);
 
     let mut buffer = vec![0; BUF_SIZE];
     let mut total_read = 0;
