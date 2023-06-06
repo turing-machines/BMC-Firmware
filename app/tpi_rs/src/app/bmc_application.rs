@@ -7,6 +7,7 @@ use anyhow::{ensure, Context};
 use evdev::Key;
 use log::debug;
 use std::path::PathBuf;
+use std::process::Command;
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::sync::Mutex;
@@ -49,7 +50,7 @@ impl BmcApplication {
                 Box::pin(Self::toggle_power_states(app.clone()))
             })
             .add_action_async(Key::KEY_RESTART, 1, |_| {
-                Box::pin(async { system_shutdown::reboot().context("reboot") })
+                Box::pin(async { reboot() })
             })
             .run()?;
 
@@ -272,4 +273,12 @@ impl BmcApplication {
 
         Ok(())
     }
+}
+
+fn reboot() -> anyhow::Result<()> {
+    Command::new("shutdown")
+        .args(["-r", "now"])
+        .spawn()?;
+
+    Ok(())
 }

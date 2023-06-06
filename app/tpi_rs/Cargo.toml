@@ -33,7 +33,6 @@ sqlx = { version = "0.6.*", features = [
 ] }
 serde = { version = "1.0.*", features = ["derive"] }
 bincode = "1.*"
-system_shutdown = "4.*"
 
 [profile.release]
 lto = "thin"
