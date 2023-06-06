@@ -11,7 +11,6 @@ pub enum NodeId {
     Node2,
     Node3,
     Node4,
-    All,
 }
 
 impl TryFrom<i32> for NodeId {
@@ -30,19 +29,11 @@ impl TryFrom<i32> for NodeId {
 
 impl NodeId {
     pub fn to_bitfield(self) -> u8 {
-        if self == NodeId::All {
-            15
-        } else {
-            1 << self as u8
-        }
+        1 << self as u8
     }
 
     pub fn to_inverse_bitfield(self) -> u8 {
-        if self == NodeId::All {
-            0
-        } else {
-            0b1111 & !(1 << self as u8)
-        }
+        0b1111 & !(1 << self as u8)
     }
 }
 

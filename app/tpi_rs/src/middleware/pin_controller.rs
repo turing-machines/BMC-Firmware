@@ -6,7 +6,6 @@ use anyhow::Context;
 use gpiod::Active;
 use gpiod::{Chip, Lines, Options, Output};
 use log::trace;
-use std::io::ErrorKind;
 use std::time::Duration;
 use tokio::time::sleep;
 
@@ -132,7 +131,6 @@ impl PinController {
             NodeId::Node2 => 0b1101,
             NodeId::Node3 => 0b0011,
             NodeId::Node4 => 0b0111,
-            NodeId::All => return Err(std::io::Error::from(ErrorKind::Unsupported)),
         };
         self.usb_mux.set_values(values)
     }
@@ -156,10 +154,6 @@ impl PinController {
 
     /// Set which role a node has (`UsbMode::Host` or `UsbMode::Device`)
     pub fn set_usb_mode(&self, node: NodeId, mode: UsbMode, prev_mode: u8) -> std::io::Result<u8> {
-        if node == NodeId::All {
-            return Err(std::io::Error::from(ErrorKind::Unsupported));
-        }
-
         let new_mode = match mode {
             UsbMode::Host => prev_mode & node.to_inverse_bitfield(),
             UsbMode::Device => prev_mode | node.to_bitfield(),
