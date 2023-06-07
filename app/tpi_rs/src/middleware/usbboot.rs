@@ -1,9 +1,10 @@
 use std::fmt;
 use std::path::PathBuf;
-use std::time::Instant;
+use std::time::{Duration, Instant};
 
 use anyhow::{bail, Context, Result};
 use crc::{Crc, CRC_64_REDIS};
+use rusb::UsbContext;
 use tokio::fs;
 use tokio::io::{self, AsyncReadExt, AsyncWriteExt};
 use tokio::sync::mpsc::Sender;
@@ -57,27 +58,46 @@ pub(crate) fn boot_node_to_msd(_node: NodeId) -> Result<(), FlashingError> {
     })
 }
 
-pub(crate) fn check_only_one_device_present(supported: &[(u16, u16)]) -> Result<(), FlashingError> {
+pub(crate) fn get_serials_for_vid_pid(
+    supported: &[(u16, u16)],
+) -> anyhow::Result<Vec<String>, FlashingError> {
     let all_devices = rusb::DeviceList::new().map_err(|err| {
         log::error!("failed to get USB device list: {}", err);
         FlashingError::UsbError
     })?;
 
-    let mut matches = 0;
+    let matches = all_devices
+        .iter()
+        .filter_map(|dev| {
+            let desc = dev.device_descriptor().ok()?;
+            let this = (desc.vendor_id(), desc.product_id());
 
-    for device in all_devices.iter() {
-        let Ok(desc) = device.device_descriptor() else {
-            continue;
-        };
+            supported
+                .contains(&this)
+                .then_some(map_to_serial(dev).ok()?)
+        })
+        .collect::<Vec<String>>();
 
-        let this = (desc.vendor_id(), desc.product_id());
+    log::debug!(
+        "found the following serials for {:?}: {:#?}",
+        supported,
+        &matches
+    );
+    Ok(matches)
+}
 
-        if supported.iter().any(|&d| d == this) {
-            matches += 1;
-        }
-    }
+fn map_to_serial<T: UsbContext>(dev: rusb::Device<T>) -> anyhow::Result<String> {
+    let desc = dev.device_descriptor()?;
+    let handle = dev.open()?;
+    let timeout = Duration::from_secs(1);
+    let language = handle.read_languages(timeout)?;
+    handle
+        .read_serial_number_string(language.first().cloned().unwrap(), &desc, timeout)
+        .context("error reading serial")
+}
 
-    match matches {
+pub(crate) fn verify_one_device<T>(devices: &[T]) -> std::result::Result<(), FlashingError> {
+    match devices.len() {
         1 => Ok(()),
         0 => {
             log::error!("No supported devices found");
@@ -90,7 +110,9 @@ pub(crate) fn check_only_one_device_present(supported: &[(u16, u16)]) -> Result<
     }
 }
 
-pub(crate) async fn get_device_path(allowed_vendors: &[&str]) -> Result<PathBuf, FlashingError> {
+pub(crate) async fn get_device_path(
+    allowed_vendors: &[&str],
+) -> anyhow::Result<PathBuf, FlashingError> {
     let mut contents = fs::read_dir("/dev/disk/by-id").await.map_err(|err| {
         log::error!("Failed to list devices: {}", err);
         FlashingError::IoError
@@ -289,7 +311,7 @@ async fn flush_file_caches() -> io::Result<()> {
 
 // This function and `write_to_device()` could be merged into one with an optional callback for
 // every chunk read, but async closures are unstable and async blocks seem to require a Mutex.
-async fn calc_file_checksum(path: &PathBuf, to_read: u64) -> Result<u64> {
+async fn calc_file_checksum(path: &PathBuf, to_read: u64) -> anyhow::Result<u64> {
     let file = fs::File::open(path).await?;
     let mut reader = io::BufReader::with_capacity(BUF_SIZE, file);
 

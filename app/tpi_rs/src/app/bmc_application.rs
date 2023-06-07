@@ -258,7 +258,16 @@ impl BmcApplication {
             let allowed_devices = [
                 (0x0a5c, 0x2711), // Raspberry Pi Compute module 4
             ];
-            usbboot::check_only_one_device_present(&allowed_devices)?;
+            let matches = usbboot::get_serials_for_vid_pid(&allowed_devices)?;
+            usbboot::verify_one_device(&matches).map_err(|e| {
+                sender
+                    .try_send(FlashProgress {
+                        status: FlashStatus::Error(e),
+                        message: String::new(),
+                    })
+                    .unwrap();
+                e
+            })?;
 
             progress_state.message = String::from("Rebooting as a USB mass storage device...");
             sender.send(progress_state.clone()).await?;
