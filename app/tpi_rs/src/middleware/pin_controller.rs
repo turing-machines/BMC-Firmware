@@ -104,7 +104,7 @@ impl PinController {
                 Active::High,
                 "reset group"
             ),
-            (atx, [POWER_EN, SYS_LED], Active::High, "atx line"),
+            (atx, [POWER_EN], Active::High, "atx line"),
             (rtl_reset, [RTL_RESET], Active::Low, "Realtek switch reset")
         );
 
@@ -114,12 +114,12 @@ impl PinController {
     }
 
     pub async fn set_atx_power(&self, on: bool) -> std::io::Result<()> {
-        let mut values: u8 = 0b10;
         if on {
-            values = !values;
+            self.atx.set_values(0b1u8)?;
+        } else {
+            self.atx.set_values(0b0u8)?;
         }
 
-        self.atx.set_values(values)?;
         sleep(Duration::from_secs(1)).await;
         Ok(())
     }

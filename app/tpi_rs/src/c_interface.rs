@@ -36,7 +36,7 @@ pub extern "C" fn tpi_initialize() {
             .init()
             .expect("failed to initialize logger");
 
-        log::info!("Turing Pi BMC firmware v{}", env!("CARGO_PKG_VERSION"));
+        log::info!("{} v{}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
 
         APP.set(Mutex::new(
             BmcApplication::new().await.expect("unable to initialize"),
