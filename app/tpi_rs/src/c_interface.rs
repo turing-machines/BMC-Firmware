@@ -8,6 +8,7 @@ use simple_logger::SimpleLogger;
 use std::ffi::{c_char, c_int, CStr};
 use std::path::PathBuf;
 use std::sync::Arc;
+use tokio::join;
 use tokio::{runtime::Runtime, sync::Mutex};
 
 use crate::middleware::usbboot::FlashingError;
@@ -138,10 +139,21 @@ pub extern "C" fn tpi_flash_node(node: c_int, image_path: *const c_char) -> Flas
     };
 
     RUNTIME.block_on(async move {
-        let lock = APP.get().unwrap().lock();
-        let res = lock.await.flash_node(node_id, node_image).await;
+        let bmc = APP.get().unwrap().lock().await;
+        let (handle, mut progress_receiver) =
+            BmcApplication::flash_node(bmc.clone(), node_id, node_image);
 
-        match res {
+        // for now we print the status updates to console. In the future we would like to pass
+        // this back to the clients.
+        let print_handle = tokio::spawn(async move {
+            while let Some(msg) = progress_receiver.recv().await {
+                log::info!("{}", msg.message);
+            }
+        });
+
+        let (res, _) = join!(handle, print_handle);
+
+        match res.unwrap() {
             Ok(_) => FlashingResult::Success,
             Err(cause) => {
                 if let Some(flashing_err) = cause.downcast_ref::<FlashingError>() {

@@ -2,17 +2,19 @@ use std::fmt;
 use std::path::PathBuf;
 use std::time::Instant;
 
-use anyhow::{bail, Result};
+use anyhow::{bail, Context, Result};
 use crc::{Crc, CRC_64_REDIS};
 use tokio::fs;
 use tokio::io::{self, AsyncReadExt, AsyncWriteExt};
+use tokio::sync::mpsc::Sender;
 
+use crate::app::bmc_application::{FlashProgress, FlashStatus};
 use crate::middleware::NodeId;
 
 const BUF_SIZE: usize = 8 * 1024;
 const PROGRESS_REPORT_PERCENT: u64 = 5;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum FlashingError {
     InvalidArgs,
     DeviceNotFound,
@@ -153,6 +155,7 @@ pub(crate) async fn get_device_path(allowed_vendors: &[&str]) -> Result<PathBuf,
 pub(crate) async fn write_to_device(
     image_path: PathBuf,
     device_path: &PathBuf,
+    sender: &Sender<FlashProgress>,
 ) -> Result<(u64, u64)> {
     let img_file = fs::File::open(image_path).await?;
     let img_len = img_file.metadata().await?.len();
@@ -183,7 +186,7 @@ pub(crate) async fn write_to_device(
         if progress_counter > progress_interval {
             progress_counter -= progress_interval;
 
-            print_progress(total_read, img_len, start_time);
+            print_progress(total_read, img_len, start_time, &sender).await?;
         }
 
         img_digest.update(&buffer[..num_read]);
@@ -210,7 +213,12 @@ pub(crate) async fn write_to_device(
     Ok((img_len, img_digest.finalize()))
 }
 
-fn print_progress(total_read: u64, img_len: u64, start_time: Instant) {
+async fn print_progress(
+    total_read: u64,
+    img_len: u64,
+    start_time: Instant,
+    sender: &Sender<FlashProgress>,
+) -> Result<()> {
     let read_percent = 100 * total_read / img_len;
 
     let duration = start_time.elapsed();
@@ -224,18 +232,29 @@ fn print_progress(total_read: u64, img_len: u64, start_time: Instant) {
     let est_seconds = estimated_left.as_secs() % 60;
     let est_minutes = (estimated_left.as_secs() / 60) % 60;
 
-    log::info!(
+    let message = format!(
         "Progress: {:>2}%, estimated time left: {:02}:{:02}",
-        read_percent,
-        est_minutes,
-        est_seconds
+        read_percent, est_minutes, est_seconds,
     );
+
+    sender
+        .send(FlashProgress {
+            status: FlashStatus::Progress {
+                read_percent,
+                est_minutes,
+                est_seconds,
+            },
+            message,
+        })
+        .await
+        .context("progress update error")
 }
 
 pub(crate) async fn verify_checksum(
     img_checksum: u64,
     img_len: u64,
     device_path: &PathBuf,
+    sender: &Sender<FlashProgress>,
 ) -> Result<()> {
     flush_file_caches().await?;
 
@@ -244,11 +263,16 @@ pub(crate) async fn verify_checksum(
     if img_checksum == dev_checksum {
         Ok(())
     } else {
-        log::error!(
-            "Source and destination checksum mismatch: {:#x} != {:#x}",
-            img_checksum,
-            dev_checksum
-        );
+        sender
+            .send(FlashProgress {
+                status: FlashStatus::Error(FlashingError::ChecksumMismatch),
+                message: format!(
+                    "Source and destination checksum mismatch: {:#x} != {:#x}",
+                    img_checksum, dev_checksum
+                ),
+            })
+            .await?;
+
         bail!(FlashingError::ChecksumMismatch)
     }
 }

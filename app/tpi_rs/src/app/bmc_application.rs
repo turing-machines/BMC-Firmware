@@ -1,4 +1,5 @@
 use super::bits_trait::ToBits;
+use crate::middleware::usbboot::FlashingError;
 use crate::middleware::{
     app_persistency::ApplicationPersistency, event_listener::EventListener,
     pin_controller::PinController, usbboot, NodeId, UsbMode, UsbRoute,
@@ -10,7 +11,9 @@ use std::path::PathBuf;
 use std::process::Command;
 use std::sync::Arc;
 use std::time::Duration;
+use tokio::sync::mpsc::Receiver;
 use tokio::sync::Mutex;
+use tokio::task::JoinHandle;
 use tokio::time::sleep;
 
 /// Stores which slots are actually used. This information is used to determine
@@ -49,9 +52,7 @@ impl BmcApplication {
             .add_action_async(Key::KEY_POWER, 1, |app| {
                 Box::pin(Self::toggle_power_states(app.clone()))
             })
-            .add_action_async(Key::KEY_RESTART, 1, |_| {
-                Box::pin(async { reboot() })
-            })
+            .add_action_async(Key::KEY_RESTART, 1, |_| Box::pin(async { reboot() }))
             .run()?;
 
         Ok(instance)
@@ -211,74 +212,118 @@ impl BmcApplication {
         self.pin_controller.rtl_reset().await.context("rtl error")
     }
 
-    pub async fn flash_node(&self, node: NodeId, image_path: PathBuf) -> anyhow::Result<()> {
-        // arbitrary number, this sleep may not even be required
-        let reboot_delay = Duration::from_millis(500);
+    pub fn flash_node(
+        self: Arc<BmcApplication>,
+        node: NodeId,
+        image_path: PathBuf,
+    ) -> (JoinHandle<anyhow::Result<()>>, Receiver<FlashProgress>) {
+        let (sender, receiver) = tokio::sync::mpsc::channel(64);
+        let inner = async move {
+            // arbitrary number, this sleep may not even be required
+            let reboot_delay = Duration::from_millis(500);
+            let mut progress_state = FlashProgress {
+                message: String::new(),
+                status: FlashStatus::Idle,
+            };
 
-        log::info!("Powering off node {}...", node as u8 + 1);
+            progress_state.message = format!("Powering off node {}...", node as u8 + 1);
+            progress_state.status = FlashStatus::Progress {
+                read_percent: 0,
+                est_minutes: u64::MAX,
+                est_seconds: u64::MAX,
+            };
+            sender.send(progress_state.clone()).await?;
 
-        self.activate_slot(node, false).await?;
-        self.pin_controller.clear_usb_boot()?;
+            self.activate_slot(node, false).await?;
+            self.pin_controller.clear_usb_boot()?;
 
-        sleep(reboot_delay).await;
+            sleep(reboot_delay).await;
 
-        self.pin_controller.select_usb(node)?;
-        self.pin_controller.set_usb_boot(node)?;
-        self.pin_controller.set_usb_route(UsbRoute::BMC)?;
+            self.pin_controller.select_usb(node)?;
+            self.pin_controller.set_usb_boot(node)?;
+            self.pin_controller.set_usb_route(UsbRoute::BMC)?;
 
-        self.set_usb_mode(node, UsbMode::Device).await?;
+            self.set_usb_mode(node, UsbMode::Device).await?;
 
-        log::info!("Prerequisite settings toggled, powering on...");
+            progress_state.message = String::from("Prerequisite settings toggled, powering on...");
+            sender.send(progress_state.clone()).await?;
 
-        self.activate_slot(node, true).await?;
+            self.activate_slot(node, true).await?;
 
-        sleep(Duration::from_secs(2)).await;
+            sleep(Duration::from_secs(2)).await;
 
-        log::info!("Checking for presence of a USB device...");
+            progress_state.message = String::from("Checking for presence of a USB device...");
+            sender.send(progress_state.clone()).await?;
 
-        let allowed_devices = [
-            (0x0a5c, 0x2711), // Raspberry Pi Compute module 4
-        ];
-        usbboot::check_only_one_device_present(&allowed_devices)?;
+            let allowed_devices = [
+                (0x0a5c, 0x2711), // Raspberry Pi Compute module 4
+            ];
+            usbboot::check_only_one_device_present(&allowed_devices)?;
 
-        log::info!("Rebooting as a USB mass storage device...");
+            progress_state.message = String::from("Rebooting as a USB mass storage device...");
+            sender.send(progress_state.clone()).await?;
 
-        usbboot::boot_node_to_msd(node)?;
+            usbboot::boot_node_to_msd(node)?;
 
-        sleep(Duration::from_secs(3)).await;
+            sleep(Duration::from_secs(3)).await;
 
-        log::info!("Checking for presence of a device file...");
+            progress_state.message = String::from("Checking for presence of a device file...");
+            sender.send(progress_state.clone()).await?;
 
-        let allowed_vendors = ["RPi-MSD-"];
-        let device_path = usbboot::get_device_path(&allowed_vendors).await?;
+            let allowed_vendors = ["RPi-MSD-"];
+            let device_path = usbboot::get_device_path(&allowed_vendors).await?;
 
-        log::info!("Writing {:?} to {:?}", image_path, device_path);
+            progress_state.message = format!("Writing {:?} to {:?}", image_path, device_path);
+            sender.send(progress_state.clone()).await?;
 
-        let (img_len, img_checksum) = usbboot::write_to_device(image_path, &device_path).await?;
+            let (img_len, img_checksum) =
+                usbboot::write_to_device(image_path, &device_path, &sender).await?;
 
-        log::info!("Verifying checksum...");
+            progress_state.message = String::from("Verifying checksum...");
+            sender.send(progress_state.clone()).await?;
 
-        usbboot::verify_checksum(img_checksum, img_len, &device_path).await?;
+            usbboot::verify_checksum(img_checksum, img_len, &device_path, &sender).await?;
 
-        log::info!("Flashing successful, restarting device...");
+            progress_state.message = String::from("Flashing successful, restarting device...");
+            sender.send(progress_state.clone()).await?;
 
-        self.activate_slot(node, false).await?;
-        self.usb_mode(UsbMode::Host, node).await?;
+            self.activate_slot(node, false).await?;
+            self.usb_mode(UsbMode::Host, node).await?;
 
-        sleep(reboot_delay).await;
+            sleep(reboot_delay).await;
 
-        self.activate_slot(node, true).await?;
+            self.activate_slot(node, true).await?;
 
-        log::info!("Done");
+            progress_state.message = String::from("Done");
+            sender.send(progress_state).await?;
 
-        Ok(())
+            Ok(())
+        };
+
+        (tokio::spawn(inner), receiver)
     }
 }
 
 fn reboot() -> anyhow::Result<()> {
-    Command::new("shutdown")
-        .args(["-r", "now"])
-        .spawn()?;
+    Command::new("shutdown").args(["-r", "now"]).spawn()?;
 
     Ok(())
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum FlashStatus {
+    Idle,
+    Progress {
+        read_percent: u64,
+        est_minutes: u64,
+        est_seconds: u64,
+    },
+    Error(FlashingError),
+    Done,
+}
+
+#[derive(Debug, Clone)]
+pub struct FlashProgress {
+    pub status: FlashStatus,
+    pub message: String,
 }
