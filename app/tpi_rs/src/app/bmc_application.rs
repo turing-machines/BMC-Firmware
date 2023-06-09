@@ -51,7 +51,7 @@ impl BmcApplication {
             .add_action_async(Key::KEY_POWER, 1, |app| {
                 Box::pin(Self::toggle_power_states(app.clone()))
             })
-            .add_action_async(Key::KEY_RESTART, 1, |_| Box::pin(async { reboot() }))
+            .add_action_async(Key::KEY_RESTART, 1, |_| Box::pin(reboot()))
             .run()?;
 
         Ok(instance)
@@ -166,6 +166,8 @@ impl BmcApplication {
         if let Some(on) = Self::need_atx_change(*current_power_state, new_power_state) {
             debug!("changing state of atx to {}", on);
             self.pin_controller.set_atx_power(on).await?;
+            let led_val = if on { b"1" } else { b"0" };
+            tokio::fs::write("/sys/class/leds/fp:sys/brightness", led_val).await?;
         }
 
         debug!(
@@ -188,7 +190,7 @@ impl BmcApplication {
     ///
     /// * 'node_values'   set values of nodes, use in combination with node_mask
     /// * 'node_mask'     select which values to update
-    /// * 'activated_nodes' a mask that has presence over the node mask, if a given node is not
+    /// * 'activated_nodes' a mask that has precendense over the node mask, if a given node is not
     /// activated, setting a value will be ignored
     /// * 'current_state'  the current state of nodes
     fn power_logic(node_values: u8, node_mask: u8, activated_nodes: u8, current_state: u8) -> u8 {
@@ -336,9 +338,9 @@ impl BmcApplication {
     }
 }
 
-fn reboot() -> anyhow::Result<()> {
+async fn reboot() -> anyhow::Result<()> {
+    tokio::fs::write("/sys/class/leds/fp:reset/brightness", b"1").await?;
     Command::new("shutdown").args(["-r", "now"]).spawn()?;
-
     Ok(())
 }
 

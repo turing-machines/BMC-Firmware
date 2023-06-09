@@ -5,8 +5,6 @@ pub const GPIO_PIN_PG: u32 = 192;
 pub const GPIO_PIN_PD: u32 = 96;
 
 pub const RTL_RESET: u32 = GPIO_PIN_PG + 13;
-pub const SYS_LED: u32 = GPIO_PIN_PG + 8;
-pub const RESET_LED: u32 = GPIO_PIN_PG + 9;
 pub const SYS_RESET: u32 = GPIO_PIN_PG + 11;
 pub const POWER_DETECT: u32 = GPIO_PIN_PG + 10;
 pub const POWER_BOARD: u32 = GPIO_PIN_PG + 15;
