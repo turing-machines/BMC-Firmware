@@ -3,9 +3,7 @@ use std::collections::{HashMap, HashSet};
 use evdev::InputEventKind;
 use evdev::{Device, Key};
 use futures::future::BoxFuture;
-use log::{error, warn};
-
-const DEVICE_PATH: &str = "/dev/input/event0";
+use log::{debug, error, warn};
 
 /// Structure that listens for incoming device events on device [`DEVICE_PATH`]
 /// Using a simple callback mechanism.
@@ -15,13 +13,15 @@ pub struct EventListener<T> {
         Box<dyn Fn(&'_ T) -> BoxFuture<'static, anyhow::Result<()>> + Send + Sync>,
     >,
     context: T,
+    device_path: &'static str,
 }
 
 impl<T: Send + Sync + Clone + 'static> EventListener<T> {
-    pub fn new(context: T) -> Self {
+    pub fn new(context: T, device_path: &'static str) -> Self {
         Self {
             map: HashMap::new(),
             context,
+            device_path,
         }
     }
 
@@ -35,7 +35,7 @@ impl<T: Send + Sync + Clone + 'static> EventListener<T> {
 
     /// non-blocking call to start listening for events of interest.
     pub fn run(self) -> std::io::Result<()> {
-        let device = Device::open(DEVICE_PATH)?;
+        let device = Device::open(self.device_path)?;
         self.verify_required_keys(&device);
 
         let mut event_stream = device.into_event_stream()?;
@@ -43,9 +43,12 @@ impl<T: Send + Sync + Clone + 'static> EventListener<T> {
             while let Ok(event) = event_stream.next_event().await {
                 if let InputEventKind::Key(x) = event.kind() {
                     if let Some(action) = self.map.get(&(x, event.value())) {
+                        debug!("handling a key event {:?}", event);
                         if let Err(e) = action(&self.context).await {
                             error!("{}", e);
                         }
+                    } else {
+                        debug!("no handler defined for event {:?}", event);
                     }
                 }
             }
@@ -66,6 +69,11 @@ impl<T: Send + Sync + Clone + 'static> EventListener<T> {
                 "not all required keys are supported by linux subsystem. need {:?}, supported {:?}",
                 required_keys,
                 device.supported_keys()
+            );
+        } else {
+            debug!(
+                "keys {:#?} are all supported by the subsystem",
+                required_keys
             );
         }
     }
