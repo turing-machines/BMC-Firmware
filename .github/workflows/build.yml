@@ -69,8 +69,6 @@ jobs:
           lib32stdc++6 \
           libstdc++6 \
           libncurses-dev \
-          u-boot-tools \
-          mkbootimg \
           cpio \
           rsync \
           xxd -y
@@ -95,7 +93,6 @@ jobs:
           if-no-files-found: error 
           name: tp2-bmc-${{ env.BUILD_VERSION }}
           path: |
-            buildroot/output/images/buildroot_linux_nand_uart3.img
             buildroot/output/images/zImage
             buildroot/output/images/sun8iw20p1-t113-turingmachines-tp2bmc.dtb
 
