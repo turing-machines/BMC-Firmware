@@ -1,0 +1,24 @@
+From 59867d556332be71e5c2385d5f1df2b6ed9d40fa Mon Sep 17 00:00:00 2001
+From: Sam Edwards <CFSworks@gmail.com>
+Date: Sun, 4 Jun 2023 17:07:57 -0600
+Subject: [PATCH 19/20] HACK: add i2c2 to pinctrl
+
+---
+ drivers/pinctrl/sunxi/pinctrl-sunxi.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/pinctrl/sunxi/pinctrl-sunxi.c b/drivers/pinctrl/sunxi/pinctrl-sunxi.c
+index 66876d9954..1cef1647a0 100644
+--- a/drivers/pinctrl/sunxi/pinctrl-sunxi.c
++++ b/drivers/pinctrl/sunxi/pinctrl-sunxi.c
+@@ -755,6 +755,7 @@ static const struct sunxi_pinctrl_function sun20i_d1_pinctrl_functions[] = {
+ 	{ "mmc0",	2 },	/* PF0-PF5 */
+ 	{ "mmc2",	3 },	/* PC1-PC7 */
+ 	{ "spi0",	2 },	/* PC2-PC7 */
++	{ "i2c2",	2 },	/* PE12-PE13 */
+ #if IS_ENABLED(CONFIG_UART0_PORT_F)
+ 	{ "uart0",	3 },	/* PF2,PF4 */
+ #else
+-- 
+2.41.0
+

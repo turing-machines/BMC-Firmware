@@ -1,0 +1,79 @@
+From 14c1abeb13eb03fcf063327c9a6ad76e0a3b0f0a Mon Sep 17 00:00:00 2001
+From: Icenowy Zheng <uwu@icenowy.me>
+Date: Fri, 14 Oct 2022 11:05:14 +0800
+Subject: [PATCH 10/20] sunxi: SPL SPI: add support for read command with 2
+ byte address
+
+This kind of read command is utilized in SPI NANDs for reading data
+inside a selected page, which is obviously smaller than how much 2
+byte address can address. So 2 bytes are used for the address and one
+dummy byte is needed after the real address. As the address is sent out
+in bit endian, this makes it not compatible with usual 3 byte address.
+
+Signed-off-by: Icenowy Zheng <uwu@icenowy.me>
+---
+ arch/arm/mach-sunxi/spl_spi_sunxi.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
+
+diff --git a/arch/arm/mach-sunxi/spl_spi_sunxi.c b/arch/arm/mach-sunxi/spl_spi_sunxi.c
+index 2e97ad818b..834f431701 100644
+--- a/arch/arm/mach-sunxi/spl_spi_sunxi.c
++++ b/arch/arm/mach-sunxi/spl_spi_sunxi.c
+@@ -345,7 +345,7 @@ static void spi0_xfer(const u8 *txbuf, u32 txlen, u8 *rxbuf, u32 rxlen)
+ 	}
+ }
+ 
+-static void spi0_read_data(void *buf, u32 addr, u32 len)
++static void spi0_read_data(void *buf, u32 addr, u32 len, u32 addr_len)
+ {
+ 	u8 *buf8 = buf;
+ 	u32 chunk_len;
+@@ -356,9 +356,15 @@ static void spi0_read_data(void *buf, u32 addr, u32 len)
+ 
+ 		/* Configure the Read Data Bytes (03h) command header */
+ 		txbuf[0] = 0x03;
+-		txbuf[1] = (u8)(addr >> 16);
+-		txbuf[2] = (u8)(addr >> 8);
+-		txbuf[3] = (u8)(addr);
++		if (addr_len == 3) {
++			txbuf[1] = (u8)(addr >> 16);
++			txbuf[2] = (u8)(addr >> 8);
++			txbuf[3] = (u8)(addr);
++		} else if (addr_len == 2) {
++			txbuf[1] = (u8)(addr >> 8);
++			txbuf[2] = (u8)(addr);
++			txbuf[3] = 0; /* dummy */
++		}
+ 
+ 		if (chunk_len > SPI_READ_MAX_SIZE)
+ 			chunk_len = SPI_READ_MAX_SIZE;
+@@ -377,7 +383,7 @@ static void spi0_read_data(void *buf, u32 addr, u32 len)
+ static ulong spi_load_read(struct spl_load_info *load, ulong sector,
+ 			   ulong count, void *buf)
+ {
+-	spi0_read_data(buf, sector, count);
++	spi0_read_data(buf, sector, count, 3);
+ 
+ 	return count;
+ }
+@@ -396,7 +402,7 @@ static int spl_spi_load_image(struct spl_image_info *spl_image,
+ 
+ 	spi0_init();
+ 
+-	spi0_read_data((void *)header, load_offset, 0x40);
++	spi0_read_data((void *)header, load_offset, 0x40, 3);
+ 
+         if (IS_ENABLED(CONFIG_SPL_LOAD_FIT) &&
+ 		image_get_magic(header) == FDT_MAGIC) {
+@@ -416,7 +422,7 @@ static int spl_spi_load_image(struct spl_image_info *spl_image,
+ 			return ret;
+ 
+ 		spi0_read_data((void *)spl_image->load_addr,
+-			       load_offset, spl_image->size);
++			       load_offset, spl_image->size, 3);
+ 	}
+ 
+ 	spi0_deinit();
+-- 
+2.41.0
+

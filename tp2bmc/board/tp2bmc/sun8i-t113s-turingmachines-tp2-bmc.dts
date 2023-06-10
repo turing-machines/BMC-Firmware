@@ -1,0 +1,171 @@
+// SPDX-License-Identifier: GPL-2.0+
+// Copyright (C) 2023 Sam Edwards <CFSworks@gmail.com>
+
+/dts-v1/;
+
+#include "sun8i-t113s.dtsi"
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+
+/ {
+	model = "Turing Machines Turing Pi 2 BMC";
+	compatible = "turingmachines,tp2bmc", "allwinner,sun8i-t113s", "allwinner,r528";
+
+	aliases {
+		ethernet0 = &emac;
+		serial3 = &uart3;
+	};
+
+	chosen {
+		stdout-path = "serial3:115200n8";
+	};
+
+	// The LEDs are actually GPIO lines that go to the front-panel LEDs.
+	leds {
+		compatible = "gpio-leds";
+
+		sys {
+			label = "fp:sys";
+			gpios = <&pio 6 8 GPIO_ACTIVE_LOW>; /* PG8 */
+		};
+
+		reset {
+			label = "fp:reset";
+			gpios = <&pio 6 9 GPIO_ACTIVE_LOW>; /* PG9 */
+		};
+	};
+
+	// The keys are also GPIO lines.
+	keys {
+		compatible = "gpio-keys";
+
+		// Part of the front-panel connector
+		power {
+			label = "fp:power";
+			linux,code = <KEY_POWER>;
+			gpios = <&pio 6 10 GPIO_ACTIVE_HIGH>; /* PG10 */
+		};
+
+		reset {
+			label = "fp:reset";
+			linux,code = <KEY_RESTART>;
+			gpios = <&pio 6 11 GPIO_ACTIVE_HIGH>; /* PG11 */
+		};
+
+		// Located on the board itself
+		key1 {
+			label = "key1";
+			linux,code = <KEY_1>;
+			gpios = <&pio 6 15 GPIO_ACTIVE_LOW>; /* PG15 */
+		};
+	};
+
+};
+
+&dcxo {
+	clock-frequency = <24000000>;
+};
+
+&cpu0 {
+	//cpu-supply = <&reg_vcc_core>;
+};
+
+&cpu1 {
+	//cpu-supply = <&reg_vcc_core>;
+};
+
+&pio {
+	i2c2_pe_pins: i2c2-pe-pins {
+		pins = "PE12", "PE13";
+		function = "i2c2";
+		drive-strength = <10>;
+	};
+};
+
+&mmc0 {
+	status = "okay";
+
+	pinctrl-names = "default";
+	pinctrl-0 = <&mmc0_pins>;
+
+	bus-width = <4>;
+	cd-gpios = <&pio 5 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>; /* PF6 */
+	cd-used-24M;
+	cap-sd-highspeed;
+	no-sdio;
+	no-mmc;
+};
+
+&uart3 {
+	status = "okay";
+
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart3_pb_pins>;
+};
+
+&i2c2 {
+	status = "okay";
+
+	pinctrl-names = "default";
+	pinctrl-0 = <&i2c2_pe_pins>;
+};
+
+&emac {
+	status = "okay";
+
+	pinctrl-names = "default";
+	pinctrl-0 = <&rmii_pe_pins>;
+
+	phy-handle = <&rtl8201f>;
+	phy-mode = "rmii";
+	allwinner,tx-delay-ps = <300>;
+	allwinner,rx-delay-ps = <0>;
+	phy-rst = <&pio 4 10 GPIO_ACTIVE_HIGH>; /* PE10 */
+};
+
+&mdio {
+	rtl8201f: ethernet-phy@0 {
+		reg = <0>;
+	};
+};
+
+&spi0 {
+	status = "okay";
+
+	pinctrl-names = "default";
+	pinctrl-0 = <&spi0_pins>;
+
+	spi-nand@0 {
+		compatible = "spi-nand";
+		reg = <0x0>;
+
+		spi-max-frequency=<80000000>;
+		//spi-rx-bus-width=<4>;
+		//spi-tx-bus-width=<4>;
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+				label = "boot";
+				reg = <0x00000000 0x00100000>;
+				read-only;
+			};
+
+			partition@100000 {
+				label = "ubi";
+				reg = <0x00100000 0x07f00000>;
+			};
+		};
+	};
+};
+
+&usb_otg {
+	status = "okay";
+};
+
+&usbphy {
+	status = "okay";
+};
