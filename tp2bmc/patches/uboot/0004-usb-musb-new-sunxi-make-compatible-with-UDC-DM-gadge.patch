@@ -1,0 +1,98 @@
+From d723ebf551df06c208acfeed98edfbdf35aff5f4 Mon Sep 17 00:00:00 2001
+From: Sam Edwards <CFSworks@gmail.com>
+Date: Fri, 2 Jun 2023 14:43:19 -0600
+Subject: [PATCH 04/17] usb: musb-new: sunxi: make compatible with UDC/DM
+ gadget model
+
+Since many sunxi boards do not implement a `board_usb_init`, it's
+better if we just make the sunxi USB driver compatible with the
+DM gadget model, as many other musb-new variants already are.
+
+This change has been verified working on a T113s.
+
+Signed-off-by: Sam Edwards <CFSworks@gmail.com>
+---
+ drivers/usb/musb-new/sunxi.c | 50 +++++++++++++++++++++++-------------
+ 1 file changed, 32 insertions(+), 18 deletions(-)
+
+diff --git a/drivers/usb/musb-new/sunxi.c b/drivers/usb/musb-new/sunxi.c
+index f6e1f147f8..969a16ea0a 100644
+--- a/drivers/usb/musb-new/sunxi.c
++++ b/drivers/usb/musb-new/sunxi.c
+@@ -429,6 +429,16 @@ static struct musb_hdrc_config musb_config_h3 = {
+ 	.ram_bits	= SUNXI_MUSB_RAM_BITS,
+ };
+ 
++#if CONFIG_IS_ENABLED(DM_USB_GADGET)
++int dm_usb_gadget_handle_interrupts(struct udevice *dev) {
++	struct sunxi_glue *glue = dev_get_priv(dev);
++	struct musb_host_data *host = &glue->mdata;
++
++	host->host->isr(0, host->host);
++	return 0;
++}
++#endif
++
+ static int musb_usb_probe(struct udevice *dev)
+ {
+ 	struct sunxi_glue *glue = dev_get_priv(dev);
+@@ -437,10 +447,6 @@ static int musb_usb_probe(struct udevice *dev)
+ 	void *base = dev_read_addr_ptr(dev);
+ 	int ret;
+ 
+-#ifdef CONFIG_USB_MUSB_HOST
+-	struct usb_bus_priv *priv = dev_get_uclass_priv(dev);
+-#endif
+-
+ 	if (!base)
+ 		return -EINVAL;
+ 
+@@ -471,23 +477,31 @@ static int musb_usb_probe(struct udevice *dev)
+ 	pdata.platform_ops = &sunxi_musb_ops;
+ 	pdata.config = glue->cfg->config;
+ 
+-#ifdef CONFIG_USB_MUSB_HOST
+-	priv->desc_before_addr = true;
++	if (IS_ENABLED(CONFIG_USB_MUSB_HOST)) {
++		struct usb_bus_priv *priv = dev_get_uclass_priv(dev);
++		priv->desc_before_addr = true;
+ 
+-	pdata.mode = MUSB_HOST;
+-	host->host = musb_init_controller(&pdata, &glue->dev, base);
+-	if (!host->host)
+-		return -EIO;
++		pdata.mode = MUSB_HOST;
++		host->host = musb_init_controller(&pdata, &glue->dev, base);
++		if (!host->host)
++			return -EIO;
+ 
+-	return musb_lowlevel_init(host);
+-#else
+-	pdata.mode = MUSB_PERIPHERAL;
+-	host->host = musb_register(&pdata, &glue->dev, base);
+-	if (IS_ERR_OR_NULL(host->host))
+-		return -EIO;
++		return musb_lowlevel_init(host);
++	} else if (CONFIG_IS_ENABLED(DM_USB_GADGET)) {
++		pdata.mode = MUSB_PERIPHERAL;
++		host->host = musb_init_controller(&pdata, &glue->dev, base);
++		if (!host->host)
++			return -EIO;
+ 
+-	return 0;
+-#endif
++		return usb_add_gadget_udc(&glue->dev, &host->host->g);
++	} else {
++		pdata.mode = MUSB_PERIPHERAL;
++		host->host = musb_register(&pdata, &glue->dev, base);
++		if (IS_ERR_OR_NULL(host->host))
++			return -EIO;
++
++		return 0;
++	}
+ }
+ 
+ static int musb_usb_remove(struct udevice *dev)
+-- 
+2.41.0
+

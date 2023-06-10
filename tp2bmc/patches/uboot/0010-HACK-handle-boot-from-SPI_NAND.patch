@@ -1,0 +1,61 @@
+From 611e7ae031760d57f42fa6ff4c269a8be8f54e8e Mon Sep 17 00:00:00 2001
+From: Sam Edwards <CFSworks@gmail.com>
+Date: Mon, 5 Jun 2023 12:43:56 -0600
+Subject: [PATCH 10/17] HACK: handle boot from SPI_NAND
+
+---
+ arch/arm/include/asm/arch-sunxi/spl.h | 9 +++++----
+ arch/arm/mach-sunxi/board.c           | 1 +
+ board/sunxi/board.c                   | 4 ++--
+ 3 files changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/arch/arm/include/asm/arch-sunxi/spl.h b/arch/arm/include/asm/arch-sunxi/spl.h
+index 14944a20ea..703aa70a49 100644
+--- a/arch/arm/include/asm/arch-sunxi/spl.h
++++ b/arch/arm/include/asm/arch-sunxi/spl.h
+@@ -12,10 +12,11 @@
+ #define SPL_ADDR		CONFIG_SUNXI_SRAM_ADDRESS
+ 
+ /* The low 8-bits of the 'boot_media' field in the SPL header */
+-#define SUNXI_BOOTED_FROM_MMC0	0
+-#define SUNXI_BOOTED_FROM_NAND	1
+-#define SUNXI_BOOTED_FROM_MMC2	2
+-#define SUNXI_BOOTED_FROM_SPI	3
++#define SUNXI_BOOTED_FROM_MMC0		0
++#define SUNXI_BOOTED_FROM_NAND		1
++#define SUNXI_BOOTED_FROM_MMC2		2
++#define SUNXI_BOOTED_FROM_SPI		3
++#define SUNXI_BOOTED_FROM_SPI_NAND	4
+ #define SUNXI_BOOTED_FROM_MMC0_HIGH	0x10
+ #define SUNXI_BOOTED_FROM_MMC2_HIGH	0x12
+ 
+diff --git a/arch/arm/mach-sunxi/board.c b/arch/arm/mach-sunxi/board.c
+index 061d52d31a..21f321f9ca 100644
+--- a/arch/arm/mach-sunxi/board.c
++++ b/arch/arm/mach-sunxi/board.c
+@@ -306,6 +306,7 @@ uint32_t sunxi_get_boot_device(void)
+ 	case SUNXI_BOOTED_FROM_MMC2_HIGH:
+ 		return BOOT_DEVICE_MMC2;
+ 	case SUNXI_BOOTED_FROM_SPI:
++	case SUNXI_BOOTED_FROM_SPI_NAND:
+ 		return BOOT_DEVICE_SPI;
+ 	}
+ 
+diff --git a/board/sunxi/board.c b/board/sunxi/board.c
+index 39ecbe988f..5b484c318a 100644
+--- a/board/sunxi/board.c
++++ b/board/sunxi/board.c
+@@ -156,8 +156,8 @@ enum env_location env_get_location(enum env_operation op, int prio)
+ 			return ENVL_NAND;
+ 		break;
+ 	case BOOT_DEVICE_SPI:
+-		if (prio == 0 && IS_ENABLED(CONFIG_ENV_IS_IN_SPI_FLASH))
+-			return ENVL_SPI_FLASH;
++		if (prio == 0 && IS_ENABLED(CONFIG_ENV_IS_IN_UBI))
++			return ENVL_UBI;
+ 		if (IS_ENABLED(CONFIG_ENV_IS_IN_FAT))
+ 			return ENVL_FAT;
+ 		break;
+-- 
+2.41.0
+

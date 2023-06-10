@@ -1,0 +1,36 @@
+From c0f9856108145611fa192985bf056db2631447f8 Mon Sep 17 00:00:00 2001
+From: Icenowy Zheng <uwu@icenowy.me>
+Date: Fri, 14 Oct 2022 11:05:17 +0800
+Subject: [PATCH 09/17] sunxi: enable support for SPI NAND booting on SUNIV
+
+As we added support for SPI NAND to the existing SPL SPI codepath, route
+the boot code to it when it detects the BROM loads SPL from SPI NAND, as
+for SoCs with both SPI NAND and boot media indicator support, the boot
+media indicator is the same for SPI NOR and NAND.
+
+Signed-off-by: Icenowy Zheng <uwu@icenowy.me>
+---
+ arch/arm/mach-sunxi/board.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/arch/arm/mach-sunxi/board.c b/arch/arm/mach-sunxi/board.c
+index c2fadf7536..061d52d31a 100644
+--- a/arch/arm/mach-sunxi/board.c
++++ b/arch/arm/mach-sunxi/board.c
+@@ -224,12 +224,10 @@ static int suniv_get_boot_source(void)
+ 	case SUNIV_BOOTED_FROM_MMC0:
+ 		return SUNXI_BOOTED_FROM_MMC0;
+ 	case SUNIV_BOOTED_FROM_SPI:
++	case SUNIV_BOOTED_FROM_NAND:
+ 		return SUNXI_BOOTED_FROM_SPI;
+ 	case SUNIV_BOOTED_FROM_MMC1:
+ 		return SUNXI_BOOTED_FROM_MMC2;
+-	/* SPI NAND is not supported yet. */
+-	case SUNIV_BOOTED_FROM_NAND:
+-		return SUNXI_INVALID_BOOT_SOURCE;
+ 	}
+ 	/* If we get here something went wrong try to boot from FEL.*/
+ 	printf("Unknown boot source from BROM: 0x%x\n", brom_call);
+-- 
+2.41.0
+

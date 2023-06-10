@@ -1,0 +1,46 @@
+From dce98d8ba7530ac6f3865a027eb27e6d005cf82f Mon Sep 17 00:00:00 2001
+From: Sam Edwards <CFSworks@gmail.com>
+Date: Thu, 8 Jun 2023 13:32:51 -0600
+Subject: [PATCH 03/17] usb: musb-new: sunxi: remove unwanted printfs
+
+Per Marek's feedback, unconditional printfs in the probe function of this
+USB controller driver should be removed.
+
+This patch also slightly tidies up the return path, in preparation for
+DM support.
+
+Signed-off-by: Sam Edwards <CFSworks@gmail.com>
+Cc: Marek Vasut <marex@denx.de>
+---
+ drivers/usb/musb-new/sunxi.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/usb/musb-new/sunxi.c b/drivers/usb/musb-new/sunxi.c
+index 91f082fe05..f6e1f147f8 100644
+--- a/drivers/usb/musb-new/sunxi.c
++++ b/drivers/usb/musb-new/sunxi.c
+@@ -479,19 +479,15 @@ static int musb_usb_probe(struct udevice *dev)
+ 	if (!host->host)
+ 		return -EIO;
+ 
+-	ret = musb_lowlevel_init(host);
+-	if (!ret)
+-		printf("Allwinner mUSB OTG (Host)\n");
++	return musb_lowlevel_init(host);
+ #else
+ 	pdata.mode = MUSB_PERIPHERAL;
+ 	host->host = musb_register(&pdata, &glue->dev, base);
+ 	if (IS_ERR_OR_NULL(host->host))
+ 		return -EIO;
+ 
+-	printf("Allwinner mUSB OTG (Peripheral)\n");
++	return 0;
+ #endif
+-
+-	return ret;
+ }
+ 
+ static int musb_usb_remove(struct udevice *dev)
+-- 
+2.41.0
+
