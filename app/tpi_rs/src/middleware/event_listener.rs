@@ -2,21 +2,17 @@ use std::collections::{HashMap, HashSet};
 
 use evdev::InputEventKind;
 use evdev::{Device, Key};
-use futures::future::BoxFuture;
-use log::{debug, error, warn};
+use log::{debug, warn};
 
 /// Structure that listens for incoming device events on device [`DEVICE_PATH`]
 /// Using a simple callback mechanism.
 pub struct EventListener<T> {
-    map: HashMap<
-        (Key, i32),
-        Box<dyn Fn(&'_ T) -> BoxFuture<'static, anyhow::Result<()>> + Send + Sync>,
-    >,
     context: T,
+    map: HashMap<(Key, i32), Box<dyn Fn(&'_ mut T) + Send + Sync>>,
     device_path: &'static str,
 }
 
-impl<T: Send + Sync + Clone + 'static> EventListener<T> {
+impl<T: Send + Sync + 'static> EventListener<T> {
     pub fn new(context: T, device_path: &'static str) -> Self {
         Self {
             map: HashMap::new(),
@@ -25,16 +21,16 @@ impl<T: Send + Sync + Clone + 'static> EventListener<T> {
         }
     }
 
-    pub fn add_action_async<F>(mut self, key: Key, value: i32, action: F) -> Self
+    pub fn add_action<F>(mut self, key: Key, value: i32, action: F) -> Self
     where
-        F: Fn(&'_ T) -> BoxFuture<'static, anyhow::Result<()>> + Send + Sync + 'static,
+        F: Fn(&'_ mut T) + Send + Sync + 'static,
     {
         self.map.insert((key, value), Box::new(action));
         self
     }
 
     /// non-blocking call to start listening for events of interest.
-    pub fn run(self) -> std::io::Result<()> {
+    pub fn run(mut self) -> std::io::Result<()> {
         let device = Device::open(self.device_path)?;
         self.verify_required_keys(&device);
 
@@ -43,10 +39,7 @@ impl<T: Send + Sync + Clone + 'static> EventListener<T> {
             while let Ok(event) = event_stream.next_event().await {
                 if let InputEventKind::Key(x) = event.kind() {
                     if let Some(action) = self.map.get(&(x, event.value())) {
-                        debug!("handling a key event {:?}", event);
-                        if let Err(e) = action(&self.context).await {
-                            error!("{}", e);
-                        }
+                        action(&mut self.context);
                     } else {
                         debug!("no handler defined for event {:?}", event);
                     }

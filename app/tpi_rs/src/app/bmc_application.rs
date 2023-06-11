@@ -11,6 +11,7 @@ use std::process::Command;
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::sync::mpsc::Receiver;
+use tokio::sync::oneshot::{channel, Sender};
 use tokio::sync::Mutex;
 use tokio::task::JoinHandle;
 use tokio::time::sleep;
@@ -42,25 +43,57 @@ impl BmcApplication {
         });
 
         instance.initialize().await?;
-
-        // start listening for device events.
-        EventListener::new(instance.clone(), "/dev/input/event0")
-            .add_action_async(Key::KEY_1, 1, |app| {
-                Box::pin(Self::toggle_power_states(app.clone()))
-            })
-            .add_action_async(Key::KEY_POWER, 1, |app| {
-                Box::pin(Self::toggle_power_states(app.clone()))
-            })
-            .add_action_async(Key::KEY_RESTART, 1, |_| Box::pin(reboot()))
-            .run()?;
-
+        Self::run_event_listener(instance.clone())?;
         Ok(instance)
     }
 
-    async fn toggle_power_states(app: Arc<BmcApplication>) -> anyhow::Result<()> {
+    fn run_event_listener(instance: Arc<BmcApplication>) -> anyhow::Result<()> {
+        // start listening for device events.
+        EventListener::new((instance, Option::<Sender<()>>::None), "/dev/input/event0")
+            .add_action(Key::KEY_1, 1, |(app, s)| {
+                let (sender, receiver) = channel();
+                *s = Some(sender);
+
+                let bmc = app.clone();
+                tokio::spawn(async move {
+                    let long_press = tokio::time::timeout(Duration::from_secs(3), receiver)
+                        .await
+                        .is_err();
+                    Self::toggle_power_states(bmc, long_press).await
+                });
+            })
+            .add_action(Key::KEY_1, 0, |(_, sender)| {
+                let _ = sender.take().and_then(|s| s.send(()).ok());
+            })
+            .add_action(Key::KEY_POWER, 1, |(app, _)| {
+                tokio::spawn(Self::toggle_power_states(app.clone(), false));
+            })
+            .add_action(Key::KEY_RESTART, 1, |_| {
+                tokio::spawn(reboot());
+            })
+            .run()
+            .context("event_listener error")
+    }
+
+    async fn toggle_power_states(
+        app: Arc<BmcApplication>,
+        mut reset_activation: bool,
+    ) -> anyhow::Result<()> {
         let lock = app.power_state.lock().await;
-        let node_values = !*lock;
+        if *lock == 0 {
+            // For first time use, when the user didnt powered any nodes yet.
+            // Activate them all.
+            reset_activation = true;
+        }
+
+        let mut node_values = *lock;
         drop(lock);
+
+        if reset_activation {
+            let value = if node_values < 15 { 0b1111 } else { 0b0000 };
+            app.app_db.set(ACTIVATED_NODES_KEY, value).await?;
+        }
+        node_values = !node_values;
 
         app.power_node(node_values, 0b1111).await
     }
