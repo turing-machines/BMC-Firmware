@@ -694,6 +694,31 @@ static void uploadFirmware(Webs *wp)
 	
 }
 
+static void run_node_to_msd(Webs *wp)
+{
+    WebsKey         *s;
+    WebsUpload      *up;
+
+    char    *node = NULL;
+    uint8_t node_id;
+    flashing_result res;
+
+    node = websGetVar(wp, "node", NULL);
+    if (!node)
+    {
+        app_webS_PrintJsonErr(wp, 400, "No node specified");
+        return;
+    }
+    tpi_node_to_msd(atoi(node));
+    websWrite(wp,"{\"response\":[{\"result\":\"ok\"}]}");
+}
+
+static void clear_usb_boot(Webs *wp)
+{
+    tpi_clear_usbboot();
+    websWrite(wp,"{\"response\":[{\"result\":\"ok\"}]}");
+}
+
 static void req_flash_node(Webs *wp)
 {
     WebsKey         *s;
@@ -841,7 +866,14 @@ static void bmcdemo(Webs *wp)
         {
             set_uartCmd(wp);
         }
-
+        else if(0==strcasecmp(pType,"node_to_msd"))
+        {
+            run_node_to_msd(wp);
+        }
+        else if(0==strcasecmp(pType,"clear_usb_boot"))
+        {
+            clear_usb_boot(wp);
+        }
         strcpy(json_result_buff,"{\"response\":[{\"result\":\"ok\"}]}");
         websWrite(wp, "%s", json_result_buff);
         websFlush(wp, 0);

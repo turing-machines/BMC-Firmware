@@ -22,4 +22,7 @@ typedef enum {
 } flashing_result;
 
 flashing_result tpi_flash_node(int node_id, const char* image_path);
+void tpi_node_to_msd(int node_id);
+void tpi_clear_usbboot();
+
 

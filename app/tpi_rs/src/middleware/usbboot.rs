@@ -1,16 +1,14 @@
-use std::fmt;
+use std::fmt::{self, Display};
 use std::path::PathBuf;
 use std::time::{Duration, Instant};
 
+use crate::middleware::NodeId;
 use anyhow::{bail, Context, Result};
 use crc::{Crc, CRC_64_REDIS};
 use rusb::UsbContext;
 use tokio::fs;
 use tokio::io::{self, AsyncReadExt, AsyncWriteExt};
 use tokio::sync::mpsc::Sender;
-
-use crate::app::bmc_application::{FlashProgress, FlashStatus};
-use crate::middleware::NodeId;
 
 const BUF_SIZE: usize = 8 * 1024;
 const PROGRESS_REPORT_PERCENT: u64 = 5;
@@ -44,6 +42,30 @@ impl fmt::Display for FlashingError {
 
 impl std::error::Error for FlashingError {}
 
+#[derive(Debug, Clone, Copy)]
+pub enum FlashStatus {
+    Idle,
+    Progress {
+        read_percent: u64,
+        est_minutes: u64,
+        est_seconds: u64,
+    },
+    Error(FlashingError),
+    Done,
+}
+
+#[derive(Debug, Clone)]
+pub struct FlashProgress {
+    pub status: FlashStatus,
+    pub message: String,
+}
+
+impl Display for FlashProgress {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.message)
+    }
+}
+
 /// Boot the Raspberry Pi node into emulating a USB Mass Storage Device (MSD)
 /// Precondition: one, and only one, node should be set into RPIBOOT mode via GPIO.
 pub(crate) fn boot_node_to_msd(_node: NodeId) -> Result<(), FlashingError> {
@@ -58,13 +80,16 @@ pub(crate) fn boot_node_to_msd(_node: NodeId) -> Result<(), FlashingError> {
     })
 }
 
-pub(crate) fn get_serials_for_vid_pid(
-    supported: &[(u16, u16)],
-) -> anyhow::Result<Vec<String>, FlashingError> {
+pub(crate) fn get_serials_for_vid_pid<I>(supported: I) -> anyhow::Result<Vec<String>, FlashingError>
+where
+    I: IntoIterator<Item = (u16, u16)> + core::fmt::Debug,
+{
     let all_devices = rusb::DeviceList::new().map_err(|err| {
         log::error!("failed to get USB device list: {}", err);
         FlashingError::UsbError
     })?;
+
+    let supported_devices = supported.into_iter().collect::<Vec<(u16, u16)>>();
 
     let matches = all_devices
         .iter()
@@ -72,15 +97,16 @@ pub(crate) fn get_serials_for_vid_pid(
             let desc = dev.device_descriptor().ok()?;
             let this = (desc.vendor_id(), desc.product_id());
 
-            supported
-                .contains(&this)
+            supported_devices
+                .iter()
+                .any(|x| x == &this)
                 .then_some(map_to_serial(dev).ok()?)
         })
         .collect::<Vec<String>>();
 
     log::debug!(
-        "found the following serials for {:?}: {:#?}",
-        supported,
+        "found the following serials for {:#?}: {:#?}",
+        supported_devices,
         &matches
     );
     Ok(matches)
@@ -110,8 +136,8 @@ pub(crate) fn verify_one_device<T>(devices: &[T]) -> std::result::Result<(), Fla
     }
 }
 
-pub(crate) async fn get_device_path(
-    allowed_vendors: &[&str],
+pub(crate) async fn get_device_path<I: IntoIterator<Item = &'static str>>(
+    allowed_vendors: I,
 ) -> anyhow::Result<PathBuf, FlashingError> {
     let mut contents = fs::read_dir("/dev/disk/by-id").await.map_err(|err| {
         log::error!("Failed to list devices: {}", err);
@@ -119,7 +145,7 @@ pub(crate) async fn get_device_path(
     })?;
 
     let target_prefixes = allowed_vendors
-        .iter()
+        .into_iter()
         .map(|vendor| format!("usb-{}_", vendor))
         .collect::<Vec<String>>();
 

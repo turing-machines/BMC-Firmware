@@ -6,9 +6,12 @@ use log::{error, LevelFilter};
 use once_cell::sync::{Lazy, OnceCell};
 use simple_logger::SimpleLogger;
 use std::ffi::{c_char, c_int, CStr};
+use std::fmt::Display;
 use std::path::PathBuf;
 use std::sync::Arc;
 use tokio::join;
+use tokio::sync::mpsc::channel;
+use tokio::sync::mpsc::Receiver;
 use tokio::{runtime::Runtime, sync::Mutex};
 
 use crate::middleware::usbboot::FlashingError;
@@ -127,6 +130,31 @@ impl From<&FlashingError> for FlashingResult {
 }
 
 #[no_mangle]
+pub extern "C" fn tpi_clear_usbboot() {
+    RUNTIME.block_on(async move {
+        APP.get().unwrap().lock().await.clear_usb_boot().unwrap();
+    })
+}
+
+#[no_mangle]
+pub extern "C" fn tpi_node_to_msd(node: c_int) {
+    RUNTIME.block_on(async move {
+        let bmc = APP.get().unwrap().lock().await.clone();
+        let (sender, receiver) = channel(64);
+        let handle = tokio::spawn(async move {
+            bmc.set_node_in_msd(
+                node.try_into().unwrap(),
+                crate::middleware::UsbRoute::BMC,
+                sender,
+            )
+            .await
+        });
+        let print_handle = logging_sink(receiver);
+        let _ = join!(handle, print_handle);
+    });
+}
+
+#[no_mangle]
 pub extern "C" fn tpi_flash_node(node: c_int, image_path: *const c_char) -> FlashingResult {
     let cstr = unsafe { CStr::from_ptr(image_path) };
     let Ok(bstr) = cstr.to_str() else {
@@ -140,17 +168,15 @@ pub extern "C" fn tpi_flash_node(node: c_int, image_path: *const c_char) -> Flas
 
     RUNTIME.block_on(async move {
         let bmc = APP.get().unwrap().lock().await;
-        let (handle, mut progress_receiver) =
-            BmcApplication::flash_node(bmc.clone(), node_id, node_image);
+        let (sender, receiver) = channel(64);
+        let handle = tokio::spawn(BmcApplication::flash_node(
+            bmc.clone(),
+            node_id,
+            node_image,
+            sender,
+        ));
 
-        // for now we print the status updates to console. In the future we would like to pass
-        // this back to the clients.
-        let print_handle = tokio::spawn(async move {
-            while let Some(msg) = progress_receiver.recv().await {
-                log::info!("{}", msg.message);
-            }
-        });
-
+        let print_handle = logging_sink(receiver);
         let (res, _) = join!(handle, print_handle);
 
         match res.unwrap() {
@@ -162,6 +188,18 @@ pub extern "C" fn tpi_flash_node(node: c_int, image_path: *const c_char) -> Flas
                     FlashingResult::Other
                 }
             }
+        }
+    })
+}
+
+// for now we print the status updates to console. In the future we would like to pass
+// this back to the clients.
+fn logging_sink<T: Display + Send + 'static>(
+    mut receiver: Receiver<T>,
+) -> tokio::task::JoinHandle<()> {
+    tokio::spawn(async move {
+        while let Some(msg) = receiver.recv().await {
+            log::info!("{}", msg);
         }
     })
 }
