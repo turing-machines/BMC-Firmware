@@ -15,6 +15,10 @@
 	/delete-node/ firmware;
 	/delete-node/ psci;
 
+	aliases {
+		flash_partitions = &flash_partitions;
+	};
+
 	// The i2c-sunxi driver does not currently support NOSTART
 	// transactions, which are necessary to support the RTL8370MB's Realtek
 	// mode, so GPIO mode is used instead for now. This can be removed once
@@ -561,7 +565,7 @@
 		// (MTD_SPI_NAND w/ MTD_OF_PARTS) is used.
 		// The Allwinner `spi-nand` driver (AW_MTD_SPINAND) ignores
 		// this, but generates the same partitioning internally.
-		partitions {
+		flash_partitions: partitions {
 			compatible = "fixed-partitions";
 			#address-cells = <1>;
 			#size-cells = <1>;
