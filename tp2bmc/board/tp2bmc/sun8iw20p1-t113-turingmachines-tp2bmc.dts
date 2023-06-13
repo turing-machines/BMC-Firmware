@@ -3,14 +3,17 @@
 
 /dts-v1/;
 
-/memreserve/ 0x41900000 0x00100000;
-
 #include "sun8iw20p1.dtsi"
 #include <dt-bindings/input/input.h>
 
 /{
 	model = "Turing Machines Turing Pi 2 BMC";
 	compatible = "turingmachines,tp2bmc", "allwinner,r528", "arm,sun8iw20p1";
+
+	// `sun8iw20p1.dtsi` adds these, but they should be added by the
+	// bootloader as needed, not at compile-time
+	/delete-node/ firmware;
+	/delete-node/ psci;
 
 	// The i2c-sunxi driver does not currently support NOSTART
 	// transactions, which are necessary to support the RTL8370MB's Realtek
