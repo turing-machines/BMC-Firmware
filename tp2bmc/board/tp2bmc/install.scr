@@ -1,0 +1,33 @@
+# SPDX-License-Identifier: GPL-2.0+
+# Copyright (C) 2023 Sam Edwards <CFSworks@gmail.com>
+
+installer_marker=/install.txt
+
+# The installer doesn't have any concept of "safe mode," so if this is
+# requested, the user is most likely trying to say that the installer should
+# NOT run. Perhaps the user is trying to get into safe mode to erase the
+# installer microSD card because it's too inconvenient to remove?
+if test "${bootmode}" != "safemode"; then
+	echo Checking ${installer_marker}...
+	if test -e ${devtype} ${devnum}:${distro_bootpart} ${installer_marker}; then
+		echo ...exists: entering installer
+
+		fdt_filename="FDT_FILENAME_HERE"
+		linux_bootpart=2
+
+		# Load image, initramfs, and FDT
+		if load ${devtype} ${devnum}:${linux_bootpart} ${loadaddr} /boot/zImage \
+			&& load ${devtype} ${devnum}:${distro_bootpart} ${ramdisk_addr_r} /boot/install.img \
+			&& load ${devtype} ${devnum}:${linux_bootpart} ${fdt_addr_r} /boot/${fdt_filename}
+		then
+			# Patch FDT to allow write access to the bootloader partition
+			fdt addr ${fdt_addr_r}
+			fdt rm flash_partitions/partition@0 read-only
+
+			env set bootargs loglevel=4 console=ttyS3,115200
+			bootz ${loadaddr} ${ramdisk_addr_r} ${fdt_addr_r}
+		fi
+	else
+		echo ...does not exist: proceeding with normal boot
+	fi
+fi

@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: GPL-2.0+
+# Copyright (C) 2023 Sam Edwards <CFSworks@gmail.com>
+
+fdt_filename="FDT_FILENAME_HERE"
+
+# Set bootargs:
+setenv bootargs earlycon=uart8250,mmio32,0x02500c00 console=ttyS3,115200 \
+	loglevel=8 cma=8M
+
+if test ${devtype} = mmc; then
+	setenv bootargs ${bootargs} root=PARTUUID=${distro_bootpart_uuid}
+fi
+if test ${devtype} = ubi; then
+	setenv bootargs ${bootargs} ubi.mtd=ubi ubi.block=${devnum},${distro_bootpart} root=254:0
+fi
+
+setenv bootargs ${bootargs} sunxi_gmac.mac_str=${ethaddr} ${bootmode}
+
+# Load image, FDT
+load ${devtype} ${devnum}:${distro_bootpart} ${loadaddr} /boot/zImage
+load ${devtype} ${devnum}:${distro_bootpart} ${fdt_addr_r} /boot/${fdt_filename}
+fdt addr ${fdt_addr_r}
+
+# Our build of Linux doesn't yet know how to manage the switch, so:
+run ethsw_do_reset
+
+bootz ${loadaddr} - ${fdt_addr_r}

@@ -1,0 +1,12 @@
+The presence of a file named "install.txt" in the root of the first partition
+of the SD card indicates that we want this to be a "installer/recovery" SD
+card, for recovering and/or updating the firmware on the Turing Pi 2 board.
+(Actually, its existence is checked by "boot/boot.scr.uimg", which boots the
+ kernel with initramfs "install.img", and that implements the installer logic.)
+
+If you would rather use this SD card *as* your BMC's root+boot drive instead of
+the builtin flash, then delete or rename this file.
+
+If you change your mind, return this file (or another; contents are ignored) to
+the same location on the SD card.  Changes made to the filesystem while the SD
+card was used as a root device will not affect the installer functionality.
