@@ -64,7 +64,7 @@ function start_adb(){
     sleep 1
 
     # enable udc
-    UDC_DEVICE=`find -name "usb_device"`
+    UDC_DEVICE=/sys/bus/platform/devices/*/usb_device
     cat $UDC_DEVICE
     #cat /sys/bus/platform/drivers/otg\ manager/soc@3000000:usbc0@0/usb_device
 
