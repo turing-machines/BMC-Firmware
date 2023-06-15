@@ -133,7 +133,7 @@ impl From<&FlashingError> for FlashingResult {
 pub extern "C" fn tpi_clear_usbboot() {
     RUNTIME.block_on(async move {
         APP.get().unwrap().lock().await.clear_usb_boot().unwrap();
-    })
+    });
 }
 
 #[no_mangle]

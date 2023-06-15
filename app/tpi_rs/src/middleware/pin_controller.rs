@@ -114,12 +114,7 @@ impl PinController {
     }
 
     pub async fn set_atx_power(&self, on: bool) -> std::io::Result<()> {
-        if on {
-            self.atx.set_values(0b1u8)?;
-        } else {
-            self.atx.set_values(0b0u8)?;
-        }
-
+        self.atx.set_values(on as u8)?;
         sleep(Duration::from_secs(1)).await;
         Ok(())
     }
@@ -141,11 +136,11 @@ impl PinController {
         match route {
             UsbRoute::UsbA => {
                 self.usb_switch.set_values(0_u8)?;
-                self.usb_pwen.set_values(1_u8)?;
+                self.usb_pwen.set_values(0_u8)?;
             }
             UsbRoute::BMC => {
                 self.usb_switch.set_values(1_u8)?;
-                self.usb_pwen.set_values(0_u8)?;
+                self.usb_pwen.set_values(1_u8)?;
             }
         }
 

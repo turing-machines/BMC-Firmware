@@ -100,7 +100,7 @@ where
             supported_devices
                 .iter()
                 .any(|x| x == &this)
-                .then_some(map_to_serial(dev).ok()?)
+                .then_some(map_to_serial(&dev).ok()?)
         })
         .collect::<Vec<String>>();
 
@@ -112,13 +112,13 @@ where
     Ok(matches)
 }
 
-fn map_to_serial<T: UsbContext>(dev: rusb::Device<T>) -> anyhow::Result<String> {
+fn map_to_serial<T: UsbContext>(dev: &rusb::Device<T>) -> anyhow::Result<String> {
     let desc = dev.device_descriptor()?;
     let handle = dev.open()?;
     let timeout = Duration::from_secs(1);
     let language = handle.read_languages(timeout)?;
     handle
-        .read_serial_number_string(language.first().cloned().unwrap(), &desc, timeout)
+        .read_serial_number_string(language.first().copied().unwrap(), &desc, timeout)
         .context("error reading serial")
 }
 
@@ -234,7 +234,7 @@ pub(crate) async fn write_to_device(
         if progress_counter > progress_interval {
             progress_counter -= progress_interval;
 
-            print_progress(total_read, img_len, start_time, &sender).await?;
+            print_progress(total_read, img_len, start_time, sender).await?;
         }
 
         img_digest.update(&buffer[..num_read]);

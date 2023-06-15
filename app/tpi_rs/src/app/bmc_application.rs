@@ -10,8 +10,7 @@ use std::path::PathBuf;
 use std::process::Command;
 use std::sync::Arc;
 use std::time::Duration;
-use tokio::sync::Mutex;
-use tokio::sync::*;
+use tokio::sync::{mpsc, oneshot, Mutex};
 use tokio::time::sleep;
 
 /// Stores which slots are actually used. This information is used to determine
@@ -235,15 +234,15 @@ impl BmcApplication {
         Ok(())
     }
 
-    /// determines the new power_state given the inputs
+    /// determines the new `power_state` given the inputs
     ///
     /// # Arguments
     ///
-    /// * 'node_values'   set values of nodes, use in combination with node_mask
-    /// * 'node_mask'     select which values to update
-    /// * 'activated_nodes' a mask that has precendense over the node mask, if a given node is not
+    /// * `node_values`   set values of nodes, use in combination with `node_mask`
+    /// * `node_mask`     select which values to update
+    /// * `activated_nodes` a mask that has precendense over the node mask, if a given node is not
     /// activated, setting a value will be ignored
-    /// * 'current_state'  the current state of nodes
+    /// * `current_state`  the current state of nodes
     fn power_logic(node_values: u8, node_mask: u8, activated_nodes: u8, current_state: u8) -> u8 {
         // make sure that only activated nodes are allowed to be on
         let mut new_power_state = current_state & activated_nodes;

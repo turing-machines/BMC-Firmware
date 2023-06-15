@@ -373,16 +373,16 @@ void usage(void)
     printf("Usage: tpi [host] <options...>\n");
     printf("Options: \n");
 
-    printf("\t-p, --power        (on off status) Power management \n");
-    printf("\t-u, --usb          (host device status) USB mode,Must be used with the node command\n");
-    printf("\t-n, --node         (1 2 3 4) USB selected node\n");
-    printf("\t-r, --resetsw       reset switch\n");
-    printf("\t-U, --uart         uart opt get or set\n");
-    printf("\t-C, --cmd          uart set cmd\n");
-    printf("\t-F, --upgrade      upgrade fw\n");
-    printf("\t-f, --flash        flash an image to a specified node\n");
-    printf("\t-l, --localfile    when flashing (-f), the specified file will be loaded locally from the device\n");
-    printf("\t-h, --help         usage\n");
+    printf("\t-p, --power         (on off status) Power management \n");
+    printf("\t-u, --usb           (host device status) USB mode,Must be used with the node command\n");
+    printf("\t-n, --node          (1 2 3 4) USB selected node\n");
+    printf("\t-r, --resetsw        reset switch\n");
+    printf("\t-U, --uart          uart opt get or set\n");
+    printf("\t-C, --cmd           uart set cmd\n");
+    printf("\t-F, --upgrade <img> upgrade fw\n");
+    printf("\t-f, --flash <img>   flash an image to a specified node\n");
+    printf("\t-l, --localfile     when flashing (-f), the specified file will be loaded locally from the device\n");
+    printf("\t-h, --help          usage\n");
     printf("example: \n");
     printf("\t$ tpi -p on //power on\n");
     printf("\t$ tpi -p off //power off\n");
@@ -391,6 +391,7 @@ void usage(void)
     printf("\t$ tpi --uart=set -n 1 --cmd=ls//set node1 uart cmd\n");
     printf("\t$ tpi --upgrade=/mnt/sdcard/xxxx.swu    //upgrade fw\n");
     printf("\t$ tpi -r  //reset switch\n");
+    printf("\t$ tpi -n 1 -l -f /mnt/sdcard/raspios.img  // flash image file to node 1\n");
     exit(1);
 }
 
