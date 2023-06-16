@@ -4,6 +4,7 @@
 #include <getopt.h>
 #include <strings.h>
 #include <stdbool.h>
+#include <errno.h>
 
 #include <sys/stat.h>
 #include <sys/ioctl.h>
@@ -60,7 +61,7 @@ bool usb_ctrl(int mode,int node)
     if(mode==2)
         sprintf(cmd,"curl 'http://%s/api/bmc?opt=get&type=usb'",host);
     else 
-        sprintf(cmd,"curl 'http://%s/api/bmc?opt=set&type=usb&mode=%d&node=%d'",host,mode,node-1);
+        sprintf(cmd,"curl 'http://%s/api/bmc?opt=set&type=usb&mode=%d&node=%d'",host,mode,node);
     system(cmd);
 }
 
@@ -160,7 +161,94 @@ int download_file(char* url)
     }
 }
 
+// An incomplete, PoC-level percent-encoding of a URL. In the Rust release, this should either be
+// done in a proper way, or the feature of using local files for flashing be outright removed.
+static int url_encode(const char *in, char *out, size_t outlen)
+{
+    size_t w = 0;
 
+    for (const char *p = in; *p; ++p)
+    {
+        if (w >= outlen)
+        {
+            return 1;
+        }
+
+        if (*p == ' ')
+        {
+            out[w++] = '%';
+            out[w++] = '2';
+            out[w++] = '0';
+        }
+        else if (*p == '/')
+        {
+            out[w++] = '%';
+            out[w++] = '2';
+            out[w++] = 'F';
+        }
+        else
+        {
+            out[w++] = *p;
+        }
+    }
+
+    return 0;
+}
+
+static int flash_node(int node, const char* image_path, int is_localfile)
+{
+    char cmd[512] = {0};
+    char line[1024] = {0};
+    char img_urlencoded[512] = { 0 };
+    int ret = -1;
+
+    if (node == -1)
+    {
+        puts("Please specify node");
+        return -1;
+    }
+
+    if (access(image_path, F_OK))
+    {
+        printf("File '%s' not found: %s\n", image_path, strerror(errno));
+        return -1;
+    }
+
+    if (is_localfile)
+    {
+        if (url_encode(image_path, img_urlencoded, sizeof(img_urlencoded)))
+        {
+            printf("Failed to URL-encode path '%s'\n", image_path);
+            return -1;
+        }
+
+        sprintf(cmd, "curl 'http://%s/api/bmc?opt=set&type=flash&file=%s&node=%d'", host, img_urlencoded, node);
+    }
+    else
+    {
+        puts("Warning: large files will very likely to fail to be uploaded in the current version");
+
+        sprintf(cmd, "curl -F 'file=@%s' 'http://%s/api/bmc?opt=set&type=flash&node=%d'", image_path, host, node);
+    }
+
+    FILE *pp = popen(cmd, "r");
+    if (!pp)
+    {
+        puts("Failed to upload image");
+        return -1;
+    }
+
+    while (fgets(line, 1024, pp)) {
+        if (strstr(line, "\"result\":\"ok\"") ) {
+            ret = 0;
+            break;
+        }
+    }
+
+    pclose(pp);
+
+    return ret;
+}
 
 int Socket(int domain, int type, int protocol)
 {
@@ -285,15 +373,16 @@ void usage(void)
     printf("Usage: tpi [host] <options...>\n");
     printf("Options: \n");
 
-    printf("\t-p, --power        (on off status) Power management \n");
-    printf("\t-u, --usb          (host device status) USB mode,Must be used with the node command\n");
-    printf("\t-n, --node         (1 2 3 4) USB selected node\n");
-    printf("\t-r, --resetsw       reset switch\n");
-    printf("\t-U, --uart         uart opt get or set\n");
-    printf("\t-C, --cmd          uart set cmd\n");
-    printf("\t-F, --upgrade      upgrade fw\n");
-    printf("\t-f, --flash        todo\n");
-    printf("\t-h, --help         usage\n");
+    printf("\t-p, --power         (on off status) Power management \n");
+    printf("\t-u, --usb           (host device status) USB mode,Must be used with the node command\n");
+    printf("\t-n, --node          (1 2 3 4) USB selected node\n");
+    printf("\t-r, --resetsw        reset switch\n");
+    printf("\t-U, --uart          uart opt get or set\n");
+    printf("\t-C, --cmd           uart set cmd\n");
+    printf("\t-F, --upgrade <img> upgrade fw\n");
+    printf("\t-f, --flash <img>   flash an image to a specified node\n");
+    printf("\t-l, --localfile     when flashing (-f), the specified file will be loaded locally from the device\n");
+    printf("\t-h, --help          usage\n");
     printf("example: \n");
     printf("\t$ tpi -p on //power on\n");
     printf("\t$ tpi -p off //power off\n");
@@ -302,6 +391,7 @@ void usage(void)
     printf("\t$ tpi --uart=set -n 1 --cmd=ls//set node1 uart cmd\n");
     printf("\t$ tpi --upgrade=/mnt/sdcard/xxxx.swu    //upgrade fw\n");
     printf("\t$ tpi -r  //reset switch\n");
+    printf("\t$ tpi -n 1 -l -f /mnt/sdcard/raspios.img  // flash image file to node 1\n");
     exit(1);
 }
 
@@ -312,6 +402,7 @@ static struct option long_options[] =
     {"usb", optional_argument, NULL, 'u'},
     {"node", optional_argument, NULL, 'n'},
     {"flash", optional_argument, NULL, 'f'},
+    {"localfile", no_argument, NULL, 'l'},
     {"resetsw", no_argument, NULL, 'r'},
     {"uart", optional_argument, NULL, 'U'},
     {"upgrade", optional_argument, NULL, 'F'},
@@ -335,6 +426,7 @@ int main(int argc, char *argv[])
     int usb_mode = -1;
     int node = -1;
     int uart_mode = -1;
+    int flashing_localfile = 0;
     while ((opt = getopt_long_only(argc, argv, string, long_options, &option_index)) != -1)
     {
         switch(opt)
@@ -381,8 +473,9 @@ int main(int argc, char *argv[])
             {
                 if(optarg)
                     node = atoi(optarg);
-                if(node<0||node>4)
+                if (node < 1 || node > 4)
                     usage();
+                --node;
                 break;
             }
             case 'r':
@@ -407,6 +500,18 @@ int main(int argc, char *argv[])
             {
                 mode = 4;
                 strcpy(up_file,optarg);
+                break;
+            }
+            case 'f':
+            {
+                mode = 5;
+                strcpy(up_file,optarg);
+                break;
+            }
+            case 'l':
+            {
+                flashing_localfile = 1;
+                break;
             }
             case 'C':
             {
@@ -437,6 +542,20 @@ int main(int argc, char *argv[])
 
     }
 
+    if (flashing_localfile && mode != 5)
+    {
+        puts("Argument '--localfile' makes sense only for '--flash' operation");
+        usage();
+    }
+
+#ifndef __arm__
+    if (flashing_localfile)
+    {
+        puts("Argument '--localfile' can be used only on the BMC");
+        usage();
+    }
+#endif
+
     switch(mode)
     {
         case 0:
@@ -463,6 +582,12 @@ int main(int argc, char *argv[])
         case 4:
         {
             download_file(up_file);
+            break;
+        }
+        case 5:
+        {
+            flash_node(node, up_file, flashing_localfile);
+            break;
         }
         default:
             usage();

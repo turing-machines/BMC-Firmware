@@ -33,6 +33,8 @@
 
 #include <stdbool.h>
 
+#include <tpi_rs.h>
+
 #define  SD_PATH "/mnt/sdcard"
 
 
@@ -220,7 +222,7 @@ static int set_usbmode(Webs* wp)
     usb->mode = atoi(mode);
     usb->node = atoi(node);
     set_env_usb(usb);
-    ctrl_usbconnet(usb->mode,usb->node);
+    tpi_usb_mode(usb->mode,usb->node);
     return 0;
 }
 
@@ -235,10 +237,10 @@ static int get_nodepower(Webs* wp)
 
     /*--json body--*/
     pItem = cJSON_CreateObject();
-	cJSON_AddNumberToObject(pItem, "node1", get_node_power(0));  
-	cJSON_AddNumberToObject(pItem, "node2", get_node_power(1));  
-    cJSON_AddNumberToObject(pItem, "node3", get_node_power(2));  
-	cJSON_AddNumberToObject(pItem, "node4", get_node_power(3));  
+	cJSON_AddNumberToObject(pItem, "node1", tpi_get_node_power(0));  
+	cJSON_AddNumberToObject(pItem, "node2", tpi_get_node_power(1));  
+    cJSON_AddNumberToObject(pItem, "node3", tpi_get_node_power(2));  
+	cJSON_AddNumberToObject(pItem, "node4", tpi_get_node_power(3));  
     cJSON_AddItemToArray(pArray, pItem);
 
 
@@ -481,9 +483,9 @@ static int set_nodepower(Webs* wp)
     {
         node = NULL;
         node = websGetVar(wp, var[i], NULL);
-        if(NULL!=node && atoi(node)!=get_node_power(i))
+        if(NULL!=node && atoi(node)!=tpi_get_node_power(i))
         {
-            node_power(i,atoi(node));
+            tpi_node_power(i,atoi(node));
             printf("set node %d,var = %d\n",i,atoi(node));        
         }
     }
@@ -498,7 +500,7 @@ static int set_network(Webs* wp)
     {
         if(0==strcmp(cmd,"reset"))
         {
-            RTL_Reset();
+            tpi_rtl_reset();
         }
     }
     
@@ -692,6 +694,83 @@ static void uploadFirmware(Webs *wp)
 	
 }
 
+static void run_node_to_msd(Webs *wp)
+{
+    WebsKey         *s;
+    WebsUpload      *up;
+
+    char    *node = NULL;
+    uint8_t node_id;
+    flashing_result res;
+
+    node = websGetVar(wp, "node", NULL);
+    if (!node)
+    {
+        app_webS_PrintJsonErr(wp, 400, "No node specified");
+        return;
+    }
+    tpi_node_to_msd(atoi(node));
+    websWrite(wp,"{\"response\":[{\"result\":\"ok\"}]}");
+}
+
+static void clear_usb_boot(Webs *wp)
+{
+    tpi_clear_usbboot();
+    websWrite(wp,"{\"response\":[{\"result\":\"ok\"}]}");
+}
+
+static void req_flash_node(Webs *wp)
+{
+    WebsKey         *s;
+    WebsUpload      *up;
+
+    char    *node = NULL;
+    char    *node_flashing_file = NULL;
+    uint8_t node_id;
+    flashing_result res;
+
+    node = websGetVar(wp, "node", NULL);
+    if (!node)
+    {
+        app_webS_PrintJsonErr(wp, 400, "No node specified");
+        return;
+    }
+
+    node_flashing_file = websGetVar(wp, "file", NULL);
+    if (!node_flashing_file)
+    {
+        app_webS_PrintJsonErr(wp, 400, "No file specified");
+        return;
+    }
+
+    websSetStatus(wp, 200);
+    websWriteHeaders(wp, -1, 0);
+    websWriteHeader(wp, "Content-Type", "text/plain");
+
+    websWriteEndHeaders(wp);
+
+    if (!isMountSDcard("/mnt/sdcard"))
+    {
+        websWrite(wp,"{\"response\":[{\"result\":\"err:no sdcard\"}]}");
+        websDone(wp);
+        return;
+    }
+
+    // NOTE: code for uploading files (as in uploadFirmware()) omitted, because can't simply
+    // configure upload path without recompiling.
+
+    node_id = atoi(node);
+
+    res = tpi_flash_node(node_id, node_flashing_file);
+
+    if (res == FR_SUCCESS)
+        websWrite(wp,"{\"response\":[{\"result\":\"ok\"}]}");
+    else
+        websWrite(wp,"{\"response\":[{\"result\":\"flashing failure: %d\"}]}", res);
+
+    websDone(wp);
+}
+
 static void bmcdemo(Webs *wp)
 {
     char    *pOpt   = NULL;
@@ -756,6 +835,10 @@ static void bmcdemo(Webs *wp)
         {
             uploadFirmware(wp);
         }
+        if(0==strcasecmp(pType,"flash"))
+        {
+            req_flash_node(wp);
+        }
         if(0==strcasecmp(pType,"sdcard"))
         {
             //todo format
@@ -783,7 +866,14 @@ static void bmcdemo(Webs *wp)
         {
             set_uartCmd(wp);
         }
-
+        else if(0==strcasecmp(pType,"node_to_msd"))
+        {
+            run_node_to_msd(wp);
+        }
+        else if(0==strcasecmp(pType,"clear_usb_boot"))
+        {
+            clear_usb_boot(wp);
+        }
         strcpy(json_result_buff,"{\"response\":[{\"result\":\"ok\"}]}");
         websWrite(wp, "%s", json_result_buff);
         websFlush(wp, 0);

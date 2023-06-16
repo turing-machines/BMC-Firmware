@@ -34,13 +34,9 @@ typedef struct _NODE_CTX_t
     NODE_BUFF_CTX_t data;
 }NODE_CTX_t;
 
-
-
-int ctrl_usbconnet(int mode,int node);
-int get_node_power(int num);
-int node_power(int num,int status);
-void RTL_Reset(void);
 char* get_nodeType(int num);
+
+int get_buff(int index,char* data,int len);
 
 int uart_write(int index,char *data,int len);
 
