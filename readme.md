@@ -15,9 +15,9 @@ are working towards a first release, which will land here soon.
 
 ## Specs Turing Pi V2
 
- * CPU Allwinner T113-S3 (ARM Cortex-A7) 
+ * CPU Allwinner T113-S3 (ARM Cortex-A7)
  * 128 MB DDR3 RAM
- * 1 GB SPI NAND flash (MX35LF1GE4AB) 
+ * 1 GB SPI NAND flash (MX35LF1GE4AB)
  * EEPROM (24C02C)
  * 3 port Gigabit Ethernet Switch (RTL8370MB)
  * Ethernet PHYceiver (RTL8201F-VB-CG)
@@ -56,15 +56,16 @@ libstdc++6 libncurses-dev u-boot-tools mkbootimg -y
 
 To build the firmware image manually, execute the following command:
 
-```shell 
-cd buildroot 
-make BR2_EXTERNAL=../tp2bmc tp2bmc_defconfig 
+```shell
+cd buildroot
+make BR2_EXTERNAL=../tp2bmc tp2bmc_defconfig
 make
 ```
 
 To package up a swu (for OTA update via webui):
 
-```shell 
-cd output/images/ cp -ra
-../../../tp2bmc/swupdate/* . ./genSWU.sh 1.0.0
+```shell
+cd output/images/
+cp -a ../../../tp2bmc/swupdate/* .
+./genSWU.sh 1.0.0
 ```
