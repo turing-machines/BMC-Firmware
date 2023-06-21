@@ -5,7 +5,7 @@ fdt_filename="FDT_FILENAME_HERE"
 
 # Set bootargs:
 setenv bootargs earlycon=uart8250,mmio32,0x02500c00 console=ttyS3,115200 \
-	loglevel=8 cma=8M
+	loglevel=8 cma=8M init=/sbin/preinit
 
 if test ${devtype} = mmc; then
 	setenv bootargs ${bootargs} root=PARTUUID=${distro_bootpart_uuid}

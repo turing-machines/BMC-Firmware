@@ -1,0 +1,127 @@
+#!/bin/bash
+
+set -euo pipefail
+
+MOUNTPOINT=/mnt/overlay
+MMC_PARTLABEL=overlay
+UBI_OVERLAY=overlay
+UBI_SIZE=29204480 # 230 LEBs
+
+#
+# setup_mmc DEVPATH
+#
+# Set up the overlay partition (resizing the GPT to fill whole SD)
+# Called only when this has not yet been done
+#
+# The DEVPATH parameter is the path to the MMC block device itself
+# (e.g. `/dev/mmcblk0`)
+#
+# This sets the MMC_PARTPATH variable to `/dev/mmcblk#p#`
+#
+setup_mmc() {
+	DEVPATH=$1
+
+	# Select a suitable partition number
+	partno=1
+	while [ -e "${DEVPATH}p${partno}" ]; do
+		partno=$((partno+1))
+	done
+
+	# Create the partition
+	sgdisk \
+		--move-second-header \
+		--new="$partno:0:0" \
+		--typecode="$partno:8300" \
+		--change-name="$partno:$MMC_PARTLABEL" \
+		"$DEVPATH"
+
+	# Reload the GPT
+	partprobe "$DEVPATH"
+	MMC_PARTPATH=${DEVPATH}p${partno}
+	if [ ! -e "$MMC_PARTPATH" ]; then
+		echo $0: $MMC_PARTPATH did not appear
+		exit 1;
+	fi
+
+	# Create the filesystem
+	mke2fs -Fq -t ext4 "$MMC_PARTPATH"
+}
+
+#
+# mount_mmc DEVPATH
+#
+# Mount /mnt/overlay from the MMC partition
+#
+# The DEVPATH parameter is the path to the MMC block device itself
+# (e.g. `/dev/mmcblk0`)
+#
+mount_mmc() {
+	DEVPATH=$1
+
+	# Search for a partition with the proper label
+	MMC_PARTPATH=$(blkid -o device -lt PARTLABEL="$MMC_PARTLABEL" || true)
+
+	# If it doesn't exist, create it
+	if [ ! -n "$MMC_PARTPATH" ]; then
+		# Defines MMC_PARTPATH in the process
+		setup_mmc "$DEVPATH"
+	fi
+
+	# Mount it on the mountpoint
+	mount "$MMC_PARTPATH" "$MOUNTPOINT"
+}
+
+#
+# ubi_resolve NAME
+#
+# Resolves a named volume to its /dev/ubi*_* character device
+#
+ubi_resolve() {
+	NAME=$1
+
+	for entry in /sys/class/ubi/*; do
+		if [ ! -f $entry/name ]; then continue; fi
+		if grep -Fxq "$NAME" $entry/name >/dev/null; then
+			echo /dev/$(basename "$entry")
+			return 0
+		fi
+	done
+
+	return 1
+}
+
+#
+# mount_ubifs
+#
+# Mount the UBI volume specified by $UBI_OVERLAY (creating it if it does not exist) as ubifs
+#
+mount_ubifs() {
+	if ! ubidev=$(ubi_resolve "$UBI_OVERLAY"); then
+		ubimkvol /dev/ubi0 -N $UBI_OVERLAY -s "$UBI_SIZE"
+		ubidev=$(ubi_resolve "$UBI_OVERLAY")
+		mkfs.ubifs "$ubidev"
+	fi
+	mount -t ubifs "$ubidev" "$MOUNTPOINT"
+}
+
+# Detect root device
+for rootpath in / /mnt/rom; do
+	ROOTDEV=$(mountpoint -n $rootpath | cut -f 1 -d " ")
+	if [ "$ROOTDEV" != "UNKNOWN" ]; then break; fi
+done
+
+# Determine root device type
+case "$ROOTDEV" in
+*mmcblk*)
+	ROOTPART=$(basename "$ROOTDEV")
+	DEVPATH=/dev/$(basename $(readlink -f "/sys/class/block/$ROOTPART/.."))
+	mount_mmc "$DEVPATH"
+	;;
+*ubiblock*)
+	mount_ubifs
+	;;
+*)
+	echo $0: Unrecognized root device type
+	exit 1
+	;;
+esac

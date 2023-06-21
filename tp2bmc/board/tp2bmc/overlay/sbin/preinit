@@ -1,0 +1,78 @@
+#!/bin/sh
+
+log() {
+	echo "PREINIT: $*"
+}
+
+#
+# is_safemode
+#
+# Returns true IFF we were told to boot in safemode
+# (such as if the user held KEY1 for a few seconds at power on)
+#
+is_safemode() {
+	grep -q 'safemode' /proc/cmdline
+}
+
+#
+# pivot_overlay OVERLAYDIR
+#
+# Establish an overlayfs over the read-only rootfs (storing data in OVERLAYDIR)
+# and make it the root
+#
+pivot_overlay() {
+	MOUNTS="dev proc tmp sys"
+	NEWROOT=/tmp/newroot
+	OLDROOT=/mnt/rom
+	UPPER=$1/upper
+	WORK=$1/work
+
+	[ -d $UPPER ] || mkdir -p $UPPER
+	[ -d $WORK ] || mkdir -p $WORK
+
+	mkdir $NEWROOT
+	mount -t overlay overlay -o lowerdir=/,upperdir=$UPPER,workdir=$WORK $NEWROOT
+
+	[ -d $NEWROOT/$OLDROOT ] || mkdir -p $NEWROOT/$OLDROOT
+
+	log Pivoting root
+	pivot_root $NEWROOT $NEWROOT/$OLDROOT
+	for mountpoint in $MOUNTS $1; do
+		if mountpoint -q $OLDROOT/$mountpoint; then
+			mount --move $OLDROOT/$mountpoint /$mountpoint;
+		fi
+	done
+
+	# Clean up, now that nothing is mounted here
+	rmdir $NEWROOT
+}
+
+#
+# preinit
+#
+# Main function
+#
+preinit() {
+	OVERLAY=/mnt/overlay
+
+	log Starting
+
+	# Need /dev, /proc, and /tmp mounted, and /sys for good measure
+	# /dev is automounted by kernel
+	mount -t proc /proc /proc
+	mount -t tmpfs /tmp /tmp
+	mount -t sysfs /sys /sys
+
+	if is_safemode || ! mount_overlay; then
+		log Entering safemode
+		OVERLAY=/tmp/safemode
+		export IS_SAFEMODE=1
+	fi
+
+	pivot_overlay $OVERLAY
+
+	log Beginning init
+	exec /sbin/init
+}
+
+preinit
