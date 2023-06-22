@@ -30,8 +30,10 @@ are working towards a first release, which will land here soon.
 ## Install firmware
 
 There are two ways to upgrade the firmware on your current board.
-1. Using the PhoenixSuit. It allows you to write an entire new image to the board.
-2. Using an OTA package. This package can be uploaded to the board via the web UI. (This method does not update the kernel).
+1. Using the PhoenixSuit. It allows you to write an entire new image to the
+board.
+2. Using an OTA package. This package can be uploaded to the board via the web
+UI. (This method does not update the kernel).
 
 The required images can be found in one of our release packages. get the latest
 [here](https://github.com/turing-machines/BMC-firmware/releases).
@@ -42,8 +44,26 @@ you can find an elaborate manual on performing an update using both methods.
 
 ## Setup build environment
 
-Currently, only X86 Linux build hosts are supported. They are required to have
-the following packages installed:
+### Using Docker
+
+In the root of our repository there is a dockerfile which can be used to build
+a development container. It has all the dependencies needed to build the
+firmware. We recommend to go through the official docker documentation. But if
+you want to quickly build and run it, execute the following commands in the root
+of your repository:
+
+```shell
+# build the docker image
+docker build . -t tp_container
+
+# open the docker container
+docker run -it -v $PWD:$PWD --workdir $PWD tp_container
+```
+
+### Natively
+
+Currently, only X86 Linux build hosts are supported. They are
+required to have the following packages installed:
 
 ```shell
 sudo apt-get install build-essential subversion git-core
