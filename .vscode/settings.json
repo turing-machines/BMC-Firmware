@@ -1,8 +1,0 @@
-{
-    "files.associations": {
-        "goahead.h": "c",
-        "param.h": "c",
-        "bmc.h": "c",
-        "stdio.h": "c"
-    }
-}
