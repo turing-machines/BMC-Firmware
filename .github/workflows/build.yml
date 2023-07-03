@@ -12,6 +12,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
       
       - name: get version
         run: echo "BUILD_VERSION=`git describe --tags`" >> $GITHUB_ENV
