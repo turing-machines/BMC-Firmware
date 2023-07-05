@@ -559,38 +559,20 @@
 		spi-rx-bus-width=<0x04>;
 		spi-tx-bus-width=<0x04>;
 
-		// TODO: It would be nice to parse boot0's configuration header
-		// to deduce these at boot
-		// NOTE: Only respected when the Linux `spi-nand` driver
-		// (MTD_SPI_NAND w/ MTD_OF_PARTS) is used.
-		// The Allwinner `spi-nand` driver (AW_MTD_SPINAND) ignores
-		// this, but generates the same partitioning internally.
 		flash_partitions: partitions {
 			compatible = "fixed-partitions";
 			#address-cells = <1>;
 			#size-cells = <1>;
 
 			partition@0 {
-				label = "boot0";
+				label = "boot";
 				reg = <0x00000000 0x00100000>;
 				read-only;
 			};
 
 			partition@100000 {
-				label = "uboot";
-				reg = <0x00100000 0x00300000>;
-				read-only;
-			};
-
-			partition@400000 {
-				label = "secure_storage";
-				reg = <0x00400000 0x00100000>;
-				read-only;
-			};
-
-			partition@500000 {
-				label = "sys";
-				reg = <0x00500000 0x07b00000>;
+				label = "ubi";
+				reg = <0x00100000 0x07f00000>;
 			};
 		};
 	};
