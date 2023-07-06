@@ -32,7 +32,7 @@ endef
 
 define TPI_RS_INSTALL_STAGING_CMDS
  $(INSTALL) -D -m 0644 $(@D)/target/$(RUSTC_TARGET_NAME)/$(if $(BR2_ENABLE_DEBUG),debug,release)/libtpi_rs.a $(STAGING_DIR)/lib
- $(INSTALL) -D -m 0644 $(@D)/tpi_rs.h $(STAGING_DIR)/usr/include
+ $(INSTALL) -D -m 0644 $(@D)/tpi_rs/tpi_rs.h $(STAGING_DIR)/usr/include
 endef
 
 $(eval $(cargo-package))
