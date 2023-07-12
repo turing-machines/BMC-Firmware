@@ -206,13 +206,30 @@ static int get_usbmode(Webs* wp)
 }
 
 
+static int reset_node(Webs* wp)
+{
+    char* node = NULL;
+    node = websGetVar(wp, "node", NULL);
+
+    if(NULL == node )
+    {
+        app_webS_PrintJsonErr(wp,400,"node argument is not set");
+        return -1;
+    }
+
+    tpi_reset_node(atoi(node));
+    
+    return 0;
+}
+
 static int set_usbmode(Webs* wp)
 {
     char* mode = NULL;
     char* node = NULL;
     mode = websGetVar(wp, "mode", NULL);
     node = websGetVar(wp, "node", NULL);
-    // env_usb_t usb;
+    char* boot_pin = websGetVar(wp, "boot_pin", NULL);
+
     if(NULL == node || NULL == mode)
     {
         app_webS_PrintJsonErr(wp,400,"mode or node is null");
@@ -222,7 +239,15 @@ static int set_usbmode(Webs* wp)
     usb->mode = atoi(mode);
     usb->node = atoi(node);
     set_env_usb(usb);
-    tpi_usb_mode(usb->mode,usb->node);
+
+    if (NULL == boot_pin) {
+        tpi_usb_mode_v2(usb->mode,usb->node,1);
+    } else {
+        int boot = atoi(boot_pin);
+        tpi_usb_mode_v2(usb->mode,usb->node, boot);
+    }
+
+    
     return 0;
 }
 
@@ -874,6 +899,11 @@ static void bmcdemo(Webs *wp)
         {
             clear_usb_boot(wp);
         }
+        else if(0==strcasecmp(pType,"reset"))
+        {
+            reset_node(wp);
+        }
+
         strcpy(json_result_buff,"{\"response\":[{\"result\":\"ok\"}]}");
         websWrite(wp, "%s", json_result_buff);
         websFlush(wp, 0);
