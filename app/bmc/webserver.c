@@ -212,7 +212,8 @@ static int set_usbmode(Webs* wp)
     char* node = NULL;
     mode = websGetVar(wp, "mode", NULL);
     node = websGetVar(wp, "node", NULL);
-    // env_usb_t usb;
+    char* boot_pin = websGetVar(wp, "boot_pin", NULL);
+
     if(NULL == node || NULL == mode)
     {
         app_webS_PrintJsonErr(wp,400,"mode or node is null");
@@ -222,7 +223,15 @@ static int set_usbmode(Webs* wp)
     usb->mode = atoi(mode);
     usb->node = atoi(node);
     set_env_usb(usb);
-    tpi_usb_mode(usb->mode,usb->node);
+
+    if (NULL == boot_pin) {
+        tpi_usb_mode(usb->mode,usb->node);
+    } else {
+        int boot = atoi(boot_pin);
+        tpi_usb_mode_v2(usb->mode,usb->node, boot);
+    }
+
+    
     return 0;
 }
 
