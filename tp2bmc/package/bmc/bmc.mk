@@ -2,7 +2,7 @@
 # bmc
 ###########################################################
  
-BMC_VERSION:= 1.0.0
+BMC_VERSION:= 1.1.0
 BMC_SITE:= $(TOPDIR)/../app/bmc
 BMC_SITE_METHOD:=local
 BMC_INSTALL_TARGET:=YES
