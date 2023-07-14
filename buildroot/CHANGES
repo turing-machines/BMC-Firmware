@@ -1,3 +1,77 @@
+2023.05, released June 7th, 2023
+
+	Fixes all over the tree.
+
+	Infrastructure: Add BR2_HOST_CMAKE_AT_LEAST_* for packages
+	needing a newer host-cmake than what is currently enforced
+	(3.18) - Up to the version provided by the cmake package (3.22).
+
+	Defconfigs: QEMU s390x: Bump rootfs size to 120MB to make room
+	for kernel modules.
+
+	Updated/fixed packages: at-spi2-core, go, libdeflate, libjxl,
+	perl-http-message, php, redis
+
+2023.05-rc3, released June 4th, 2023
+
+	Fixes all over the tree.
+
+	Updated/fixed packages: bird, containerd, earlyoom, gcc,
+	ipython, kexec, kodi-skin-confluence, libcurl, libopenssl,
+	mesa3d, minidlna, mpd, openjdk, openjdk-bin,
+	python-matplotlib, sdl2_net, vdr
+
+	New packages: python-asttokens, python-executing,
+	python-pure-eval, python-stack-data
+
+2023.05-rc2, released May 28th, 2023
+
+	Fixes all over the tree.
+
+	Updated/fixed packages: busybox, clamav, crudini,
+	kodi-pvr-vbox, libcurl, libmnl, libpqxx, libressl, libssh,
+	llvm, lua, mesa3d, perl-http-message, python-can,
+	python-django, sdl2_mixer, webkitgtk, zfs, znc
+
+	New packages: perl-clone
+
+	Issues resolved (http://bugs.uclibc.org):
+
+	#15421: qemu_aarch64_ebbr_defconfig: Missing Linux kernel source..
+	#15581: qemu_ppc_mpc8544ds_defconfig: Fails due to non-working patch
+
+2023.05-rc1, released May 15th, 2023
+
+	Fixes all over the tree and new features.
+
+	Toolchain:
+	- glibc update to 2.37, uClibc-ng updated to 1.0.43
+	- suppoert 6.2.x / 6.3.x kernel headers
+
+	Infrastucture:
+	- go: Ensure go versions of os/user and net are used for
+          static builds so CGO is not used
+
+	- rust / cargo: Correctly split up rust flags for host and
+          target builds
+
+	New defconfigs: STM32F769 discovery
+
+	New packages: petitboot, python-evdev, python-hwdata,
+	python-pyproject-hooks, shadow
+
+	Removed packages: atk, at-spi2-atk, optee-benchmark,
+	python-pep517
+
+	Issues resolved (http://bugs.uclibc.org):
+
+	#14356: cronstamp jobs are not performed with bumped version of...
+	#15191: pc_x86_64_efi_defconfig doesn't run on real hardware
+	#15306: glibc build fails in Docker container
+	#15321: docker-engine now requires libseccomp by default
+	#15376: Libiconv config
+	#15461: QtVirtualKeyboard segfaults
+
 2023.02.1, released May 9th, 2023
 
 	Important / security related fixes.
@@ -167,6 +241,31 @@
 	#15291: BR2_PACKAGE_GNU_EFI_ARCH_SUPPORTS without location
 	#15301: Selecting NAND Flash boot media (NAND_BOOT) breaks the uboot..
 	#15331: Warning on python-flit-core license when generating legal info
+
+2022.11.3, released March 18th, 2023
+
+	Important / security related fixes.
+
+	Updated/fixed packages: ace, apache, apr, apr-util, asterisk,
+	at91dataflashboot, audit, bash, bind, bridge-utils, clamav,
+	dmalloc, efivar, erlang, exfat, exfat-utils, f2fs-tools, gcc,
+	gdal, gensio, gerbera, git, glslsandbox-player, go, haproxy,
+	hawktracer, intel-gmmlib, ipmiutil, less, libblockdev,
+	libcurl, libev, libgcrypt, libglfw, libmad, libmdbx,
+	libmodsecurity, libolm, libpjsip, lirc-tools,
+	lttng-babeltrace, mender, mpv, mutt, mxs-bootlets, netsurf,
+	ntpsec, nut, opensbi, opus, paho-mqtt-c, pcm-tools, php,
+	pistache, proftpd, proxychains-ng, pulseaudio,
+	python-cryptography, python-django, python-m2crypto,
+	python-numpy, python-werkzeug, qemu, quazip, quickjs,
+	rockchip-mali, rsync, s6-linux-utils, sudo, tiff, uacme, uqmi,
+	webkitgtk, wilc-driver, wpa_supplicant, wpewebkit,
+	xdriver_xf86-video-qxl, znc
+
+	Issues resolved (http://bugs.uclibc.org):
+
+	#15306: glibc build fails in Docker container
+	#15361: Buildroot linking error on Apple Silicon
 
 2022.11.2, released March 1st, 2023
 
@@ -785,6 +884,39 @@
 	#14721: python-argon2_cffi no longer works
 	#14731: BR2_PACKAGE_IOSTAT
 	#14751: LVM2 Outdated Link
+
+2022.02.12, released May 5th, 2023
+
+	Important / security related fixes.
+
+	Updated/fixed packages: agentpp, apache, ca-certificates,
+	containerd, coremark, dcron, eudev, ffmpeg, git,
+	intel-microcode, kexec, lcdproc, libmicrohttpd, libosmium,
+	libxml2, linux-tools, matio, osm2pgsql, poppler, postgresql,
+	protozero, python-web2py, runc, s390-tools, samba4, snmppp,
+	sudo, tcpdump, uclibc, vim, webkitgtk, wpewebkit,
+	xserver_xorg-server
+
+2022.02.11, released March 19th, 2023
+
+	Important / security related fixes.
+
+	Updated/fixed packages: apache, apr, apr-util, asterisk,
+	at91dataflashboot, audit, bash, bind, bridge-utils, clamav,
+	dmalloc, exfat, exfat-utils, f2fs-tools, gcc, git,
+	glslsandbox-player, go, haproxy, intel-gmmlib, ipmiutil, less,
+	libblockdev, libcurl, libev, libgcrypt, libmad, libmdbx,
+	libmodsecurity, libolm, libpjsip, lttng-babeltrace, mender,
+	mpv, mutt, mxs-bootlets, opensbi, opus, paho-mqtt-c,
+	pcm-tools, php, proxychains-ng, python-django,
+	python-m2crypto, python-werkzeug, quazip, quickjs,
+	rockchip-mali, rsync, sudo, tiff, uacme, uqmi, webkitgtk,
+	wpebackend-fdo, wpewebkit, xdriver_xf86-video-qxl, znc
+
+	Issues resolved (http://bugs.uclibc.org):
+
+	#15306: glibc build fails in Docker container
+	#15361: Buildroot linking error on Apple Silicon
 
 2022.02.10, released March 1st, 2023
 

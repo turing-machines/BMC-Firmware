@@ -24,6 +24,21 @@ config BR2_TOOLCHAIN_EXTERNAL_REL_BIN_PATH
 config BR2_TOOLCHAIN_EXTERNAL_CUSTOM_PREFIX
 	string "Toolchain prefix"
 	default "$(ARCH)-linux"
+	help
+	  Component name prefix used by your external toolchain.
+
+	  Typically, this is the target tuple, e.g. something that
+	  looks like: $(ARCH)-unknown-linux-gnu.
+
+	  If unsure, look at the "bin" directory of your toolchain and
+	  note the part of component name before the last dash, i.e. if
+	  you call the toolchain's gcc as $(ARCH)-unknown-linux-gnu-gcc,
+	  the prefix is $(ARCH)-unknown-linux-gnu.
+
+	  Note that Buildroot toolchains have shorter aliases that look
+	  like $(ARCH)-linux, as symlinks to the full-tuple components,
+	  so you can leave this option at default value if you use them
+	  as external toolchain.
 
 choice
 	bool "External toolchain gcc version"
@@ -127,8 +142,16 @@ choice
 	  If your toolchain uses headers newer than the latest version
 	  in the choice, then select the latest version.
 
+config BR2_TOOLCHAIN_EXTERNAL_HEADERS_6_3
+	bool "6.3.x or later"
+	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_3
+
+config BR2_TOOLCHAIN_EXTERNAL_HEADERS_6_2
+	bool "6.2.x"
+	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_2
+
 config BR2_TOOLCHAIN_EXTERNAL_HEADERS_6_1
-	bool "6.1.x or later"
+	bool "6.1.x"
 	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_6_1
 
 config BR2_TOOLCHAIN_EXTERNAL_HEADERS_6_0

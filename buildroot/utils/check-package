@@ -11,8 +11,10 @@ import sys
 import checkpackagelib.base
 import checkpackagelib.lib_config
 import checkpackagelib.lib_hash
+import checkpackagelib.lib_ignore
 import checkpackagelib.lib_mk
 import checkpackagelib.lib_patch
+import checkpackagelib.lib_python
 import checkpackagelib.lib_shellscript
 import checkpackagelib.lib_sysv
 
@@ -99,17 +101,22 @@ def get_lib_from_filetype(fname):
     filetype = get_filetype(fname)
     if filetype == "text/x-shellscript":
         return checkpackagelib.lib_shellscript
+    if filetype in ["text/x-python", "text/x-script.python"]:
+        return checkpackagelib.lib_python
     return None
 
 
 CONFIG_IN_FILENAME = re.compile(r"Config\.\S*$")
 DO_CHECK_INTREE = re.compile(r"|".join([
+    r".checkpackageignore",
     r"Config.in",
     r"arch/",
+    r"board/",
     r"boot/",
     r"fs/",
     r"linux/",
     r"package/",
+    r"support/",
     r"system/",
     r"toolchain/",
     r"utils/",
@@ -119,6 +126,11 @@ DO_NOT_CHECK_INTREE = re.compile(r"|".join([
     r"fs/common\.mk$",
     r"package/doc-asciidoc\.mk$",
     r"package/pkg-\S*\.mk$",
+    r"support/dependencies/[^/]+\.mk$",
+    r"support/gnuconfig/config\.",
+    r"support/kconfig/",
+    r"support/misc/[^/]+\.mk$",
+    r"support/testing/tests/.*br2-external/",
     r"toolchain/helpers\.mk$",
     r"toolchain/toolchain-external/pkg-toolchain-external\.mk$",
     ]))
@@ -136,6 +148,8 @@ def get_lib_from_filename(fname):
         if os.path.basename(fname) == "external.mk" and \
            os.path.exists(fname[:-2] + "desc"):
             return None
+    if fname == ".checkpackageignore":
+        return checkpackagelib.lib_ignore
     if CONFIG_IN_FILENAME.search(fname):
         return checkpackagelib.lib_config
     if fname.endswith(".hash"):
