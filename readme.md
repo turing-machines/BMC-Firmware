@@ -1,6 +1,6 @@
 # Official Turing Pi BMC firmware
 
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/turing-machines/BMC-firmware/build.yml?style=for-the-badge)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/turing-machines/BMC-firmware/build.yml?branch=master&style=for-the-badge)
 
 Welcome to the new home of the Turing Pi firmware. The Turing Pi is a compact AI
 & edge computing cluster purposed to run cloud stacks and AI inference at the
