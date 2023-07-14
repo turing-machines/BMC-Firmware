@@ -80,7 +80,7 @@ jobs:
       - name: conditional bmcd version injection
         if: inputs.bmcd_version != ''
         run: |
-         sed -ir 's/^TPI_RS_VERSION.*/TPI_RS_VERSION=${{inputs.bmcd}}/g' ${{ github.workspace }}/tp2bmc/package/tpi_rs/tpi_rs.mk
+         sed -ir 's/^TPI_RS_VERSION.*/TPI_RS_VERSION=${{ inputs.bmcd_version }}/g' ${{ github.workspace }}/tp2bmc/package/tpi_rs/tpi_rs.mk
       - name: configure
         run: |
           cd buildroot
