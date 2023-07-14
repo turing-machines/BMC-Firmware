@@ -1,6 +1,24 @@
 name: CI
 on:
   workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'info'
+        type: choice
+        options:
+        - off
+        - error
+        - warn
+        - info
+        - debug
+        - trace
+      bmcd_version:
+        description: 'BMC daemon version'
+        required: false
+        type: string
+
   pull_request:
     branches: ["master"]
   push:
@@ -9,6 +27,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      RUST_LOG: ${{ inputs.logLevel }}
 
     steps:
       - uses: actions/checkout@v3
@@ -57,6 +77,10 @@ jobs:
           path: ~/.buildroot-ccache
           restore-keys: ${{ runner.os }}-ccache-
 
+      - name: conditional bmcd version injection
+        if: inputs.bmcd_version != ''
+        run: |
+         sed -ir 's/^TPI_RS_VERSION.*/TPI_RS_VERSION=${{inputs.bmcd}}/g' ${{ github.workspace }}/tp2bmc/package/tpi_rs/tpi_rs.mk
       - name: configure
         run: |
           cd buildroot
