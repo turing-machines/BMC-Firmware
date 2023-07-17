@@ -13,7 +13,7 @@ decided to branch off and commit our fresh inputs to this repository, which
 implies that we will gradually phase out the Wenyi0421 repository. Currently, we
 are working towards a first release, which will land here soon.
 
-## Specs Turing Pi V2
+## BMC chip specs
 
  * CPU Allwinner T113-S3 (ARM Cortex-A7)
  * 128 MB DDR3 RAM
