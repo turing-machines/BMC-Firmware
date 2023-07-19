@@ -7,7 +7,8 @@ PIDFILE="/var/run/$DAEMON.pid"
 start() {
     printf 'Starting %s...\n' "$DAEMON"
 
-    start-stop-daemon --start --quiet --background --make-pidfile --pidfile "$PIDFILE" --exec "$BIN"
+    start-stop-daemon --start --quiet --background --make-pidfile --pidfile "$PIDFILE" --no-close \
+        --exec "$BIN"
 
     # Note: there are a lot of init.d scripts in buildroot packages that use -b/--background flag
     # for programs that don't daemonize themselves. Contrary to the vast majority of them, it's
