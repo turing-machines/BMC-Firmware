@@ -41,15 +41,20 @@ char host[64] = {0};
 
 
 
-bool power(int arg)
+bool power(int arg, int node)
 {
     char cmd[128] = {0};
-    if(arg==1)
-        sprintf(cmd,"curl 'http://%s/api/bmc?opt=set&type=power&node1=1&node2=1&node3=1&node4=1'",host);
-    else if(0==arg)
-        sprintf(cmd,"curl 'http://%s/api/bmc?opt=set&type=power&node1=0&node2=0&node3=0&node4=0'",host);
-    else if(2 == arg)
-    {
+    char nodes[128] = {0};
+
+    if(arg == 0 || arg == 1) {
+      if(node == -1) {
+        sprintf(nodes, "&node1=%1$d&node2=%1$d&node3=%1$d&node4=%1$d", arg);
+      } else {
+        sprintf(nodes,"&node%d=%d", node+1, arg);
+      }
+
+      sprintf(cmd,"curl 'http://%s/api/bmc?opt=set&type=power%s'",host, nodes);
+    } else {
         sprintf(cmd,"curl 'http://%s/api/bmc?opt=get&type=power'",host);
     }
     system(cmd);
@@ -560,7 +565,7 @@ int main(int argc, char *argv[])
     {
         case 0:
         {
-            power(power_cmd);
+            power(power_cmd, node);
             break;
         }
         case 1:
