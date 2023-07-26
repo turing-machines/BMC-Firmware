@@ -1,0 +1,7 @@
+config BR2_PACKAGE_BMC_INSTALLER
+	bool bmc_installer
+	depends on BR2_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS
+	select BR2_PACKAGE_HOST_RUSTC
+	help
+	  This is only necessary if you're building the installation SD Card
+	  image. It implements the actual writing of the images to flash.
