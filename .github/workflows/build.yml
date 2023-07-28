@@ -108,3 +108,24 @@ jobs:
             buildroot/output/images/zImage
             buildroot/output/images/sun8iw20p1-t113-turingmachines-tp2bmc.dtb
 
+  legacy_tpi:
+    strategy:
+      matrix:
+        os:
+          - aarch64-unknown-linux-gnu
+          - aarch64-apple-darwin
+          - x86_64-apple-darwin
+          - x86_64-pc-windows-msvc
+          - x86_64-unknown-linux-gnu
+    runs-on: '${{ matrix.os }}'
+    steps:
+      - uses: actions/checkout@v3
+      - run: make -C app/tpi
+      - name: archive
+        uses: actions/upload-artifact@v3
+        with:
+          name: '${{ matrix.os }}'
+          path: |
+            app/tpi/tpi
+            app/tpi/tpi.exe
+
