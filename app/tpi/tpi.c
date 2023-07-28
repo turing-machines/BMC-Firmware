@@ -13,33 +13,20 @@
 #include <sys/select.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
-
-#include <sys/prctl.h>
 #include <net/route.h>
-
-
 #include <net/if.h>
-
 #include <string.h>
-
-
-
 
 #define B_RED(str)      "\033[1;31m" str "\033[0m"
 #define B_GREEN(str)    "\033[1;32m" str "\033[0m"
 #define B_YELLOW(str)   "\033[1;33m" str "\033[0m"
-
 
 #define Printf(str,...)   		printf("%s(%d)[%s]: " str ,__FILE__, __LINE__,__FUNCTION__,##__VA_ARGS__)
 #define ERR_Printf(str,...)   	printf(B_RED("[ERR ]")"%s(%d)[%s]: " str ,__FILE__, __LINE__,__FUNCTION__,##__VA_ARGS__)
 #define INFO_Printf(str,...)   	printf(B_GREEN("[INFO]")"%s(%d)[%s]: " str ,__FILE__, __LINE__,__FUNCTION__,##__VA_ARGS__)
 #define WARN_Printf(str,...)   	printf(B_YELLOW("[WARN]")"%s(%d)[%s]: " str ,__FILE__, __LINE__,__FUNCTION__,##__VA_ARGS__)
 
-
-
 char host[64] = {0};
-
-
 
 bool power(int arg, int node)
 {
@@ -101,10 +88,26 @@ bool msd_mode(int node)
         return false;
     }
     
-    printf("booting node %d into msd mode. please wait a moment..\n");
+    printf("booting node %d into msd mode. please wait a moment..\n", node);
     sprintf(cmd,"curl 'http://%s/api/bmc?opt=set&type=node_to_msd&node=%d'",host,node);
     system(cmd);
-    printf("successful!\n");
+    return true;
+}
+
+bool clear_msd(int node)
+{
+    char cmd[128] = {0};
+    if (node == -1)
+    {
+        puts("Please specify node");
+        return false;
+    }
+    
+    sprintf(cmd,"curl 'http://%s/api/bmc?opt=set&type=clear_msd&node=%d'",host,node);
+    system(cmd);
+
+    power(0, node);
+    power(1, node);
     return true;
 }
 
@@ -403,6 +406,7 @@ void usage(void)
     printf("\t-f, --flash <img>   flash an image to a specified node\n");
     printf("\t-l, --localfile     when flashing (-f), the specified file will be loaded locally from the device\n");
     printf("\t-m, --msd           load the node as mass storage device.\n");
+    printf("\t-x, --clear_msd     pull rpiboot pin low and restart node.\n");
     printf("\t-h, --help          usage\n");
     printf("example: \n");
     printf("\t$ tpi -p on //power on\n");
@@ -412,8 +416,11 @@ void usage(void)
     printf("\t$ tpi --uart=set -n 1 --cmd=ls//set node1 uart cmd\n");
     printf("\t$ tpi --upgrade=/mnt/sdcard/xxxx.swu    //upgrade fw\n");
     printf("\t$ tpi -r  //reset switch\n");
-    printf("\t$ tpi -m -n 1  //(Rpi only) load the MSD driver\n");
     printf("\t$ tpi -n 1 -l -f /mnt/sdcard/raspios.img  // flash image file to node 1\n");
+    printf("\t$ tpi -m -n 1  //(Rpi only) load the MSD driver. When executed successfully,\n");
+    printf("\t// log into the BMC and use 'dmesg' to see the names of the new block devices,\n");
+    printf("\t// and mount them as you wish.\n");
+    printf("\t$ tpi -x -n 1  // clear msd node and restart\n");
     exit(1);
 }
 
@@ -424,6 +431,7 @@ static struct option long_options[] =
     {"usb", optional_argument, NULL, 'u'},
     {"node", optional_argument, NULL, 'n'},
     {"msd", optional_argument, NULL, 'm'},
+    {"clear_msd", optional_argument, NULL, 'x'},
     {"flash", optional_argument, NULL, 'f'},
     {"localfile", no_argument, NULL, 'l'},
     {"resetsw", no_argument, NULL, 'r'},
@@ -439,7 +447,7 @@ int main(int argc, char *argv[])
     int opt;
     int digit_optind = 0;
     int option_index = 0;
-    char *string = "p:u:U:n:f:F:hr";
+    char *string = "p:u:U:n:f:F:hrxm";
 
     // test();
     char uart_cmd[512];
@@ -546,6 +554,11 @@ int main(int argc, char *argv[])
                 strcpy(uart_cmd,optarg);
                 break;
             }
+            case 'x':
+            {
+                mode = 7;
+                break;
+            }
             default:
                 usage();
         }
@@ -620,6 +633,11 @@ int main(int argc, char *argv[])
         case 6:
         {
             msd_mode(node);
+            break;
+        }
+        case 7:
+        {
+            clear_msd(node);
             break;
         }
         default:

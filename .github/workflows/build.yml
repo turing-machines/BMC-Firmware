@@ -112,20 +112,25 @@ jobs:
     strategy:
       matrix:
         os:
-          - aarch64-unknown-linux-gnu
-          - aarch64-apple-darwin
-          - x86_64-apple-darwin
-          - x86_64-pc-windows-msvc
-          - x86_64-unknown-linux-gnu
+          - ubuntu-22.04
+          - macos-13
+            #- windows-2022
     runs-on: '${{ matrix.os }}'
     steps:
       - uses: actions/checkout@v3
-      - run: make -C app/tpi
+      - run: echo "CC=gcc" >> $env:GITHUB_ENV
+        if:  contains(${{ matrix.os }}, 'windows') 
+      - run: cd app/tpi && make 
+        shell: bash
+      - name: move artifact 
+        if:  contains(${{ matrix.os }}, 'windows') != true
+        run: mkdir -p ${{ matrix.os }} && mv app/tpi/tpi ${{ matrix.os }}/
       - name: archive
         uses: actions/upload-artifact@v3
         with:
-          name: '${{ matrix.os }}'
+          name: 'tpi'
           path: |
-            app/tpi/tpi
+            ${{ matrix.os }}/tpi
             app/tpi/tpi.exe
+
 
