@@ -113,6 +113,7 @@ DATE := $(shell date +%Y%m%d)
 # Need to export it, so it can be got from environment in children (eg. mconf)
 
 BR2_LOCALVERSION := $(shell $(TOPDIR)/support/scripts/setlocalversion)
+$(warning "see if git command was actually executed with success: $(BR2_LOCALVERSION)")
 ifeq ($(BR2_LOCALVERSION),)
 export BR2_VERSION_FULL := $(BR2_VERSION)
 else
