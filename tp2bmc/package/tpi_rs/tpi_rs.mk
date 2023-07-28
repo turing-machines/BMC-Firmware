@@ -4,7 +4,7 @@
 #
 ###########################################################
 
-TPI_RS_VERSION = v1.2.0
+TPI_RS_VERSION = 1.3.0
 TPI_RS_SITE = $(call github,turing-machines,tpi_rs,$(TPI_RS_VERSION))
 TPI_RS_LICENSE = Apache-2.0
 TPI_RS_LICENSE_FILES = LICENSE
