@@ -92,6 +92,21 @@ bool uart_ctrl(int mode,int node,char* data)
     system(cmd);
 }
 
+bool msd_mode(int node)
+{
+    char cmd[128] = {0};
+    if (node == -1)
+    {
+        puts("Please specify node");
+        return false;
+    }
+    
+    printf("booting node %d into msd mode. please wait a moment..\n");
+    sprintf(cmd,"curl 'http://%s/api/bmc?opt=set&type=node_to_msd&node=%d'",host,node);
+    system(cmd);
+    printf("successful!\n");
+    return true;
+}
 
 bool update_fw(char* file)
 {
@@ -387,6 +402,7 @@ void usage(void)
     printf("\t-F, --upgrade <img> upgrade fw\n");
     printf("\t-f, --flash <img>   flash an image to a specified node\n");
     printf("\t-l, --localfile     when flashing (-f), the specified file will be loaded locally from the device\n");
+    printf("\t-m, --msd           load the node as mass storage device.\n");
     printf("\t-h, --help          usage\n");
     printf("example: \n");
     printf("\t$ tpi -p on //power on\n");
@@ -396,6 +412,7 @@ void usage(void)
     printf("\t$ tpi --uart=set -n 1 --cmd=ls//set node1 uart cmd\n");
     printf("\t$ tpi --upgrade=/mnt/sdcard/xxxx.swu    //upgrade fw\n");
     printf("\t$ tpi -r  //reset switch\n");
+    printf("\t$ tpi -m -n 1  //(Rpi only) load the MSD driver\n");
     printf("\t$ tpi -n 1 -l -f /mnt/sdcard/raspios.img  // flash image file to node 1\n");
     exit(1);
 }
@@ -406,6 +423,7 @@ static struct option long_options[] =
     {"power", required_argument, NULL, 'p'},
     {"usb", optional_argument, NULL, 'u'},
     {"node", optional_argument, NULL, 'n'},
+    {"msd", optional_argument, NULL, 'm'},
     {"flash", optional_argument, NULL, 'f'},
     {"localfile", no_argument, NULL, 'l'},
     {"resetsw", no_argument, NULL, 'r'},
@@ -472,6 +490,11 @@ int main(int argc, char *argv[])
                 }
                 else
                     usage();
+                break;
+            }
+            case 'm':
+            {
+                mode = 6;
                 break;
             }
             case 'n':
@@ -592,6 +615,11 @@ int main(int argc, char *argv[])
         case 5:
         {
             flash_node(node, up_file, flashing_localfile);
+            break;
+        }
+        case 6:
+        {
+            msd_mode(node);
             break;
         }
         default:
