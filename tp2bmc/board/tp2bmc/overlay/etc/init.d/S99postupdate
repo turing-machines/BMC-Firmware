@@ -1,0 +1,83 @@
+#!/bin/sh -e
+
+# This script implements the post-reboot half of the OTA update procedure. For
+# the pre-reboot half, see `/sbin/osupdate`
+#
+# This script is pretty simple; it runs late in the boot process (where we can
+# be pretty confident that the rootfs is good) and looks for "postupdate" in
+# the kernel args, indicating this boot is a "tentative" boot on the new image.
+# If found, it makes the new boot permanent:
+# 1) Rename the currently-mounted UBI root volume to "rootfs"
+# 2) If the latter already exists, rename it to "rootfs_recovery" first
+# 3) If THAT already exists, remove it
+
+UBIDEV=/dev/ubi0
+ROOTFS_PRIMARY=rootfs
+ROOTFS_SECONDARY=rootfs_recovery
+
+#
+# ubi_block_name
+#
+# Echoes the name of the volume currently attached as a UBI block device
+#
+ubi_block_name() {
+	for block in /sys/class/block/ubiblock*; do
+		blockdev=$(basename $block)
+		namepath=/sys/class/ubi/${blockdev//block/}/name
+		if [ -f $namepath ]; then
+			cat "$namepath"
+			return 0
+		fi
+	done
+
+	return 1
+}
+
+#
+# ubi_exists NAME
+#
+# Checks for the existence of the named UBI volume
+#
+ubi_exists() {
+	NAME=$1
+
+	for entry in /sys/class/ubi/$(basename "$UBIDEV")/ubi*; do
+		if [ ! -f $entry/name ]; then continue; fi
+		if grep -Fxq "$NAME" $entry/name >/dev/null; then
+			return 0
+		fi
+	done
+
+	return 1
+}
+
+postupdate() {
+	# Is the rename even necessary?
+	root_name=$(ubi_block_name)
+	if [ "x$root_name" = "x$ROOTFS_PRIMARY" ]; then
+		return;
+	fi
+
+	# The rename is necessary; $root_name -> $ROOTFS_PRIMARY
+	renames="$root_name $ROOTFS_PRIMARY"
+	if ubi_exists "$ROOTFS_PRIMARY"; then
+		# First move $ROOTFS_PRIMARY to $ROOTFS_SECONDARY.
+		# This clobbers the latter if it exists.
+		renames="$ROOTFS_PRIMARY $ROOTFS_SECONDARY $renames"
+	fi
+	ubirename "$UBIDEV" $renames
+	echo "postupdate: Volumes renamed: $renames"
+}
+
+start() {
+	if grep -q 'postupdate' /proc/cmdline; then
+		postupdate
+	fi
+}
+
+case "$1" in
+	start)
+		start;;
+	force)
+		postupdate;;
+esac

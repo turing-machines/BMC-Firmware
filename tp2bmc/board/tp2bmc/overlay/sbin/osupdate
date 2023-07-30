@@ -1,0 +1,89 @@
+#!/bin/sh -eu
+
+# This script implements the pre-reboot half of the OTA update procedure. For
+# the post-reboot half, see `/etc/init.d/S99postupdate`
+#
+# This script needs to do a few steps:
+# 1) Clear away all UBI volumes with "rootfs*" names, except for the
+#    currently-mounted rootfs block device.
+# 2) Rename the currently-mounted rootfs device to "rootfs" if it isn't.
+# 3) Create a new static UBI volume, named "rootfs_new", with skipcheck and the
+#    appropriate size in LEBs.
+# 4) Run `ubiupdatevol` to put the new filesystem image in "rootfs_new"
+# 5) Set the bootloader's "nextboot" variable to boot into "rootfs_new" once.
+# 6) Next boot, the bootloader will tentatively boot to the new rootfs. If the
+#    boot fails, a subsequent hard reboot will rollback the update. But if the
+#    boot succeeds, the postupdate script will make it permanent.
+
+UBIDEV=/dev/ubi0
+RMVOL_REGEX='rootfs.*'
+OLDVOL_NAME=rootfs
+NEWVOL_NAME=rootfs_new
+NEWVOL_LEBS=370
+NEXTBOOT="bootmode=postupdate; distro_bootpart=$NEWVOL_NAME; run boot_do_scan"
+
+#
+# ubi_cleanup
+#
+# Remove all UBI volumes with names matching $RMVOL_REGEX, *except* for those
+# which have an attached ubiblock device, which are instead renamed to
+# $OLDVOL_NAME
+#
+ubi_cleanup() {
+	blockname=
+	for entry in /sys/class/ubi/$(basename "$UBIDEV")/ubi*; do
+		if [ ! -f $entry/name ]; then continue; fi
+		if grep -xq "$RMVOL_REGEX" $entry/name; then
+			ubichar=$(basename "$entry")
+			ubiblock=${ubichar//ubi/ubiblock}
+			ubiname=$(cat "$entry/name")
+			if [ -e "/sys/class/block/$ubiblock" ]; then
+				blockname=$ubiname
+			else
+				ubirmvol "$UBIDEV" -N "$ubiname"
+			fi
+		fi
+	done
+	if [ -n "$blockname" ] && [ "x$blockname" != "x$OLDVOL_NAME" ]; then
+		ubirename "$UBIDEV" "$blockname" "$OLDVOL_NAME"
+	fi
+}
+
+#
+# ubi_create NAME LEBS IMAGE
+#
+# Create a UBI volume with the specified name, size (in LEBs), and image path.
+#
+ubi_create() {
+	NAME=$1
+	LEBS=$2
+	IMAGE=$3
+
+	ubimkvol "$UBIDEV" --type=static --skipcheck --name "$NAME" --lebs "$LEBS"
+
+	for entry in /sys/class/ubi/$(basename "$UBIDEV")/ubi*; do
+		if [ ! -f $entry/name ]; then continue; fi
+		if grep -Fxq "$NAME" $entry/name; then
+			volpath=/dev/$(basename "$entry")
+			break
+		fi
+	done
+
+	ubiupdatevol "$volpath" "$IMAGE"
+}
+
+#
+# perform_update IMAGE
+#
+# Installs the update to the file path given by IMAGE and stages it for the
+# next reboot, but does not perform the reboot.
+#
+perform_update() {
+	IMAGE=$1
+
+	ubi_cleanup
+	ubi_create "$NEWVOL_NAME" "$NEWVOL_LEBS" "$IMAGE"
+	fw_setenv nextboot "$NEXTBOOT"
+}
+
+perform_update "$1"
