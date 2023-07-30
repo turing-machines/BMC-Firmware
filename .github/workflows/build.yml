@@ -89,19 +89,12 @@ jobs:
           cd buildroot
           make
 
-      - name: build swupdate
-        run: |
-          cd buildroot/output/images/
-          cp -ra ../../../tp2bmc/swupdate/* .
-          ./genSWU.sh ${{ env.BUILD_VERSION }}
-
       - name: upload
         uses: actions/upload-artifact@v3
         with:
           if-no-files-found: error 
           name: tp2-bmc-${{ env.BUILD_VERSION }}
           path: |
-            buildroot/output/images/turingpi_${{ env.BUILD_VERSION }}.swu
             buildroot/output/images/buildroot_linux_nand_uart3.img
             buildroot/output/images/zImage
             buildroot/output/images/sun8iw20p1-t113-turingmachines-tp2bmc.dtb
