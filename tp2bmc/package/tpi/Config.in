@@ -1,4 +1,4 @@
 config BR2_PACKAGE_TPI
 bool "TPI"
 help
-This is a turing pi CLI.
+turing pi CLI.
