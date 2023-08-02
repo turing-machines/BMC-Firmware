@@ -108,29 +108,3 @@ jobs:
             buildroot/output/images/zImage
             buildroot/output/images/sun8iw20p1-t113-turingmachines-tp2bmc.dtb
 
-  legacy_tpi:
-    strategy:
-      matrix:
-        os:
-          - ubuntu-22.04
-          - macos-13
-            #- windows-2022
-    runs-on: '${{ matrix.os }}'
-    steps:
-      - uses: actions/checkout@v3
-      - run: echo "CC=gcc" >> $env:GITHUB_ENV
-        if:  contains(${{ matrix.os }}, 'windows') 
-      - run: cd app/tpi && make 
-        shell: bash
-      - name: move artifact 
-        if:  contains(${{ matrix.os }}, 'windows') != true
-        run: mkdir -p ${{ matrix.os }} && mv app/tpi/tpi ${{ matrix.os }}/
-      - name: archive
-        uses: actions/upload-artifact@v3
-        with:
-          name: 'tpi'
-          path: |
-            ${{ matrix.os }}/tpi
-            app/tpi/tpi.exe
-
-
