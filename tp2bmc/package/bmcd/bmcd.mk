@@ -4,14 +4,13 @@
 #
 ###########################################################
 
-BMCD_VERSION = 1.3.0
-BMCD_SITE = $(call github,turing-machines,tpi_rs,v$(BMCD_VERSION))
+BMCD_VERSION = 898aab25e9f7a62ff5aebb3ee15db2b60e5ef2e8
+BMCD_SITE = $(call github,turing-machines,tpi_rs,$(BMCD_VERSION))
 BMCD_LICENSE = Apache-2.0
 BMCD_LICENSE_FILES = LICENSE
 BMCD_CARGO_ENV := PKG_CONFIG_ALLOW_CROSS=1
 BMCD_CARGO_ENV += CC_armv7_unknown_linux_gnueabi="arm-linux-gcc"
 
-# See tpi_rs.mk
 define BMCD_BUILD_CMDS
 	cd $(BMCD_SRCDIR) && \
 	$(TARGET_MAKE_ENV) \
