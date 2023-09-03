@@ -4,8 +4,8 @@
 #
 ###########################################################
 
-TPI_RS_VERSION = 1.3.0
-TPI_RS_SITE = $(call github,turing-machines,tpi_rs,$(TPI_RS_VERSION))
+TPI_RS_VERSION = bb3636350509b09fcb4b4637b8fd669719206d5a
+TPI_RS_SITE = $(call github,turing-machines,bmcd,$(TPI_RS_VERSION))
 TPI_RS_LICENSE = Apache-2.0
 TPI_RS_LICENSE_FILES = LICENSE
 TPI_RS_INSTALL_STAGING = YES

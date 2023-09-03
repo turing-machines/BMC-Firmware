@@ -4,8 +4,8 @@
 #
 ###########################################################
 
-BMCD_VERSION = 898aab25e9f7a62ff5aebb3ee15db2b60e5ef2e8
-BMCD_SITE = $(call github,turing-machines,tpi_rs,$(BMCD_VERSION))
+BMCD_VERSION = bb3636350509b09fcb4b4637b8fd669719206d5a
+BMCD_SITE = $(call github,turing-machines,bmcd,$(BMCD_VERSION))
 BMCD_LICENSE = Apache-2.0
 BMCD_LICENSE_FILES = LICENSE
 BMCD_CARGO_ENV := PKG_CONFIG_ALLOW_CROSS=1
@@ -24,11 +24,11 @@ define BMCD_BUILD_CMDS
 			$(BMCD_CARGO_BUILD_OPTS)
 endef
 
-# A copy of default build commands but with --path amended, since we have a virtual manifest
+# A copy of default build commands but with --path amended, since we have a virtual manifest.
+# For the same reasons as in tpi_rs.mk, TARGET_CONFIGURE_OPTS are removed.
 define BMCD_INSTALL_TARGET_CMDS
 	cd $(BMCD_SRCDIR) && \
 	$(TARGET_MAKE_ENV) \
-		$(TARGET_CONFIGURE_OPTS) \
 		$(PKG_CARGO_ENV) \
 		$(BMCD_CARGO_ENV) \
 		cargo install \
