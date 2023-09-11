@@ -1,6 +1,8 @@
 config BR2_PACKAGE_BMCD
 	bool "bmcd"
 	depends on BR2_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS
+    depends on BR2_PACKAGE_LIBOPENSSL_BIN
+
 	select BR2_PACKAGE_HOST_RUSTC
 	help
 	  System management daemon for the Baseboard Management Controller (BMC)

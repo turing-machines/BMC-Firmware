@@ -3,12 +3,16 @@
 DAEMON="bmcd"
 BIN="/usr/bin/$DAEMON"
 PIDFILE="/var/run/$DAEMON.pid"
+CERTFILE="/etc/ssl/certs/bmcd_cert.pem"
+KEYFILE="/etc/ssl/certs/bmcd_key.pem"
 
 start() {
     printf 'Starting %s...\n' "$DAEMON"
 
+    [ ! -f "$CERTFILE" ] || [ ! -f "$KEYFILE" ] && /etc/bmcd/generate_self_signedx509.sh 
+
     start-stop-daemon --start --quiet --background --make-pidfile --pidfile "$PIDFILE" --no-close \
-        --exec "$BIN"
+        --exec "$BIN" -- --config "/etc/bmcd/config.yaml"
 
     # Note: there are a lot of init.d scripts in buildroot packages that use -b/--background flag
     # for programs that don't daemonize themselves. Contrary to the vast majority of them, it's
