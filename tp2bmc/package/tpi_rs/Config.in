@@ -1,7 +1,0 @@
-config BR2_PACKAGE_TPI_RS
-	bool "tpi_rs"
-	depends on BR2_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS
-	select BR2_PACKAGE_HOST_RUSTC
-	select BR2_PACKAGE_LIBUSB
-	help
-	  development of the rust version of the tp2
