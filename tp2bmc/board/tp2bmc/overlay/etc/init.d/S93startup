@@ -13,8 +13,5 @@ if [ "$1" = "start" ]; then
 
     sleep 1
     /etc/setStaticNet.sh
-
-    bmc &
-
     /etc/test_ping.sh &
 fi
