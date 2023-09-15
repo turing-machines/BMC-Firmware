@@ -29,6 +29,9 @@ define BMCD_INSTALL_TARGET_CMDS
 
 	$(INSTALL) -D -m 744 $(BR2_EXTERNAL_TP2BMC_PATH)/package/bmcd/generate_self_signedx509.sh \
 		$(TARGET_DIR)/etc/bmcd/generate_self_signedx509.sh
+
+	$(INSTALL) -D -m 755 $(BR2_EXTERNAL_TP2BMC_PATH)/package/bmcd/default_config.yaml \
+		$(TARGET_DIR)/etc/bmcd/config.yaml
 endef
 
 define BMCD_INSTALL_INIT_SYSV
