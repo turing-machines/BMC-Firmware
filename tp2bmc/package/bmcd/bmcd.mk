@@ -3,7 +3,7 @@
 # bmcd
 ###########################################################
 
-BMCD_VERSION = ad360f38420f8cbf4fc84d327da18dfdc58cd8e5
+BMCD_VERSION = e699d6dd4f10cf32f4607349782df7a0ed30b515
 BMCD_SITE = $(call github,turing-machines,bmcd,$(BMCD_VERSION))
 BMCD_LICENSE = Apache-2.0
 BMCD_LICENSE_FILES = LICENSE
