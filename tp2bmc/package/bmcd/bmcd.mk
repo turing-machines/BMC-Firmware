@@ -3,7 +3,7 @@
 # bmcd
 ###########################################################
 
-BMCD_VERSION = f34bdd9d12b45c147634730682f38dc4e6112d14
+BMCD_VERSION = d2f10575424743867c9137a47be9817a14666d66
 BMCD_SITE = $(call github,turing-machines,bmcd,$(BMCD_VERSION))
 BMCD_LICENSE = Apache-2.0
 BMCD_LICENSE_FILES = LICENSE
@@ -21,7 +21,7 @@ define BMCD_INSTALL_TARGET_CMDS
 			--offline \
 			--root $(TARGET_DIR)/usr/ \
 			--bins \
-			--path bmcd \
+			--path ./ \
 			--force \
 			--locked \
 			-Z target-applies-to-host \
@@ -30,7 +30,7 @@ define BMCD_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 744 $(BR2_EXTERNAL_TP2BMC_PATH)/package/bmcd/generate_self_signedx509.sh \
 		$(TARGET_DIR)/etc/bmcd/generate_self_signedx509.sh
 
-	$(INSTALL) -D -m 755 $(BR2_EXTERNAL_TP2BMC_PATH)/package/bmcd/default_config.yaml \
+	$(INSTALL) -D -m 755 $(BMCD_SRCDIR)/default_config.yaml \
 		$(TARGET_DIR)/etc/bmcd/config.yaml
 endef
 
