@@ -31,6 +31,11 @@ jobs:
       RUST_LOG: ${{ inputs.logLevel }}
 
     steps:
+      - name: Maximize build space
+        uses: AdityaGarg8/remove-unwanted-software@v1
+        with:
+          remove-android: 'true'
+
       - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
@@ -70,13 +75,6 @@ jobs:
           rsync \
           xxd -y
 
-      - name: retrieve ccache
-        uses: actions/cache@v3
-        with:
-          key: ${{ runner.os }}-ccache-${{ env.BUILD_VERSION }}
-          path: ~/.buildroot-ccache
-          restore-keys: ${{ runner.os }}-ccache-
-
       - name: conditional bmcd version injection
         if: inputs.bmcd_version != ''
         run: |
@@ -84,12 +82,12 @@ jobs:
       - name: configure
         run: |
           cd buildroot
-          make BR2_EXTERNAL=../tp2bmc BR2_CCACHE=y tp2bmc_defconfig
+          make BR2_EXTERNAL=../tp2bmc tp2bmc_defconfig
 
       - name: build
         run: |
           cd buildroot
-          make BR2_CCACHE=y
+          make
 
       - name: build swupdate
         run: |
