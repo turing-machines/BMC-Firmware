@@ -6,31 +6,27 @@ Welcome to the new home of the Turing Pi firmware. The Turing Pi is a compact AI
 & edge computing cluster purposed to run cloud stacks and AI inference at the
 edge. Find out more on our [website](turingpi.com).
 
-### Wenyi0421 Repository
-
-The Wenyi0421 repository was formerly used for firmware development. We have
-decided to branch off and commit our fresh inputs to this repository, which
-implies that we will gradually phase out the Wenyi0421 repository. Currently, we
-are working towards a first release, which will land here soon.
+The firmware is based on a Linux 5.4 kernel and hosts a web interface
+with a REST API to control and manage the board. The packages
+[bmcd](https://www.github.com/turing-machines/bmcd) and
+[tpi](https://github.com/turing-machines/tpi) are part of the firmware and
+facilitate most of this functionality. We recommend reporting issues using the
+current BMC-Firmware repository for visibility reasons.
 
 ## BMC chip specs
 
  * CPU Allwinner T113-S3 (ARM Cortex-A7)
  * 128 MB DDR3 RAM
- * 1 GB SPI NAND flash (MX35LF1GE4AB)
+ * 128 MB SPI NAND flash (MX35LF1GE4AB)
  * EEPROM (24C02C)
  * 3 port Gigabit Ethernet Switch (RTL8370MB)
  * Ethernet PHYceiver (RTL8201F-VB-CG)
  * SD card slot
- * Buildroot SDK 2023.02.1
-    * Linux 5.4
-    * Linaro GCC 7.2
-    * U-boot bootloader
 
 ## Install firmware
 
 There are two ways to upgrade the firmware on your current board.
-1. Using the PhoenixSuit. It allows you to write an entire new image to the
+1. Using the PhoenixSuit. It allows you to write an entirely new image on the
 board.
 2. Using an OTA package. This package can be uploaded to the board via the web
 UI. (This method does not update the kernel).
@@ -46,9 +42,9 @@ you can find an elaborate manual on performing an update using both methods.
 
 ### Using Docker
 
-In the root of our repository there is a dockerfile which can be used to build
+In the root of our repository there is a dockerfile that can be used to build
 a development container. It has all the dependencies needed to build the
-firmware. We recommend to go through the official docker documentation. But if
+firmware. We would recommend that you go through the official docker documentation. But if
 you want to quickly build and run it, execute the following commands in the root
 of your repository:
 
