@@ -22,16 +22,14 @@ function C_setCBResuleParseDisp(json) {
   var Result;
   if (json == "urlerr") {
     sessionStorage.setItem('Notification', 'err');
-  }
-  else {
-    $.each(json, function (index, item) {
+  } else {
+    $.each(json, function(index, item) {
       Result = json[index][0].result;
     });
 
     if (Result == "ok") {
       sessionStorage.setItem('Notification', 'ok');
-    }
-    else {
+    } else {
       sessionStorage.setItem('Notification', 'err');
     }
   }
@@ -40,8 +38,7 @@ function C_setCBResuleParseDisp(json) {
 function C_Notification() {
   if (sessionStorage.getItem('Notification') == "ok") {
     $.NotificationApp.send("info", "save ok .", 'top-center', '#1ea69a', 'info', 2000, 1, 'slide');
-  }
-  else if (sessionStorage.getItem('Notification') == "err") {
+  } else if (sessionStorage.getItem('Notification') == "err") {
     $.NotificationApp.send("info", "save err.", 'top-center', '#1ea69a', 'error', 2000, 1, 'slide');
   }
 
@@ -77,11 +74,11 @@ function page_http_req_get(uUrl, lType) {
       C_getCBResuleParseUSBDisp(json);
     else if (lType == 'sdcard')
       C_getCBResuleParseSDCardDisp(json);
-    else if(lType == 'other')
+    else if (lType == 'other')
       C_getCBResuleParseOtherDisp(json);
-    else if(lType == 'power')
+    else if (lType == 'power')
       C_getCBResuleParsePowerDisp(json);
-    else if(lType == 'nodeinfo')
+    else if (lType == 'nodeinfo')
       C_getCBResuleParseNodeInfoDisp(json);
   }
 }
@@ -116,7 +113,7 @@ function page_http_req_set(uUrl, lType) {
 }
 
 function C_getCBResuleParseSDCardDisp(json) {
-  $.each(json, function (index, item) {
+  $.each(json, function(index, item) {
     var total = json[index][0].total;
     var use = json[index][0].use;
     var free = json[index][0].free;
@@ -128,7 +125,7 @@ function C_getCBResuleParseSDCardDisp(json) {
 }
 
 function C_getCBResuleParseOtherDisp(json) {
-  $.each(json, function (index, item) {
+  $.each(json, function(index, item) {
     var version = json[index][0].version;
     var buildtime = json[index][0].buildtime;
     var ip = json[index][0].ip;
@@ -142,7 +139,7 @@ function C_getCBResuleParseOtherDisp(json) {
 }
 
 function C_getCBResuleParsePowerDisp(json) {
-  $.each(json, function (index, item) {
+  $.each(json, function(index, item) {
     var node1 = json[index][0].node1;
     var node2 = json[index][0].node2;
     var node3 = json[index][0].node3;
@@ -163,7 +160,7 @@ function C_getCBResuleParsePowerDisp(json) {
 }
 
 function C_getCBResuleParseUSBDisp(json) {
-  $.each(json, function (index, item) {
+  $.each(json, function(index, item) {
     var mode = json[index][0].mode;
     var node = json[index][0].node;
 
@@ -173,7 +170,7 @@ function C_getCBResuleParseUSBDisp(json) {
 }
 
 function C_getCBResuleParseNodeInfoDisp(json) {
-  $.each(json, function (index, item) {
+  $.each(json, function(index, item) {
     var node1 = json[index][0].node1;
     var node2 = json[index][0].node2;
     var node3 = json[index][0].node3;
@@ -197,20 +194,15 @@ function C_getParamAll() {
 function C_getParamList(ltype) {
   if (ltype == 'usb') {
     var url = '/api/bmc?opt=get&type=usb';
-  }
-  else if (ltype == 'sdcard') {
+  } else if (ltype == 'sdcard') {
     var url = '/api/bmc?opt=get&type=sdcard';
-  }
-  else if(ltype == 'power'){
+  } else if (ltype == 'power') {
     var url = '/api/bmc?opt=get&type=power';
-  }
-  else if(ltype == 'nodeinfo'){
+  } else if (ltype == 'nodeinfo') {
     var url = '/api/bmc?opt=get&type=nodeinfo';
-  }
-  else if(ltype == 'other'){
+  } else if (ltype == 'other') {
     var url = '/api/bmc?opt=get&type=other';
-  }
-  else
+  } else
     return;
 
   page_http_req_get(url, ltype);
@@ -249,6 +241,6 @@ function C_setParamSdcard() {
 }
 
 function C_setParamFirmware() {
-  var url="/api/bmc?opt=set&type=firmware";
-  page_http_req_set(url,'firmware');
+  var url = "/api/bmc?opt=set&type=firmware";
+  page_http_req_set(url, 'firmware');
 }
