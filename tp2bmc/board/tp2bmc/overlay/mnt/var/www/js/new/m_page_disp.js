@@ -1,4 +1,3 @@
-
 function page_changeSwitchery(element, checked) {
   if ((element.is(':checked') && checked == false) || (!element.is(':checked') && checked == true)) {
     element.parent().find('.switchery').trigger('click');
@@ -24,7 +23,6 @@ function oth2bool(val) {
   else
     return true;
 }
-
 
 //CB : http req  get result
 function C_setCBResuleParseDisp(json) {
@@ -56,7 +54,7 @@ function C_Notification() {
   }
 
   sessionStorage.removeItem('Notification');
-  //sessionStorage.clear();       // modify by wenyi 
+  //sessionStorage.clear();       // modify by wenyi
 }
 
 function C_NotificationImage() {
@@ -65,38 +63,24 @@ function C_NotificationImage() {
   }
 
   sessionStorage.removeItem('Notification');
-  //sessionStorage.clear();       // modify by wenyi 
+  //sessionStorage.clear();       // modify by wenyi
 }
 
-
-
-
 function page_http_req_get(uUrl, lType) {
-
   //alert(uUrl);
-
   $.ajax({
-
     url: '' + uUrl + '',
-
     type: 'GET',
-
     dataType: 'json',
-
     timeout: 5000,
-
     cache: false,
-
     beforeSend: LoadFunction,
     error: erryFunction,
     success: succFunction
-
   })
 
   function LoadFunction() {
-
-    //$(".list").html('load.......');  
-
+    //$(".list").html('load.......');
   }
 
   function erryFunction() {
@@ -105,7 +89,6 @@ function page_http_req_get(uUrl, lType) {
   }
 
   function succFunction(uStr) {
-
     //$("#list").val("");
 
     // console.log('page_http_req_get type = %s',lType);
@@ -120,52 +103,37 @@ function page_http_req_get(uUrl, lType) {
     else if(lType == 'power')
       C_getCBResuleParsePowerDisp(json);
     else if(lType == 'nodeinfo')
-      C_getCBResuleParseNodeInfoDisp(json);  
-
+      C_getCBResuleParseNodeInfoDisp(json);
   }
 }
 
-
-
 function page_http_req_set(uUrl, lType) {
-
   $.ajax({
-
     url: '' + uUrl + '',
-
     type: 'POST',
-
     dataType: 'json',
-
     timeout: 5000,
-
     cache: false,
     async: false,
     beforeSend: LoadFunction,
     error: erryFunction,
     success: succFunction
-
   })
 
   function LoadFunction() {
-
-    //$(".list").html('load.......');  
+    //$(".list").html('load.......');
   }
 
   function erryFunction() {
     // alert('page set error1');    //modify by wenyi
     console.log("ajax post error");
     C_setCBResuleParseDisp("urlerr");
-    //alert("set error");  
+    //alert("set error");
   }
 
   function succFunction(uStr) {
-
     //$("#list").val("");
     var json = eval(uStr);
     C_setCBResuleParseDisp(json);
   }
 }
-
-
-
