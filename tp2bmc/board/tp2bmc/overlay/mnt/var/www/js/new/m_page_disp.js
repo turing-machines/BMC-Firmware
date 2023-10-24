@@ -92,7 +92,8 @@ function page_http_req_get(uUrl, lType) {
     //$("#list").val("");
 
     // console.log('page_http_req_get type = %s',lType);
-    var json = eval(uStr);
+    var response = eval(uStr);
+    var json = response["response"][0];
     // console.log(json);
     if (lType == 'usb')
       C_getCBResuleParseUSBDisp(json);
