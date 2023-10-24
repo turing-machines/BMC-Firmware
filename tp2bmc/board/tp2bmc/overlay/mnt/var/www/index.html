@@ -11,7 +11,7 @@
   <meta http-equiv="Cache-control" content="no-cache">
   <meta http-equiv="Cache" content="no-cache">
 
-  <title>turing config</title>
+  <title>Turing Pi config</title>
 
   <!--[if lt IE 9]>
       <script src="./js/html5shiv.min.js"></script>
@@ -206,22 +206,22 @@
         <div class="aui_nav_list_box">
           <ul class="clearfix">
             <li class="aui_current">
-              <a href="javascript:;">usb</a>
+              <a href="javascript:;">USB</a>
             </li>
             <li class="aui_current">
-              <a href="javascript:;">power</a>
+              <a href="javascript:;">Power</a>
             </li>
             <li class="aui_current">
-              <a href="javascript:;">nodeInfo</a>
+              <a href="javascript:;">Node Info</a>
             </li>
             <li>
-              <a href="javascript:;">sdcard</a>
+              <a href="javascript:;">SD Card</a>
             </li>
             <li>
-              <a href="javascript:;">other</a>
+              <a href="javascript:;">Other</a>
             </li>
             <li>
-              <a href="javascript:;">update</a>
+              <a href="javascript:;">Update</a>
             </li>
           </ul>
         </div>
@@ -233,7 +233,7 @@
                 <div class="col-lg-6">
                   <form role="form" id="form1">
                     <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">usb mode:</label>
+                      <label for="inputEmail3" class="col-sm-2 col-form-label">USB mode:</label>
                       <div class="col-sm-7">
                         <select id="usbMode" class="selectpicker" data-style="btn-outline-primary">
                           <option value="0">Host</option>
@@ -243,13 +243,13 @@
                     </div>
 
                     <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">connet node:</label>
+                      <label for="inputEmail3" class="col-sm-2 col-form-label">Connected node:</label>
                       <div class="col-sm-7">
                         <select id="usbNode" class="selectpicker" data-style="btn-outline-primary">
-                          <option value="0">node1</option>
-                          <option value="1">node2</option>
-                          <option value="2">node3</option>
-                          <option value="3">node4</option>
+                          <option value="0">Node 1</option>
+                          <option value="1">Node 2</option>
+                          <option value="2">Node 3</option>
+                          <option value="3">Node 4</option>
                         </select>
                       </div>
                     </div>
@@ -271,9 +271,10 @@
               <div class="row">
                 <div class="col-lg-6">
                   <form role="form" id="form3">
-                    <label >Control the power supply of the connected node!</label>
+                    <label>Control the power supply of connected nodes</label>
+
                     <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">node1:</label>
+                      <label for="inputEmail3" class="col-sm-2 col-form-label">Node 1:</label>
                       <div class="col-sm-7">
                         <div class="switchery-demo">
                           <input type="checkbox" id="node1Power" data-plugin="switchery" data-color="#008000"
@@ -283,7 +284,7 @@
                     </div>
 
                     <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">node2:</label>
+                      <label for="inputEmail3" class="col-sm-2 col-form-label">Node 2:</label>
                       <div class="col-sm-7">
                         <div class="switchery-demo">
                           <input type="checkbox" id="node2Power" data-plugin="switchery" data-color="#008000"
@@ -293,7 +294,7 @@
                     </div>
 
                     <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">node3:</label>
+                      <label for="inputEmail3" class="col-sm-2 col-form-label">Node 3:</label>
                       <div class="col-sm-7">
                         <div class="switchery-demo">
                           <input type="checkbox" id="node3Power" data-plugin="switchery" data-color="#008000"
@@ -303,14 +304,13 @@
                     </div>
 
                     <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">node4:</label>
+                      <label for="inputEmail3" class="col-sm-2 col-form-label">Node 4:</label>
                       <div class="col-sm-7">
                         <div class="switchery-demo">
                           <input type="checkbox" id="node4Power" data-plugin="switchery" data-color="#008000"
                             data-size="small" />
                         </div>
                       </div>
-
                     </div>
 
                     <div class="form-group row">
@@ -326,12 +326,13 @@
           </div>
 
           <!-- node info -->
-
           <div class="aui_nav_list_item" style="display: none;">
             <ul>
               <div class="row">
                 <div class="col-lg-6">
                   <form role="form" id="nodetype">
+                    <label>Get the type of connected nodes via serial</label>
+
                     <!-- <label >TIPS:Enable to obtain node information using serial port!</label>
                     <div class="form-group row">
                       <label for="inputEmail3" class="col-sm-2 col-form-label">enable:</label>
@@ -344,7 +345,7 @@
                     </div> -->
 
                     <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">node1:</label>
+                      <label for="inputEmail3" class="col-sm-2 col-form-label">Node 1:</label>
                       <div class="col-sm-7">
                         <input type="text" id="node1type" class="form-control" disabled="true" />
                       </div>
@@ -352,21 +353,21 @@
                     </div>
 
                     <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">node2:</label>
+                      <label for="inputEmail3" class="col-sm-2 col-form-label">Node 2:</label>
                       <div class="col-sm-7">
                         <input type="text" id="node2type" class="form-control" disabled="true" />
                       </div>
                     </div>
 
                     <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">node3:</label>
+                      <label for="inputEmail3" class="col-sm-2 col-form-label">Node 3:</label>
                       <div class="col-sm-7">
                         <input type="text" id="node3type" class="form-control" disabled="true" />
                       </div>
                     </div>
 
                     <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">node4:</label>
+                      <label for="inputEmail3" class="col-sm-2 col-form-label">Node 4:</label>
                       <div class="col-sm-7">
                         <input type="text" id="node4type" class="form-control" disabled="true" />
                       </div>
@@ -390,27 +391,27 @@
                 <div class="col-lg-6">
                   <form role="form" id="form2">
                     <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">total:</label>
+                      <label for="inputEmail3" class="col-sm-2 col-form-label">Total:</label>
                       <div class="col-sm-7">
                         <input type="text" id="sdTotal" class="form-control" disabled="true" />
                       </div>
-                      <label>MB</label>
+                      <label>B</label>
                     </div>
 
                     <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">use:</label>
+                      <label for="inputEmail3" class="col-sm-2 col-form-label">Used:</label>
                       <div class="col-sm-7">
                         <input type="text" id="sdUse" class="form-control" disabled="true" />
                       </div>
-                      <label>MB</label>
+                      <label>B</label>
                     </div>
 
                     <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">free:</label>
+                      <label for="inputEmail3" class="col-sm-2 col-form-label">Free:</label>
                       <div class="col-sm-7">
                         <input type="text" id="sdFree" class="form-control" disabled="true" />
                       </div>
-                      <label>MB</label>
+                      <label>B</label>
                     </div>
 
                     <!-- <div class="form-group row">
@@ -432,32 +433,32 @@
                   <form role="form" id="form4">
                     <div class="form-group row">
                       <div class="col-sm-12 " style="text-align: left;left: 250px;">
-                        <button type="submit" class="btn btn-outline-danger btn-rounded w-md">reset network</button>
+                        <button type="submit" class="btn btn-outline-danger btn-rounded w-md">Reset network</button>
                         <!-- <button type="reset" class="btn btn-outline-secondary btn-rounded w-md">Reset</button> -->
                       </div>
                     </div>
 
                     <!-- <div id="result"></div> -->
                     <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">bmc version:</label>
+                      <label for="inputEmail3" class="col-sm-2 col-form-label">Daemon version:</label>
                       <div class="col-sm-7">
                         <div id="otherVer" class="col-sm-8 col-form-label"></div>
                       </div>
                     </div>
                     <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">build time:</label>
+                      <label for="inputEmail3" class="col-sm-2 col-form-label">Build time:</label>
                       <div class="col-sm-7">
                         <div id="otherBuildtime" class="col-sm-8 col-form-label"></div>
                       </div>
                     </div>
                     <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">ip:</label>
+                      <label for="inputEmail3" class="col-sm-2 col-form-label">IP address:</label>
                       <div class="col-sm-7">
                         <div id="otherIp" class="col-sm-8 col-form-label"></div>
                       </div>
                     </div>
                     <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">mac:</label>
+                      <label for="inputEmail3" class="col-sm-2 col-form-label">MAC address:</label>
                       <div class="col-sm-7">
                         <div id="otherMac" class="col-sm-8 col-form-label"></div>
                       </div>
@@ -476,7 +477,7 @@
                   <form method="post" action="/api/bmc?opt=set&type=firmware" enctype="multipart/form-data">
                     <input type="hidden">
                     <table border="0">
-                        <tr><td>upgrade File:</td><td><input type="file" name="file"></td></tr>
+                        <tr><td>Upgrade file:</td><td><input type="file" name="file"></td></tr>
                     </table>
                     <div class="form-group row">
                       <div class="col-sm-12 " style="text-align: left;left: 250px;">
