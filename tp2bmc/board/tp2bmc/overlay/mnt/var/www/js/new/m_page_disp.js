@@ -53,7 +53,7 @@ function page_http_req_get(uUrl, lType) {
   $.ajax({
     url: '' + uUrl + '',
     type: 'GET',
-    dataType: 'json',
+    dataType: 'text',
     timeout: 5000,
     cache: false,
     beforeSend: LoadFunction,
@@ -70,7 +70,7 @@ function page_http_req_get(uUrl, lType) {
   }
 
   function succFunction(uStr) {
-    var response = eval(uStr);
+    var response = JSON.parse(uStr);
     var json = response["response"][0];
 
     if (lType == 'usb')
@@ -90,7 +90,7 @@ function page_http_req_set(uUrl, lType) {
   $.ajax({
     url: '' + uUrl + '',
     type: 'POST',
-    dataType: 'json',
+    dataType: 'text',
     timeout: 5000,
     cache: false,
     async: false,
@@ -110,7 +110,7 @@ function page_http_req_set(uUrl, lType) {
   }
 
   function succFunction(uStr) {
-    var json = eval(uStr);
+    var json = JSON.parse(uStr);
     C_setCBResuleParseDisp(json);
   }
 }
