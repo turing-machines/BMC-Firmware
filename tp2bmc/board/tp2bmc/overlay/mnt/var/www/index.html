@@ -21,7 +21,7 @@
   <link href="css/style.css" rel="stylesheet">
   <link href="css/css.css" rel="stylesheet">
 
-  <!--new css-->
+  <!-- new css -->
   <link rel="stylesheet" href="css/new/vendor/animate.css/animate.css">
   <link href="css/new/materialdesignicons.min.css" rel="stylesheet" type="text/css" />
   <link href="css/new/webfont.css" rel="stylesheet" type="text/css" />
@@ -46,16 +46,16 @@
   <!-- App css -->
   <!-- build:css -->
   <link href="css/new/app.css" rel="stylesheet" type="text/css" />
-  <!--new css end-->
+  <!-- new css end -->
 
-  <!--------------------------------- JQuery.JS ------------------------------------------------->
+  <!-- JQuery.JS -->
   <script src="js/jquery.min.js" type="text/javascript"></script>
 
-  <!--------------------------------- slider.js ---------------------------------------------->
+  <!-- slider.js -->
   <script src="js/new/ion.rangeSlider.min.js"></script>
   <script src="js/new/jquery.range-sliders.js"></script>
 
-  <!--------------------------------- Function ------------------------------------------------->
+  <!-- Function -->
   <script src="js/new/m_page_disp.js" type="text/javascript"></script>
 </head>
 
@@ -137,8 +137,7 @@
                       <label for="inputEmail3" class="col-sm-2 col-form-label">Node 1:</label>
                       <div class="col-sm-7">
                         <div class="switchery-demo">
-                          <input type="checkbox" id="node1Power" data-plugin="switchery" data-color="#008000"
-                            data-size="small" />
+                          <input type="checkbox" id="node1Power" data-plugin="switchery" data-color="#008000" data-size="small" />
                         </div>
                       </div>
                     </div>
@@ -147,8 +146,7 @@
                       <label for="inputEmail3" class="col-sm-2 col-form-label">Node 2:</label>
                       <div class="col-sm-7">
                         <div class="switchery-demo">
-                          <input type="checkbox" id="node2Power" data-plugin="switchery" data-color="#008000"
-                            data-size="small" />
+                          <input type="checkbox" id="node2Power" data-plugin="switchery" data-color="#008000" data-size="small" />
                         </div>
                       </div>
                     </div>
@@ -157,8 +155,7 @@
                       <label for="inputEmail3" class="col-sm-2 col-form-label">Node 3:</label>
                       <div class="col-sm-7">
                         <div class="switchery-demo">
-                          <input type="checkbox" id="node3Power" data-plugin="switchery" data-color="#008000"
-                            data-size="small" />
+                          <input type="checkbox" id="node3Power" data-plugin="switchery" data-color="#008000" data-size="small" />
                         </div>
                       </div>
                     </div>
@@ -167,8 +164,7 @@
                       <label for="inputEmail3" class="col-sm-2 col-form-label">Node 4:</label>
                       <div class="col-sm-7">
                         <div class="switchery-demo">
-                          <input type="checkbox" id="node4Power" data-plugin="switchery" data-color="#008000"
-                            data-size="small" />
+                          <input type="checkbox" id="node4Power" data-plugin="switchery" data-color="#008000" data-size="small" />
                         </div>
                       </div>
                     </div>
@@ -337,16 +333,21 @@
                   <form method="post" action="/api/bmc?opt=set&type=firmware" enctype="multipart/form-data">
                     <input type="hidden">
                     <table border="0">
-                        <tr><td>Upgrade file:</td><td><input type="file" name="file"></td></tr>
+                      <tr>
+                        <td>Upgrade file:</td>
+                        <td>
+                          <input type="file" name="file">
+                        </td>
+                      </tr>
                     </table>
                     <div class="form-group row">
                       <div class="col-sm-12 " style="text-align: left;left: 250px;">
                         <button type="submit" class="btn btn-outline-danger btn-rounded w-md">Submit</button>
                       </div>
                     </div>
-                </form>
+                  </form>
 
-                <!-- <hr style="height:1px;border:none;border-top:1px dashed #666;" />
+                  <!-- <hr style="height:1px;border:none;border-top:1px dashed #666;" />
                 <br>
                 <div class="form-group row">
                   <label for="inputEmail3"  class="col-sm-2 col-form-label" ><script type="text/javascript">SYSTEM_DEVICE_UPGRADE</script></label>
@@ -355,7 +356,7 @@
                   </div>
                 </div> -->
 
-                <!-- <form role="form" id="form5">
+                  <!-- <form role="form" id="form5">
                   <label >Control !</label>
                   <div class="form-group row">
                     <label for="inputEmail3" class="col-sm-2 col-form-label">node1:</label>
@@ -382,10 +383,10 @@
     </div>
   </div>
 
-  <!--------------------------------- JS ------------------------------------------------->
+  <!-- JS -->
   <script src="js/bootstrap.min.js"></script>
 
-  <!--new js-->
+  <!-- new js -->
   <!-- jQuery  -->
   <script src="js/new/bootstrap.bundle.min.js"></script>
   <script src="js/new/jquery.slimscroll.min.js"></script>
@@ -422,11 +423,11 @@
   <!--new js end-->
 
   <script>
-    $(function () {
+    $(function() {
       var num = sessionStorage.getItem('fromAVNum');
       $('.aui_nav_list_box').find('li').eq(num).addClass('aui_current').siblings().removeClass('aui_current');
       $('.aui_nav_list_tab>div:eq(' + num + ')').show().siblings().hide();
-      $('.aui_nav_list_box li').click(function () {
+      $('.aui_nav_list_box li').click(function() {
         sessionStorage.setItem('fromAVNum', $(this).index());
         $(this).addClass('aui_current').siblings().removeClass('aui_current');
         $('.aui_nav_list_tab>div:eq(' + $(this).index() + ')').show().siblings().hide();
@@ -437,19 +438,19 @@
   <script type="text/javascript">
     $('#form1').parsley();
     $('#form2').parsley();
-    $("#form1").submit(function (e) {
+    $("#form1").submit(function(e) {
       C_setParamUsb();
     });
-    $("#form2").submit(function (e) {
+    $("#form2").submit(function(e) {
       C_setParamSdcard();
     });
-    $("#form3").submit(function (e) {
+    $("#form3").submit(function(e) {
       C_setParamPower();
     });
-    $("#form4").submit(function (e) {
+    $("#form4").submit(function(e) {
       C_setParamResetNetwork();
     });
-    $("#form5").submit(function (e) {
+    $("#form5").submit(function(e) {
       C_setParamFirmware();
     });
 
