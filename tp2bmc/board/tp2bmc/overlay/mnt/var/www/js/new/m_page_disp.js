@@ -4,12 +4,6 @@ function page_changeSwitchery(element, checked) {
   }
 }
 
-function page_changeCheckbox(element, checked) {
-  if ((element.is(':checked') && checked == false) || (!element.is(':checked') && checked == true)) {
-    element.trigger('click');
-  }
-}
-
 function bool2int(val) {
   if (val == false)
     return 0;
@@ -24,14 +18,12 @@ function oth2bool(val) {
     return true;
 }
 
-//CB : http req  get result
 function C_setCBResuleParseDisp(json) {
   var Result;
   if (json == "urlerr") {
     sessionStorage.setItem('Notification', 'err');
   }
   else {
-
     $.each(json, function (index, item) {
       Result = json[index][0].result;
     });
@@ -57,17 +49,7 @@ function C_Notification() {
   //sessionStorage.clear();       // modify by wenyi
 }
 
-function C_NotificationImage() {
-  if (sessionStorage.getItem('Notification') == "err") {
-    $.NotificationApp.send("info", "save err.", 'top-center', '#1ea69a', 'error', 2000, 1, 'slide');
-  }
-
-  sessionStorage.removeItem('Notification');
-  //sessionStorage.clear();       // modify by wenyi
-}
-
 function page_http_req_get(uUrl, lType) {
-  //alert(uUrl);
   $.ajax({
     url: '' + uUrl + '',
     type: 'GET',
@@ -84,17 +66,13 @@ function page_http_req_get(uUrl, lType) {
   }
 
   function erryFunction() {
-    console.error("ajax url=%s", uUrl);
     alert("page get error");
   }
 
   function succFunction(uStr) {
-    //$("#list").val("");
-
-    // console.log('page_http_req_get type = %s',lType);
     var response = eval(uStr);
     var json = response["response"][0];
-    // console.log(json);
+
     if (lType == 'usb')
       C_getCBResuleParseUSBDisp(json);
     else if (lType == 'sdcard')
@@ -129,11 +107,9 @@ function page_http_req_set(uUrl, lType) {
     // alert('page set error1');    //modify by wenyi
     console.log("ajax post error");
     C_setCBResuleParseDisp("urlerr");
-    //alert("set error");
   }
 
   function succFunction(uStr) {
-    //$("#list").val("");
     var json = eval(uStr);
     C_setCBResuleParseDisp(json);
   }
