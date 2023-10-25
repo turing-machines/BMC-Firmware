@@ -53,14 +53,9 @@ function page_http_req_get(uUrl, lType) {
     dataType: 'text',
     timeout: 5000,
     cache: false,
-    beforeSend: LoadFunction,
     error: erryFunction,
     success: succFunction
   })
-
-  function LoadFunction() {
-    //$(".list").html('load.......');
-  }
 
   function erryFunction() {
     alert("page get error");
@@ -91,14 +86,9 @@ function page_http_req_set(uUrl, lType) {
     timeout: 5000,
     cache: false,
     async: false,
-    beforeSend: LoadFunction,
     error: erryFunction,
     success: succFunction
   })
-
-  function LoadFunction() {
-    //$(".list").html('load.......');
-  }
 
   function erryFunction() {
     // alert('page set error1');    //modify by wenyi
