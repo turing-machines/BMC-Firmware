@@ -1,460 +1,505 @@
 <!DOCTYPE html>
 <html lang="en-US" class="configure">
+
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <meta http-equiv="Expires" content="0">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Cache-control" content="no-cache">
-  <meta http-equiv="Cache" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
 
-  <title>Turing Pi config</title>
+    <title>Turing Pi config</title>
 
-  <!--[if lt IE 9]>
-      <script src="./js/html5shiv.min.js"></script>
-      <script src="./js/respond.min.js"></script>
-    <![endif]-->
+    <!--[if lt IE 9]>
+            <script src="./js/html5shiv.min.js"></script>
+            <script src="./js/respond.min.js"></script>
+        <![endif]-->
 
-  <link href="css/style.css" rel="stylesheet">
-  <link href="css/css.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <link href="css/css.css" rel="stylesheet">
 
-  <!-- new css -->
-  <link rel="stylesheet" href="css/new/vendor/animate.css/animate.css">
-  <link href="css/new/materialdesignicons.min.css" rel="stylesheet" type="text/css" />
-  <link href="css/new/webfont.css" rel="stylesheet" type="text/css" />
-  <link href="css/new/simple-line-icons.css" rel="stylesheet" type="text/css" />
+    <!-- new css -->
+    <link rel="stylesheet" href="css/new/vendor/animate.css/animate.css">
+    <link href="css/new/materialdesignicons.min.css" rel="stylesheet" type="text/css" />
+    <link href="css/new/webfont.css" rel="stylesheet" type="text/css" />
+    <link href="css/new/simple-line-icons.css" rel="stylesheet" type="text/css" />
 
-  <link href="css/new/select2.min.css" rel="stylesheet" type="text/css" />
-  <link href="css/new/bootstrap-tagsinput.css" rel="stylesheet" />
-  <link href="css/new/switchery.min.css" rel="stylesheet">
-  <link href="css/new/bootstrap-select.min.css" rel="stylesheet" />
-  <link href="css/new/bootstrap-timepicker.min.css" rel="stylesheet" />
-  <link href="css/new/bootstrap-colorpicker.min.css" rel="stylesheet" />
-  <link href="css/new/bootstrap-datepicker.min.css" rel="stylesheet" />
-  <link href="css/new/daterangepicker.css" rel="stylesheet" />
+    <link href="css/new/select2.min.css" rel="stylesheet" type="text/css" />
+    <link href="css/new/bootstrap-tagsinput.css" rel="stylesheet" />
+    <link href="css/new/switchery.min.css" rel="stylesheet">
+    <link href="css/new/bootstrap-select.min.css" rel="stylesheet" />
+    <link href="css/new/bootstrap-timepicker.min.css" rel="stylesheet" />
+    <link href="css/new/bootstrap-colorpicker.min.css" rel="stylesheet" />
+    <link href="css/new/bootstrap-datepicker.min.css" rel="stylesheet" />
+    <link href="css/new/daterangepicker.css" rel="stylesheet" />
 
-  <!-- Toastr css -->
-  <link href="css/new/jquery.toast.min.css" rel="stylesheet" />
+    <!-- Toastr css -->
+    <link href="css/new/jquery.toast.min.css" rel="stylesheet" />
 
-  <!-- ION Slider -->
-  <link href="css/new/ion.rangeSlider.css" rel="stylesheet" type="text/css" />
-  <link href="css/new/ion.rangeSlider.skinFlat.css" rel="stylesheet" type="text/css" />
+    <!-- ION Slider -->
+    <link href="css/new/ion.rangeSlider.css" rel="stylesheet" type="text/css" />
+    <link href="css/new/ion.rangeSlider.skinFlat.css" rel="stylesheet" type="text/css" />
 
-  <!-- App css -->
-  <!-- build:css -->
-  <link href="css/new/app.css" rel="stylesheet" type="text/css" />
-  <!-- new css end -->
+    <!-- App css -->
+    <!-- build:css -->
+    <link href="css/new/app.css" rel="stylesheet" type="text/css" />
+    <!-- new css end -->
 
-  <!-- JQuery.JS -->
-  <script src="js/jquery.min.js" type="text/javascript"></script>
+    <!-- JQuery.JS -->
+    <script src="js/jquery.min.js" type="text/javascript"></script>
 
-  <!-- slider.js -->
-  <script src="js/new/ion.rangeSlider.min.js"></script>
-  <script src="js/new/jquery.range-sliders.js"></script>
+    <!-- slider.js -->
+    <script src="js/new/ion.rangeSlider.min.js"></script>
+    <script src="js/new/jquery.range-sliders.js"></script>
 
-  <!-- Function -->
-  <script src="js/new/m_page_disp.js" type="text/javascript"></script>
+    <!-- Function -->
+    <script src="js/new/m_page_disp.js" type="text/javascript"></script>
 </head>
 
 <body onload="C_getParamAll()">
-  <div class="animated fadeInUp" style="position: absolute; left: 10px; top: 10px; width: 100%;">
-    <div class="content_box clearfix">
-      <div class="aui_nav_content_box">
-        <div class="aui_nav_list_box">
-          <ul class="clearfix">
-            <li class="aui_current">
-              <a href="javascript:;">USB</a>
-            </li>
-            <li class="aui_current">
-              <a href="javascript:;">Power</a>
-            </li>
-            <li class="aui_current">
-              <a href="javascript:;">Node Info</a>
-            </li>
-            <li>
-              <a href="javascript:;">SD Card</a>
-            </li>
-            <li>
-              <a href="javascript:;">Other</a>
-            </li>
-            <li>
-              <a href="javascript:;">Update</a>
-            </li>
-          </ul>
+    <div class="animated fadeInUp" style="position: absolute; left: 10px; top: 10px; width: 100%;">
+        <div class="content_box clearfix">
+            <div class="aui_nav_content_box">
+                <div class="aui_nav_list_box">
+                    <ul class="clearfix">
+                        <li class="aui_current">
+                            <a href="javascript:;">USB</a>
+                        </li>
+                        <li class="aui_current">
+                            <a href="javascript:;">Power</a>
+                        </li>
+                        <li class="aui_current">
+                            <a href="javascript:;">Node Info</a>
+                        </li>
+                        <li>
+                            <a href="javascript:;">SD Card</a>
+                        </li>
+                        <li>
+                            <a href="javascript:;">Other</a>
+                        </li>
+                        <li>
+                            <a href="javascript:;">Firmware Upgrade</a>
+                        </li>
+                        <li>
+                            <a href="javascript:;">Flash Node</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="aui_nav_list_tab">
+                    <div class="aui_nav_list_item">
+                        <ul>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <form role="form" id="form1">
+                                        <div class="form-group row">
+                                            <label for="inputEmail3" class="col-sm-2 col-form-label">USB mode:</label>
+                                            <div class="col-sm-7">
+                                                <select id="usbMode" class="selectpicker"
+                                                    data-style="btn-outline-primary">
+                                                    <option value="0">Host</option>
+                                                    <option value="1">Device</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group row">
+                                            <label for="inputEmail3" class="col-sm-2 col-form-label">Connected
+                                                node:</label>
+                                            <div class="col-sm-7">
+                                                <select id="usbNode" class="selectpicker"
+                                                    data-style="btn-outline-primary">
+                                                    <option value="0">Node 1</option>
+                                                    <option value="1">Node 2</option>
+                                                    <option value="2">Node 3</option>
+                                                    <option value="3">Node 4</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group row">
+                                            <div class="col-sm-12 " style="text-align: left;left: 250px;">
+                                                <button type="submit"
+                                                    class="btn btn-outline-danger btn-rounded w-md">Submit</button>
+                                                <!-- <button type="reset" class="btn btn-outline-secondary btn-rounded w-md">Reset</button> -->
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </ul>
+                    </div>
+
+                    <div class="aui_nav_list_item" style="display: none;">
+                        <ul>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <form role="form" id="form3">
+                                        <label>Control the power supply of connected nodes</label>
+
+                                        <div class="form-group row">
+                                            <label for="inputEmail3" class="col-sm-2 col-form-label">Node 1:</label>
+                                            <div class="col-sm-7">
+                                                <div class="switchery-demo">
+                                                    <input type="checkbox" id="node1Power" data-plugin="switchery"
+                                                        data-color="#008000" data-size="small" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group row">
+                                            <label for="inputEmail3" class="col-sm-2 col-form-label">Node 2:</label>
+                                            <div class="col-sm-7">
+                                                <div class="switchery-demo">
+                                                    <input type="checkbox" id="node2Power" data-plugin="switchery"
+                                                        data-color="#008000" data-size="small" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group row">
+                                            <label for="inputEmail3" class="col-sm-2 col-form-label">Node 3:</label>
+                                            <div class="col-sm-7">
+                                                <div class="switchery-demo">
+                                                    <input type="checkbox" id="node3Power" data-plugin="switchery"
+                                                        data-color="#008000" data-size="small" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group row">
+                                            <label for="inputEmail3" class="col-sm-2 col-form-label">Node 4:</label>
+                                            <div class="col-sm-7">
+                                                <div class="switchery-demo">
+                                                    <input type="checkbox" id="node4Power" data-plugin="switchery"
+                                                        data-color="#008000" data-size="small" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group row">
+                                            <div class="col-sm-12 " style="text-align: left;left: 250px;">
+                                                <button type="submit"
+                                                    class="btn btn-outline-danger btn-rounded w-md">Submit</button>
+                                                <!-- <button type="reset" class="btn btn-outline-secondary btn-rounded w-md">Reset</button> -->
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </ul>
+                    </div>
+
+                    <!-- node info -->
+                    <div class="aui_nav_list_item" style="display: none;">
+                        <ul>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <form role="form" id="nodetype">
+                                        <label>Get the type of connected nodes via serial</label>
+
+                                        <!-- <label >TIPS:Enable to obtain node information using serial port!</label>
+                                                <div class="form-group row">
+                                                <label for="inputEmail3" class="col-sm-2 col-form-label">enable:</label>
+                                                <div class="col-sm-7">
+                                                <div class="switchery-demo">
+                                                <input type="checkbox" id="nodeInfoEn" data-plugin="switchery" data-color="#008000"
+                                                data-size="small" />
+                                                </div>
+                                                </div>
+                                                </div> -->
+
+                                        <div class="form-group row">
+                                            <label for="inputEmail3" class="col-sm-2 col-form-label">Node 1:</label>
+                                            <div class="col-sm-7">
+                                                <input type="text" id="node1type" class="form-control"
+                                                    disabled="true" />
+                                            </div>
+                                            <!-- <label for="inputEmail3" id="node1type" class="col-sm-2 col-form-label">unknown</label> -->
+                                        </div>
+
+                                        <div class="form-group row">
+                                            <label for="inputEmail3" class="col-sm-2 col-form-label">Node 2:</label>
+                                            <div class="col-sm-7">
+                                                <input type="text" id="node2type" class="form-control"
+                                                    disabled="true" />
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group row">
+                                            <label for="inputEmail3" class="col-sm-2 col-form-label">Node 3:</label>
+                                            <div class="col-sm-7">
+                                                <input type="text" id="node3type" class="form-control"
+                                                    disabled="true" />
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group row">
+                                            <label for="inputEmail3" class="col-sm-2 col-form-label">Node 4:</label>
+                                            <div class="col-sm-7">
+                                                <input type="text" id="node4type" class="form-control"
+                                                    disabled="true" />
+                                            </div>
+                                        </div>
+
+                                        <!-- <div class="form-group row">
+                                                    <div class="col-sm-12 " style="text-align: left;left: 250px;">
+                                                    <button type="submit" class="btn btn-outline-danger btn-rounded w-md">Submit</button>
+                                                    </div>
+                                                    </div> -->
+                                    </form>
+                                </div>
+                            </div>
+                        </ul>
+                    </div>
+
+                    <!-- sdcard -->
+                    <div class="aui_nav_list_item" style="display: none;">
+                        <ul>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <form role="form" id="form2">
+                                        <div class="form-group row">
+                                            <label for="inputEmail3" class="col-sm-2 col-form-label">Total:</label>
+                                            <div class="col-sm-7">
+                                                <input type="text" id="sdTotal" class="form-control" disabled="true" />
+                                            </div>
+                                            <label>B</label>
+                                        </div>
+
+                                        <div class="form-group row">
+                                            <label for="inputEmail3" class="col-sm-2 col-form-label">Used:</label>
+                                            <div class="col-sm-7">
+                                                <input type="text" id="sdUse" class="form-control" disabled="true" />
+                                            </div>
+                                            <label>B</label>
+                                        </div>
+
+                                        <div class="form-group row">
+                                            <label for="inputEmail3" class="col-sm-2 col-form-label">Free:</label>
+                                            <div class="col-sm-7">
+                                                <input type="text" id="sdFree" class="form-control" disabled="true" />
+                                            </div>
+                                            <label>B</label>
+                                        </div>
+
+                                        <!-- <div class="form-group row">
+                                                <div class="col-sm-12 " style="text-align: left;left: 250px;">
+                                                <button type="submit" class="btn btn-outline-danger btn-rounded w-md">format</button>
+                                                </div>
+                                                </div> -->
+                                    </form>
+                                </div>
+                            </div>
+                        </ul>
+                    </div>
+
+                    <!-- other -->
+                    <div class="aui_nav_list_item" style="display: none;">
+                        <ul>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <form role="form" id="form4">
+                                        <div class="form-group row">
+                                            <div class="col-sm-12 " style="text-align: left;left: 250px;">
+                                                <button type="submit"
+                                                    class="btn btn-outline-danger btn-rounded w-md">Reset
+                                                    network</button>
+                                                <!-- <button type="reset" class="btn btn-outline-secondary btn-rounded w-md">Reset</button> -->
+                                            </div>
+                                        </div>
+
+                                        <!-- <div id="result"></div> -->
+                                        <div class="form-group row">
+                                            <label for="inputEmail3" class="col-sm-2 col-form-label">Daemon
+                                                version:</label>
+                                            <div class="col-sm-7">
+                                                <div id="otherVer" class="col-sm-8 col-form-label"></div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="inputEmail3" class="col-sm-2 col-form-label">Build time:</label>
+                                            <div class="col-sm-7">
+                                                <div id="otherBuildtime" class="col-sm-8 col-form-label"></div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="inputEmail3" class="col-sm-2 col-form-label">IP address:</label>
+                                            <div class="col-sm-7">
+                                                <div id="otherIp" class="col-sm-8 col-form-label"></div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="inputEmail3" class="col-sm-2 col-form-label">MAC
+                                                address:</label>
+                                            <div class="col-sm-7">
+                                                <div id="otherMac" class="col-sm-8 col-form-label"></div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </ul>
+                    </div>
+                    <!-- this is additional styling which is only applied for the Firmware Upgrade
+                            tab and Image node Tab. -->
+                    <style>
+                        .force-tab-style {
+                            font-size: 1.8em;
+                        }
+
+                        .force-tab-style .progress {
+                            height: 1.5em;
+                            width: 100%;
+                        }
+
+                        #node-progress-group {
+                            display: none;
+                        }
+
+                        #firmware-progress-group {
+                            display: none;
+                        }
+                    </style>
+
+                    <!-- Firmware Upgrade -->
+                    <div id="firmware-upgrade-tab" class="force-tab-style aui_nav_list_item" style="display: none;">
+                        <label class="form-group row">BMC firmware
+                            upgrade</label>
+                        <form id="firmware-upgrade-form" class="form-group row">
+                            <label class="col-form-label
+                                        col-sm-2">File:</label><input id="firmware-upgrade-file-id" class="col-sm"
+                                type="file" name="file">
+                            <div class="col-sm">
+                                <button disabled type="submit" class="btn btn-outline-danger btn-rounded w-md">Upgrade
+                                    BMC</button>
+                            </div>
+                        </form>
+                        <br>
+                        <div id="firmware-progress-group" class="form-group row">
+                            <div class="progress">
+                                <div class="progress-bar bg-danger" role="progressbar" aria-valuenow="2"
+                                    aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <label class="form-group row">update text</label>
+                        </div>
+                    </div>
+
+                    <!-- Node Upgrade -->
+                    <div id="node-upgrade-tab" class="force-tab-style aui_nav_list_item" style="display: none;">
+                        <label class="row">Select an image-file that will be
+                            uploaded and written to the node. </label>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">Node:</label>
+                            <div class="col-sm">
+                                <select id="node-upgrade-picker" class="selectpicker" data-style="btn-outline-primary">
+                                    <option value="0">Node 1</option>
+                                    <option value="1">Node 2</option>
+                                    <option value="2">Node 3</option>
+                                    <option value="3">Node 4</option>
+                                </select>
+                            </div>
+                        </div>
+                        <form id="node-upgrade-form" class="form-group row">
+                            <label class="col-sm-2
+                                        col-form-label">File:</label><input id="node-upgrade-file-id" class="col-sm"
+                                type="file" name="file">
+                            <div class="col-sm">
+                                <button disabled type="submit" class="btn btn-outline-danger btn-rounded w-md">Upgrade
+                                    Node</button>
+                            </div>
+                        </form>
+                        <br>
+                        <div id="node-progress-group" class="form-group row">
+                            <div class="progress w-75">
+                                <div class="progress-bar bg-danger" role="progressbar" aria-valuenow="20"
+                                    aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <label class="form-group row">update text</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <div class="aui_nav_list_tab">
-          <div class="aui_nav_list_item">
-            <ul>
-              <div class="row">
-                <div class="col-lg-6">
-                  <form role="form" id="form1">
-                    <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">USB mode:</label>
-                      <div class="col-sm-7">
-                        <select id="usbMode" class="selectpicker" data-style="btn-outline-primary">
-                          <option value="0">Host</option>
-                          <option value="1">Device</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">Connected node:</label>
-                      <div class="col-sm-7">
-                        <select id="usbNode" class="selectpicker" data-style="btn-outline-primary">
-                          <option value="0">Node 1</option>
-                          <option value="1">Node 2</option>
-                          <option value="2">Node 3</option>
-                          <option value="3">Node 4</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div class="form-group row">
-                      <div class="col-sm-12 " style="text-align: left;left: 250px;">
-                        <button type="submit" class="btn btn-outline-danger btn-rounded w-md">Submit</button>
-                        <!-- <button type="reset" class="btn btn-outline-secondary btn-rounded w-md">Reset</button> -->
-                      </div>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </ul>
-          </div>
-
-          <div class="aui_nav_list_item" style="display: none;">
-            <ul>
-              <div class="row">
-                <div class="col-lg-6">
-                  <form role="form" id="form3">
-                    <label>Control the power supply of connected nodes</label>
-
-                    <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">Node 1:</label>
-                      <div class="col-sm-7">
-                        <div class="switchery-demo">
-                          <input type="checkbox" id="node1Power" data-plugin="switchery" data-color="#008000" data-size="small" />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">Node 2:</label>
-                      <div class="col-sm-7">
-                        <div class="switchery-demo">
-                          <input type="checkbox" id="node2Power" data-plugin="switchery" data-color="#008000" data-size="small" />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">Node 3:</label>
-                      <div class="col-sm-7">
-                        <div class="switchery-demo">
-                          <input type="checkbox" id="node3Power" data-plugin="switchery" data-color="#008000" data-size="small" />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">Node 4:</label>
-                      <div class="col-sm-7">
-                        <div class="switchery-demo">
-                          <input type="checkbox" id="node4Power" data-plugin="switchery" data-color="#008000" data-size="small" />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="form-group row">
-                      <div class="col-sm-12 " style="text-align: left;left: 250px;">
-                        <button type="submit" class="btn btn-outline-danger btn-rounded w-md">Submit</button>
-                        <!-- <button type="reset" class="btn btn-outline-secondary btn-rounded w-md">Reset</button> -->
-                      </div>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </ul>
-          </div>
-
-          <!-- node info -->
-          <div class="aui_nav_list_item" style="display: none;">
-            <ul>
-              <div class="row">
-                <div class="col-lg-6">
-                  <form role="form" id="nodetype">
-                    <label>Get the type of connected nodes via serial</label>
-
-                    <!-- <label >TIPS:Enable to obtain node information using serial port!</label>
-                    <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">enable:</label>
-                      <div class="col-sm-7">
-                        <div class="switchery-demo">
-                          <input type="checkbox" id="nodeInfoEn" data-plugin="switchery" data-color="#008000"
-                            data-size="small" />
-                        </div>
-                      </div>
-                    </div> -->
-
-                    <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">Node 1:</label>
-                      <div class="col-sm-7">
-                        <input type="text" id="node1type" class="form-control" disabled="true" />
-                      </div>
-                      <!-- <label for="inputEmail3" id="node1type" class="col-sm-2 col-form-label">unknown</label> -->
-                    </div>
-
-                    <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">Node 2:</label>
-                      <div class="col-sm-7">
-                        <input type="text" id="node2type" class="form-control" disabled="true" />
-                      </div>
-                    </div>
-
-                    <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">Node 3:</label>
-                      <div class="col-sm-7">
-                        <input type="text" id="node3type" class="form-control" disabled="true" />
-                      </div>
-                    </div>
-
-                    <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">Node 4:</label>
-                      <div class="col-sm-7">
-                        <input type="text" id="node4type" class="form-control" disabled="true" />
-                      </div>
-                    </div>
-
-                    <!-- <div class="form-group row">
-                      <div class="col-sm-12 " style="text-align: left;left: 250px;">
-                        <button type="submit" class="btn btn-outline-danger btn-rounded w-md">Submit</button>
-                      </div>
-                    </div> -->
-                  </form>
-                </div>
-              </div>
-            </ul>
-          </div>
-
-          <!-- sdcard -->
-          <div class="aui_nav_list_item" style="display: none;">
-            <ul>
-              <div class="row">
-                <div class="col-lg-6">
-                  <form role="form" id="form2">
-                    <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">Total:</label>
-                      <div class="col-sm-7">
-                        <input type="text" id="sdTotal" class="form-control" disabled="true" />
-                      </div>
-                      <label>B</label>
-                    </div>
-
-                    <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">Used:</label>
-                      <div class="col-sm-7">
-                        <input type="text" id="sdUse" class="form-control" disabled="true" />
-                      </div>
-                      <label>B</label>
-                    </div>
-
-                    <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">Free:</label>
-                      <div class="col-sm-7">
-                        <input type="text" id="sdFree" class="form-control" disabled="true" />
-                      </div>
-                      <label>B</label>
-                    </div>
-
-                    <!-- <div class="form-group row">
-                      <div class="col-sm-12 " style="text-align: left;left: 250px;">
-                        <button type="submit" class="btn btn-outline-danger btn-rounded w-md">format</button>
-                      </div>
-                    </div> -->
-                  </form>
-                </div>
-              </div>
-            </ul>
-          </div>
-
-          <!-- other -->
-          <div class="aui_nav_list_item" style="display: none;">
-            <ul>
-              <div class="row">
-                <div class="col-lg-6">
-                  <form role="form" id="form4">
-                    <div class="form-group row">
-                      <div class="col-sm-12 " style="text-align: left;left: 250px;">
-                        <button type="submit" class="btn btn-outline-danger btn-rounded w-md">Reset network</button>
-                        <!-- <button type="reset" class="btn btn-outline-secondary btn-rounded w-md">Reset</button> -->
-                      </div>
-                    </div>
-
-                    <!-- <div id="result"></div> -->
-                    <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">Daemon version:</label>
-                      <div class="col-sm-7">
-                        <div id="otherVer" class="col-sm-8 col-form-label"></div>
-                      </div>
-                    </div>
-                    <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">Build time:</label>
-                      <div class="col-sm-7">
-                        <div id="otherBuildtime" class="col-sm-8 col-form-label"></div>
-                      </div>
-                    </div>
-                    <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">IP address:</label>
-                      <div class="col-sm-7">
-                        <div id="otherIp" class="col-sm-8 col-form-label"></div>
-                      </div>
-                    </div>
-                    <div class="form-group row">
-                      <label for="inputEmail3" class="col-sm-2 col-form-label">MAC address:</label>
-                      <div class="col-sm-7">
-                        <div id="otherMac" class="col-sm-8 col-form-label"></div>
-                      </div>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </ul>
-          </div>
-
-          <!-- update -->
-          <div class="aui_nav_list_item" style="display: none;">
-            <ul>
-              <div class="row">
-                <div class="col-lg-6">
-                  <form method="post" action="/api/bmc?opt=set&type=firmware" enctype="multipart/form-data">
-                    <input type="hidden">
-                    <table border="0">
-                      <tr>
-                        <td>Upgrade file:</td>
-                        <td>
-                          <input type="file" name="file">
-                        </td>
-                      </tr>
-                    </table>
-                    <div class="form-group row">
-                      <div class="col-sm-12 " style="text-align: left;left: 250px;">
-                        <button type="submit" class="btn btn-outline-danger btn-rounded w-md">Submit</button>
-                      </div>
-                    </div>
-                  </form>
-
-                  <!-- <hr style="height:1px;border:none;border-top:1px dashed #666;" />
-                <br>
-                <div class="form-group row">
-                  <label for="inputEmail3"  class="col-sm-2 col-form-label" ><script type="text/javascript">SYSTEM_DEVICE_UPGRADE</script></label>
-                  <div class="col-sm-7">
-                    <button type="button" onclick="C_OnclickSetUpdate();" class="btn btn-outline-danger w-md"><script type="text/javascript">SYSTEM_UPGRADE_FILE</script></button>
-                  </div>
-                </div> -->
-
-                  <!-- <form role="form" id="form5">
-                  <label >Control !</label>
-                  <div class="form-group row">
-                    <label for="inputEmail3" class="col-sm-2 col-form-label">node1:</label>
-                    <div class="col-sm-7">
-                      <div class="switchery-demo">
-                        <input type="file" name="file"  data-color="#008000"
-                          data-size="small" />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="form-group row">
-                    <div class="col-sm-12 " style="text-align: left;left: 250px;">
-                      <button type="submit" class="btn btn-outline-danger btn-rounded w-md">Submit</button>
-                    </div>
-                  </div>
-                </form> -->
-                </div>
-              </div>
-            </ul>
-          </div>
-        </div>
-      </div>
     </div>
-  </div>
 
-  <!-- JS -->
-  <script src="js/bootstrap.min.js"></script>
+    <!-- JS -->
+    <script src="js/bootstrap.min.js"></script>
 
-  <!-- new js -->
-  <!-- jQuery  -->
-  <script src="js/new/bootstrap.bundle.min.js"></script>
-  <script src="js/new/jquery.slimscroll.min.js"></script>
+    <!-- new js -->
+    <!-- jQuery  -->
+    <script src="js/new/bootstrap.bundle.min.js"></script>
+    <script src="js/new/jquery.slimscroll.min.js"></script>
 
-  <!-- select2 js -->
-  <script src="js/new/select2.min.js"></script>
-  <script src="js/new/bootstrap-tagsinput.min.js"></script>
-  <script src="js/new/switchery.min.js"></script>
-  <script src="js/new/bootstrap-maxlength.min.js"></script>
+    <!-- select2 js -->
+    <script src="js/new/select2.min.js"></script>
+    <script src="js/new/bootstrap-tagsinput.min.js"></script>
+    <script src="js/new/switchery.min.js"></script>
+    <script src="js/new/bootstrap-maxlength.min.js"></script>
 
-  <!-- Mask input -->
-  <script src="js/new/jquery.mask.min.js"></script>
+    <!-- Mask input -->
+    <script src="js/new/jquery.mask.min.js"></script>
 
-  <!-- Bootstrap Select -->
-  <script src="js/new/bootstrap-select.min.js"></script>
-  <script src="js/new/bootstrap-timepicker.min.js"></script>
-  <script src="js/new/bootstrap-colorpicker.min.js"></script>
-  <script src="js/new/moment.js"></script>
-  <script src="js/new/bootstrap-datepicker.min.js"></script>
-  <script src="js/new/daterangepicker.js"></script>
+    <!-- Bootstrap Select -->
+    <script src="js/new/bootstrap-select.min.js"></script>
+    <script src="js/new/bootstrap-timepicker.min.js"></script>
+    <script src="js/new/bootstrap-colorpicker.min.js"></script>
+    <script src="js/new/moment.js"></script>
+    <script src="js/new/bootstrap-datepicker.min.js"></script>
+    <script src="js/new/daterangepicker.js"></script>
 
-  <!-- Toastr js -->
-  <script src="js/new/jquery.toast.min.js"></script>
-  <script src="js/new/jquery.toastr.js"></script>
+    <!-- Toastr js -->
+    <script src="js/new/jquery.toast.min.js"></script>
+    <script src="js/new/jquery.toastr.js"></script>
 
-  <!-- Init Js file -->
-  <script src="js/new/jquery.form-advanced.js"></script>
+    <!-- Init Js file -->
+    <script src="js/new/jquery.form-advanced.js"></script>
 
-  <!-- Parsley js -->
-  <script type="text/javascript" src="js/new/parsley.min.js"></script>
+    <!-- Parsley js -->
+    <script type="text/javascript" src="js/new/parsley.min.js"></script>
 
-  <script src="js/new/jquery.core.js"></script>
-  <script src="js/new/jquery.app.js"></script>
-  <!--new js end-->
+    <script src="js/new/jquery.core.js"></script>
+    <script src="js/new/jquery.app.js"></script>
+    <!--new js end-->
 
-  <script>
-    $(function() {
-      var num = sessionStorage.getItem('fromAVNum');
-      $('.aui_nav_list_box').find('li').eq(num).addClass('aui_current').siblings().removeClass('aui_current');
-      $('.aui_nav_list_tab>div:eq(' + num + ')').show().siblings().hide();
-      $('.aui_nav_list_box li').click(function() {
-        sessionStorage.setItem('fromAVNum', $(this).index());
-        $(this).addClass('aui_current').siblings().removeClass('aui_current');
-        $('.aui_nav_list_tab>div:eq(' + $(this).index() + ')').show().siblings().hide();
-      })
-    })
-  </script>
+    <script>
+        $(function () {
+            var num = sessionStorage.getItem('fromAVNum');
+            $('.aui_nav_list_box').find('li').eq(num).addClass('aui_current').siblings().removeClass('aui_current');
+            $('.aui_nav_list_tab>div:eq(' + num + ')').show().siblings().hide();
+            $('.aui_nav_list_box li').click(function () {
+                sessionStorage.setItem('fromAVNum', $(this).index());
+                $(this).addClass('aui_current').siblings().removeClass('aui_current');
+                $('.aui_nav_list_tab>div:eq(' + $(this).index() + ')').show().siblings().hide();
+            })
+        })
+    </script>
 
-  <script type="text/javascript">
-    $('#form1').parsley();
-    $('#form2').parsley();
-    $("#form1").submit(function(e) {
-      C_setParamUsb();
-    });
-    $("#form2").submit(function(e) {
-      C_setParamSdcard();
-    });
-    $("#form3").submit(function(e) {
-      C_setParamPower();
-    });
-    $("#form4").submit(function(e) {
-      C_setParamResetNetwork();
-    });
-    $("#form5").submit(function(e) {
-      C_setParamFirmware();
-    });
+    <script type="text/javascript">
+        $('#form1').parsley();
+        $('#form2').parsley();
+        $("#form1").submit(function (e) {
+            C_setParamUsb();
+        });
+        $("#form2").submit(function (e) {
+            C_setParamSdcard();
+        });
+        $("#form3").submit(function (e) {
+            C_setParamPower();
+        });
+        $("#form4").submit(function (e) {
+            C_setParamResetNetwork();
+        });
+        $("#form5").submit(function (e) {
+            C_setParamFirmware();
+        });
 
-    C_Notification();
-  </script>
+        C_Notification();
+    </script>
 </body>
+
 </html>

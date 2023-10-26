@@ -81,7 +81,7 @@ function page_http_req_get(uUrl, lType) {
 function page_http_req_set(uUrl, lType) {
   $.ajax({
     url: '' + uUrl + '',
-    type: 'POST',
+    type: 'GET',
     dataType: 'text',
     timeout: 5000,
     cache: false,
@@ -91,7 +91,6 @@ function page_http_req_set(uUrl, lType) {
   })
 
   function erryFunction() {
-    // alert('page set error1');    //modify by wenyi
     console.log("ajax post error");
     C_setCBResuleParseDisp("urlerr");
   }
@@ -233,4 +232,140 @@ function C_setParamSdcard() {
 function C_setParamFirmware() {
   var url = "/api/bmc?opt=set&type=firmware";
   page_http_req_set(url, 'firmware');
+}  
+
+function load_button_toggle_behavior(input, button) {
+    function toggle() {
+        if ($(input)[0].files.length > 0) {
+            $(button).removeAttr("disabled");
+        } else {
+            $(button).attr("disabled");
+        }
+    }
+
+    toggle();
+
+    $(input).on('event', function() {
+        toggle();
+  });
 }
+
+function get_request_handle(request_url) {
+    return new Promise(function(resolve) {
+        $.ajax({
+            url: request_url,
+            type: 'GET',
+            timeout: 5000,
+            dataType: "json",
+            success: function (data) {
+                resolve(data["handle"]);
+            }
+        });
+    });
+}
+
+function get_status(type) {
+    return new Promise(function(resolve, reject) {
+        var request_status = '/api/bmc?opt=get&type='+ type;
+        $.ajax({
+            url: request_status,
+            type: 'GET',
+            timeout: 5000,
+            dataType: "json",
+            success: function (data) {
+                if ("Error" in data) {
+                    reject(data["Error"]);
+                } else {
+                resolve(data);
+                }
+            },
+            error: function (error) {
+                reject(error);
+            },
+        });
+    });
+}
+
+function multipart_transfer(handle, form_data, progress_bar) {
+    return new Promise(function(resolve, reject) {
+        $.ajax({
+            url: "/api/bmc/upload/" + handle,
+            type: 'POST',
+            data: form_data,
+            processData: false,
+            contentType: false,
+            error: function (jqXHR, textStatus, errorThrown) {
+                reject(jqXHR.responseText);
+            },
+            success: function (data) {
+                resolve(data);
+            },
+            xhr: function () {
+                const xhr = new XMLHttpRequest();
+                // Add a progress callback for upload
+                xhr.upload.addEventListener("progress", function (e) {
+                    if (e.lengthComputable) {
+                        const percentComplete = (e.loaded / e.total) * 100;
+                        $(progress_bar).attr('aria-valuenow', percentComplete);
+                        console.log("Upload progress: " + percentComplete + "%");
+                    }
+                }, false);
+
+                return xhr;
+            }
+        });
+    });
+}
+
+const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
+async function wait_for_done(type) {
+    let state = await get_status(type);
+    while (!("Done" in state)) {
+        await sleep(1000);
+        console.log(state);
+        state = await get_status(type);
+    }
+        console.log(state);
+}
+
+async function upload_multipart_action(form, progress_group, type) {
+    let update_label = $(progress_group + " label");
+    $(form).on("submit", function(event) {
+        event.preventDefault(); 
+        $(progress_group).css('display', 'inline');
+
+        var request_transfer;
+        var file =  $(form + " input")[0].files[0];
+        if (type === "flash") {
+            var node = $("#node-upgrade-picker").val();
+            request_transfer = '/api/bmc?opt=set&type=flash&file=' + file.name + '&length=' + file.size + '&node=' + node;
+        } else if (type === "firmware") {
+            request_transfer = '/api/bmc?opt=set&type=firmware&file=' + file.name + '&length=' + file.size 
+        } else {
+            alert(type + " is not a option");
+        }
+
+        get_request_handle(request_transfer).then(function(handle) {
+            var formData = new FormData();
+            formData.append('file', file);
+            update_label.text("Transfering..");
+            return multipart_transfer(handle, formData, progress_group + " .progress-bar");
+        }).then(function() {
+            update_label.text("verify checksum, and finalizing upgrade..");
+            return wait_for_done(type);
+        }).then(function() {
+            update_label.text("Upgrade completed successful!");
+        }).catch(function(err) {
+            update_label.text("Upgrade failed: " + err);
+        });
+        $(form)[0].reset();
+    });
+}
+
+
+$(document).ready(function() {
+    load_button_toggle_behavior("#node-upgrade-file-id", "#node-upgrade-form button");
+    load_button_toggle_behavior("#firmware-upgrade-file-id", "#firmware-upgrade-form button");
+    upload_multipart_action("#node-upgrade-form", "#node-progress-group", "flash");
+    upload_multipart_action("#firmware-upgrade-form", "#firmware-progress-group", "firmware");
+});
