@@ -95,4 +95,6 @@ jobs:
           path: |
             buildroot/output/images/zImage
             buildroot/output/images/sun8iw20p1-t113-turingmachines-tp2bmc.dtb
+            buildroot/output/images/tp2-bmc-firmware-sdcard.img
+            buildroot/output/images/rootfs.erofs
 
