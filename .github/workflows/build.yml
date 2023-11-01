@@ -76,25 +76,28 @@ jobs:
       - name: conditional bmcd version injection
         if: inputs.bmcd_version != ''
         run: |
-         sed -ir 's#^TPI_RS_VERSION.*#TPI_RS_VERSION=${{ inputs.bmcd_version }}#g' ${{ github.workspace }}/tp2bmc/package/tpi_rs/tpi_rs.mk
+         sed -ir 's#^BMCD_VERSION.*#BMCD_VERSION=${{ inputs.bmcd_version }}#g' ${{ github.workspace }}/tp2bmc/package/bmcd/bmcd.mk
+
       - name: configure
         run: |
           cd buildroot
           make BR2_EXTERNAL=../tp2bmc tp2bmc_defconfig
 
-      - name: build
+      - name: build all
         run: |
           cd buildroot
           make
 
-      - name: upload
+      - name: stamp images
+        run: |
+          mkdir artifacts
+          mv buildroot/output/images/tp2-bmc-firmware-sdcard.img artifacts/tp2-firmware-sdcard-${{ env.BUILD_VERSION }}.img
+          mv buildroot/output/images/rootfs.erofs artifacts/tp2-ota-${{ env.BUILD_VERSION }}.tpu
+
+      - name: archive artifacts
         uses: actions/upload-artifact@v3
         with:
           if-no-files-found: error 
-          name: tp2-bmc-${{ env.BUILD_VERSION }}
-          path: |
-            buildroot/output/images/zImage
-            buildroot/output/images/sun8iw20p1-t113-turingmachines-tp2bmc.dtb
-            buildroot/output/images/tp2-bmc-firmware-sdcard.img
-            buildroot/output/images/rootfs.erofs
+          name: tp2-${{ env.BUILD_VERSION }}
+          path: artifacts/*
 
