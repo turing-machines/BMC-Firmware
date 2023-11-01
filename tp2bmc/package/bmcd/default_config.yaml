@@ -1,4 +1,0 @@
----
-tls:
-  certificate: /etc/ssl/certs/bmcd_cert.pem
-  private_key: /etc/ssl/certs/bmcd_key.pem
