@@ -61,7 +61,7 @@
 </head>
 
 <body onload="C_getParamAll()">
-    <div class="animated fadeInUp" style="position: absolute; left: 10px; top: 10px; width: 100%;">
+    <div class="animated fadeInUp">
         <div class="content_box clearfix">
             <div class="aui_nav_content_box">
                 <div class="aui_nav_list_box">
@@ -94,7 +94,7 @@
                     <div class="aui_nav_list_item">
                         <ul>
                             <div class="row">
-                                <div class="col-lg-6">
+                                <div class="col-lg-12">
                                     <form role="form" id="form1">
                                         <div class="form-group row">
                                             <label for="inputEmail3" class="col-sm-2 col-form-label">USB mode:</label>
@@ -137,7 +137,7 @@
                     <div class="aui_nav_list_item" style="display: none;">
                         <ul>
                             <div class="row">
-                                <div class="col-lg-6">
+                                <div class="col-lg-12">
                                     <form role="form" id="form3">
                                         <label>Control the power supply of connected nodes</label>
 
@@ -198,7 +198,7 @@
                     <div class="aui_nav_list_item" style="display: none;">
                         <ul>
                             <div class="row">
-                                <div class="col-lg-6">
+                                <div class="col-lg-12">
                                     <form role="form" id="nodetype">
                                         <label>Get the type of connected nodes via serial</label>
 
@@ -261,7 +261,7 @@
                     <div class="aui_nav_list_item" style="display: none;">
                         <ul>
                             <div class="row">
-                                <div class="col-lg-6">
+                                <div class="col-lg-12">
                                     <form role="form" id="form2">
                                         <div class="form-group row">
                                             <label for="inputEmail3" class="col-sm-2 col-form-label">Total:</label>
@@ -302,10 +302,10 @@
                     <div class="aui_nav_list_item" style="display: none;">
                         <ul>
                             <div class="row">
-                                <div class="col-lg-6">
+                                <div class="col-lg-12">
                                     <form role="form" id="form4">
                                         <div class="form-group row">
-                                            <div class="col-sm-12 " style="text-align: left;left: 250px;">
+                                            <div class="col-sm-12">
                                                 <button type="submit"
                                                     class="btn btn-outline-danger btn-rounded w-md">Reset
                                                     network</button>
@@ -391,9 +391,17 @@
 
                     <!-- Node Upgrade -->
                     <div id="node-upgrade-tab" class="force-tab-style aui_nav_list_item" style="display: none;">
-                        <label class="row">Select an image-file that will be
-                            uploaded and written to the node. </label>
+                        
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <label >Select an image-file that will be
+                                    uploaded and written to the node. </label>
+                            </div>
+                        </div>
+                        
+                    
                         <div class="form-group row">
+                            
                             <label class="col-sm-2 col-form-label">Node:</label>
                             <div class="col-sm">
                                 <select id="node-upgrade-picker" class="selectpicker" data-style="btn-outline-primary">
@@ -415,7 +423,7 @@
                         </form>
                         <br>
                         <div id="node-progress-group" class="form-group row">
-                            <div class="progress w-75">
+                            <div class="progress">
                                 <div class="progress-bar bg-danger" role="progressbar" aria-valuenow="20"
                                     aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
