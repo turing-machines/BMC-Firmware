@@ -1,0 +1,4 @@
+config BR2_PACKAGE_BMC_UI
+	bool "bmc-ui"
+	help
+	  Web pages of the BMC 
