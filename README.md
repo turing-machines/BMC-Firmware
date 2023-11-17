@@ -49,37 +49,114 @@ you can find more information on installing firmware.
 **We recently announced the v2 release of our firmware. The documentation pages will
 be updated as soon as v2 goes public.**
 
-## Build
+## Manual builds
 
-### Using Docker
+If you want to build the BMC firmware yourself, there is some preparation
+needed, which depends on your working environment.
 
-In the root of our repository there is a Dockerfile that can be used to build a
-development container. It has all the dependencies needed to build the firmware.
-We would recommend that you go through the official docker documentation. But if
-you want to quickly build and run it, execute the following commands in the root
-of your repository:
+The recommended way is to build using Docker, for that is a `Dockerfile` in the
+root directory of this repository, that can be used to build a development
+container. It has all the dependencies needed to build the firmware.
+
+> The build process needs approx. 5GB to 10GB disk space. On OSX you need that
+> amount of space reserved and free in the the LIMA VM of Docker or Rancher
+> Desktop.
+
+The build process uses [Buildroot](https://buildroot.org/) further documentation
+can be found [here](https://buildroot.org/downloads/manual/manual.html).
+
+### Using Docker on Linux
+
+We would recommend that you go through the official docker documentation for
+further details. If you want to quickly build and run it, execute the following
+commands in the root of your repository:
 
 ```shell
-# build the docker image
+# On the host: build the docker image
 docker build . -t tp_container
 
-# open the docker container
-docker run -it -v $PWD:$PWD --workdir $PWD tp_container
+# On the host: enter the container
+docker run -it --rm -v $PWD:/src -w /src/buildroot -u $(id -u):$(id -g) tp_container
+# NOTE: the shell prompt might be a bit garbled, this is fine
+#       the -u $(id -u):$(id -g) parameter ensures that the generated files
+#       are owned by your user
+
+# inside of the container: prepare buildroot
+make BR2_EXTERNAL=../tp2bmc tp2bmc_defconfig
+
+# build
+make
 ```
 
-Run the following command inside the docker container:
+### Using Docker on OSX
+
+Build of the BMC firmware is also possible here by using [Rancher
+Desktop](https://rancherdesktop.io) or [Docker
+Desktop](https://www.docker.com/products/docker-desktop/). The way Docker and
+directory forwarding into the is working on OSX we need some addition step in
+the manual build process. Those might not be needed for Docker Desktop, but
+strange issues might happen. So if unsure follow this guide, it also speeds up
+building on OSX significantly.
 
 ```shell
-cd buildroot
-make BR2_EXTERNAL=../tp2bmc tp2bmc_defconfig && make
+# On OSX shell: create container
+docker build . -t tp_container
+
+# On OSX shell: create a docker volume for building volume
+docker volume create turing-pi-bmc-firmware
+
+# On OSX shell: check out the repository in the volume
+docker run -it -v turing-pi-bmc-firmware:/src -w /src tp_container \
+  git clone https://github.com/turing-machines/BMC-Firmware.git
+
+# On OSX shell: enter the container
+docker run -it --rm -v turing-pi-bmc-firmware:/src -w /src/buildroot tp_container
+
+# inside of the container: prepare buildroot
+make BR2_EXTERNAL=../tp2bmc tp2bmc_defconfig
+
+# build
+make
 ```
 
-Once the build completed, both the SD card image and upgrade package
+> NOTE: Due to the ways this works the generated firmware files are on the
+> volume
+
+> NOTE: this steps also work on native Linux with Docker.
+
+> Q: Why do we need this on OSX? A: This is because on Docker Desktop and
+> Rancher Desktop on OSX use a remote filesystem via some tunneling mechanisms.
+> This does not resemble all needed POSIX capabilities, and leads to strange
+> errors and most likely non-working builds.
+
+### Build nativly on a Debian or Ubuntu-like host
+
+Currently, only X86 Linux build hosts are supported. They are
+required to have the following packages installed:
+
+```shell
+# install packages needed for build
+sudo apt-get -y install \
+  build-essential subversion git-core \
+  libncurses5-dev zlib1g-dev gawk flex quilt libssl-dev xsltproc \
+  libxml-parser-perl mercurial bzr ecj cvs unzip zlib1g-dev \
+  libstdc++6 libncurses-dev u-boot-tools mkbootimg
+
+# prepare buildroot
+make BR2_EXTERNAL=../tp2bmc tp2bmc_defconfig
+
+# build
+make
+```
+
+> NOTE: This might work on WSL on Windows with Ubuntu, too.
+
+Once the build completed, the SD card image and upgrade package
 (`rootfs.erofs`)
 can be found in the buildroot output folder, `buildroot/output/images/`.
 
 Both UI and `tpi` can be used to write the upgrade package to your board. When
-you try to upload the image via the firmware upgrade tab on the UI. You will
+you try to upload the image via the firmware upgrade tab on the UI, You will
 notice that the file extension is not matching the one the UI expects. You can
 ignore this, a `.tpu` image is nothing more than a rename of `rootfs.erofs`
 image. To smoothen the experience, you can decide to change the extension of the
