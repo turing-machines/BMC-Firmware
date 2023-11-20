@@ -1,17 +1,25 @@
 # Official Turing Pi BMC firmware
 
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/turing-machines/BMC-firmware/build.yml?branch=master&style=for-the-badge)
+![GitHub Workflow
+Status](https://img.shields.io/github/actions/workflow/status/turing-machines/BMC-firmware/build.yml?branch=master&style=for-the-badge)
 
-Welcome to the new home of the Turing Pi firmware. The Turing Pi is a compact AI
-& edge computing cluster purposed to run cloud stacks and AI inference at the
-edge. Find out more on our [website](turingpi.com).
+The Turing Pi is a compact AI & edge computing cluster purposed to run cloud
+stacks and AI inference at the edge. Find out more on our
+[website](turingpi.com).
 
-The firmware is based on a Linux 5.4 kernel and hosts a web interface
-with a REST API to control and manage the board. The packages
-[bmcd](https://www.github.com/turing-machines/bmcd) and
-[tpi](https://github.com/turing-machines/tpi) are part of the firmware and
-facilitate most of this functionality. We recommend reporting issues using the
-current BMC-Firmware repository for visibility reasons.
+The firmware is based on a Linux 5.4 kernel and hosts a web interface with a
+REST API to control and manage the board. The packages
+[bmcd](https://www.github.com/turing-machines/bmcd),
+[tpi](https://github.com/turing-machines/tpi) and
+[bmc-ui](https://github.com/turing-machines/BMC-UI) are part of the firmware and
+facilitate most of this functionality.
+
+## Reporting issues & requesting features
+
+It is recommended to use the issue tracker of the current BMC-Firmware repository
+to request features or submit bug reports. We are open to all feedback and
+improvements. We scan the dependent repositories regularly for activity, but for
+visibility reasons, we will mainly use the issue tracker of this repository.
 
 ## BMC chip specs
 
@@ -25,18 +33,21 @@ current BMC-Firmware repository for visibility reasons.
 
 ## Install firmware
 
-There are two ways to upgrade the firmware on your current board.
-1. Using the PhoenixSuit. It allows you to write an entirely new image on the
-board.
-2. Using an OTA package. This package can be uploaded to the board via the web
-UI. (This method does not update the kernel).
+>**Note: If you are running a firmware version lower than < v2.0.0, you must do
+>a one-time-only SD card upgrade to version v2.0.0.**
 
-The required images can be found in one of our release packages. get the latest
-[here](https://github.com/turing-machines/BMC-firmware/releases).
+>**Note 2: Prior to v2.0.0 a third-party tool 'PhoenixSuit' was required to
+>flash firmware. This tool is obsoleted, and only the methods described on our
+>website can be used to flash your board.**
+
+The latest firmware images can be found on the [release page](https://github.com/turing-machines/BMC-firmware/releases).
 
 On our
 [website](https://help.turingpi.com/hc/en-us/articles/8686945524893-Baseboard-Management-Controller-BMC-)
-you can find an elaborate manual on performing an update using both methods.
+you can find more information on installing firmware.
+
+**We recently announced the v2 release of our firmware. The documentation pages will
+be updated as soon as v2 goes public.**
 
 ## Manual builds
 
@@ -127,3 +138,14 @@ make
 ```
 
 > NOTE: This might work on WSL on Windows with Ubuntu, too.
+
+Once the build completed, the SD card image and upgrade package
+(`rootfs.erofs`)
+can be found in the buildroot output folder, `buildroot/output/images/`.
+
+Both UI and `tpi` can be used to write the upgrade package to your board. When
+you try to upload the image via the firmware upgrade tab on the UI, You will
+notice that the file extension is not matching the one the UI expects. You can
+ignore this, a `.tpu` image is nothing more than a rename of `rootfs.erofs`
+image. To smoothen the experience, you can decide to change the extension of the
+file to `.tpu`.
