@@ -43,11 +43,8 @@ visibility reasons, we will mainly use the issue tracker of this repository.
 The latest firmware images can be found on the [release page](https://github.com/turing-machines/BMC-firmware/releases).
 
 On our
-[website](https://help.turingpi.com/hc/en-us/articles/8686945524893-Baseboard-Management-Controller-BMC-)
+[website](https://docs.turingpi.com/docs/turing-pi2-bmc-firmware-upgrade)
 you can find more information on installing firmware.
-
-**We recently announced the v2 release of our firmware. The documentation pages will
-be updated as soon as v2 goes public.**
 
 ## Manual builds
 
