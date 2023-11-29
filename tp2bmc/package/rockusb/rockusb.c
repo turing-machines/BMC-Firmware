@@ -18,6 +18,7 @@
 #include <scsi/scsi.h>
 #include <scsi/scsi_cmnd.h>
 #include <scsi/scsi_device.h>
+#include <scsi/scsi_eh.h>
 
 #include "usb.h"
 #include "transport.h"
@@ -65,28 +66,24 @@ static void rockusb_command(struct scsi_cmnd *srb, struct us_data *us)
 	{
 		unsigned long capacity;
 		struct flash_info flinfo;
-		struct scsi_data_buffer sdb;
-		struct scatterlist sgl;
+		struct scsi_eh_save ses;
+		int tmp_result;
 
 		/* Rewrite into a READ FLASH INFO command */
-		srb->cmnd[0] = OP_READ_FLASH_INFO;
+		scsi_eh_prep_cmnd(srb, &ses, NULL, 0, sizeof(flinfo));
 		srb->cmd_len = 0x06;
+		srb->cmnd[0] = OP_READ_FLASH_INFO;
 
-		/* Temporarily replace data pointer with &flinfo */
-		sdb = srb->sdb;
-		memset(&srb->sdb, 0, sizeof(srb->sdb));
-		sg_init_one(&sgl, &flinfo, sizeof(flinfo));
-		srb->sdb.table.sgl = &sgl;
-		srb->sdb.table.nents = srb->sdb.table.orig_nents = 1;
-		srb->sdb.length = sizeof(flinfo);
+		/* Fire off the command, restore old SRB */
+		usb_stor_transparent_scsi_command(srb, us);
+		memcpy(&flinfo, srb->sense_buffer, sizeof(flinfo));
+		tmp_result = srb->result;
+		scsi_eh_restore_cmnd(srb, &ses);
 
-		if (usb_stor_Bulk_transport(srb, us) != USB_STOR_TRANSPORT_GOOD) {
-			srb->sdb = sdb;
+		if (tmp_result != SAM_STAT_GOOD) {
 			srb->result = DID_ERROR << 16;
 			break;
 		}
-
-		srb->sdb = sdb;
 
 		capacity = le32_to_cpu(flinfo.flash_size);
 
