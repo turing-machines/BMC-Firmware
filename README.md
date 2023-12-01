@@ -5,7 +5,7 @@ Status](https://img.shields.io/github/actions/workflow/status/turing-machines/BM
 
 The Turing Pi is a compact AI & edge computing cluster purposed to run cloud
 stacks and AI inference at the edge. Find out more on our
-[website](turingpi.com).
+[website](https://turingpi.com).
 
 The firmware is based on a Linux 5.4 kernel and hosts a web interface with a
 REST API to control and manage the board. The packages
