@@ -59,8 +59,11 @@ container. It has all the dependencies needed to build the firmware.
 > amount of space reserved and free in the the LIMA VM of Docker or Rancher
 > Desktop.
 
-The build process uses [Buildroot](https://buildroot.org/) further documentation
+The build process uses [Buildroot](https://buildroot.org/) for further documentation
 can be found [here](https://buildroot.org/downloads/manual/manual.html).
+Buildroot is not included in this repository and needs to be downloaded once
+before building. We included a script (`setup_build.sh`) that does everything
+for you. Be aware that this script must be rerun when the buildroot version is updated.
 
 ### Using Docker on Linux
 
