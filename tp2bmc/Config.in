@@ -4,4 +4,5 @@ menu "tpi2 app packages"
 	source "$BR2_EXTERNAL_TP2BMC_PATH/package/bmc_installer/Config.in"
 	source "$BR2_EXTERNAL_TP2BMC_PATH/package/rockusb/Config.in"
 	source "$BR2_EXTERNAL_TP2BMC_PATH/package/tpi/Config.in"
+	source "$BR2_EXTERNAL_TP2BMC_PATH/package/raspberrypi-target-usbboot/Config.in"
 endmenu
