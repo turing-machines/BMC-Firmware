@@ -1,8 +1,17 @@
 #!/bin/bash
+#
+# This script downloads, unpacks and installs the buildroot system to a given
+# location. The default install location will be used when no install dir is
+# passed, this is the root directory of this repository.
+#
+# Usage:
+#
+#   ./setup_build.sh <install dir> (optional)
+#
 
 download_dir=$(mktemp -d)
 install_dir="$1"
-buildroot_url='https://buildroot.org/downloads/buildroot-2023.08.tar.gz'
+buildroot_url='https://buildroot.org/downloads/buildroot-2023.11.tar.gz'
 buildroot=$(basename "$buildroot_url")
 buildroot_folder="${buildroot%.tar.gz}"
 project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
