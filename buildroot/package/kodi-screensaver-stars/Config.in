@@ -1,6 +1,0 @@
-config BR2_PACKAGE_KODI_SCREENSAVER_STARS
-	bool "kodi-screensaver-stars"
-	help
-	  Starfield screensaver for Kodi
-
-	  https://github.com/xbmc/screensaver.stars

@@ -1,7 +1,0 @@
-# Locally calculated
-sha256  53caea73e6bdf234cb445067be3bc4e07ed59af7da967638ac598188b719958e  qtquickcontrols2-74e8db97fdb9b55c4b4614b83f4bf17e00df55e9.tar.bz2
-
-# Hashes for license files:
-sha256  d2cfc059acb4abd8e513cd0a73cd8489f34cbafa7bc34d5d31fb3210821cf8ca  LICENSE.GPLv3
-sha256  9e63a04ce021b8bf811b30881fa51c8c3db88afeead942cd59322f2fb69c75bc  LICENSE.LGPLv3
-sha256  ed8742a95cb9db653a09b050e27ccff5e67ba69c14aa2c3137f2a4e1892f6c0d  LICENSE.FDL

@@ -1,6 +1,0 @@
-config BR2_PACKAGE_PYTHON_TOMLI
-	bool "python-tomli"
-	help
-	  A lil' TOML parser.
-
-	  https://github.com/hukkin/tomli

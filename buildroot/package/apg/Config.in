@@ -1,6 +1,0 @@
-config BR2_PACKAGE_APG
-	bool "apg"
-	help
-	  Automated Password Generator (APG).
-
-	  https://github.com/wilx/apg

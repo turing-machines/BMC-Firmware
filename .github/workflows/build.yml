@@ -67,6 +67,7 @@ jobs:
           image: buildroot_local:latest
           options: -v ${{ github.workspace }}:/work
           run: |
+            /work/setup_build.sh
             cd /work/buildroot
             make BR2_EXTERNAL=../tp2bmc tp2bmc_defconfig
             make

@@ -1,5 +1,0 @@
-# From https://sourceforge.net/projects/lcms/files/lcms/2.15
-sha1  b143ff29b03676119dbca30f13cbed72af15cce8  lcms2-2.15.tar.gz
-# Locally computed:
-sha256  b20cbcbd0f503433be2a4e81462106fa61050a35074dc24a4e356792d971ab39  lcms2-2.15.tar.gz
-sha256  46d4e05af3bce75332a12d01f19bcce7e32b6bac544be28a64043d0231291e31  COPYING

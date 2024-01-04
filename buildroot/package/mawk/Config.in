@@ -1,6 +1,0 @@
-config BR2_PACKAGE_MAWK
-	bool "mawk"
-	help
-	  Interpreter for the AWK Programming Language.
-
-	  http://invisible-island.net/mawk/mawk.html

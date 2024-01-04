@@ -1,5 +1,0 @@
-# From https://lists.x.org/archives/xorg-announce/2023-May/003395.html
-sha256  7064b513ffe33efa040577c4d355ce2c76ed218989ab38feb8972750d5acbc46  xf86-video-i128-1.4.1.tar.xz
-sha512  ec6b4dd9092292b5aabff7cf477090fe62c89944d251689817ac8114a65672f85880b719a442f4c742d63dc2d6c61ec315e53da5b5c625074d1aa0b9ace8e865  xf86-video-i128-1.4.1.tar.xz
-# Locally computed
-sha256  7677424d79633dbf255a81bd4e05dd621931b89997af33c31522269ec2ed391e  COPYING

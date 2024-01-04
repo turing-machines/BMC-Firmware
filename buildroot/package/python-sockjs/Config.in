@@ -1,7 +1,0 @@
-config BR2_PACKAGE_PYTHON_SOCKJS
-	bool "python-sockjs"
-	select BR2_PACKAGE_PYTHON_AIOHTTP # runtime
-	help
-	  SockJS server implementation for aiohttp.
-
-	  https://github.com/aio-libs/sockjs/

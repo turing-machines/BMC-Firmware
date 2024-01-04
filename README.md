@@ -73,12 +73,14 @@ commands in the root of your repository:
 docker build . -t tp_container
 
 # On the host: enter the container
-docker run -it --rm -v $PWD:/src -w /src/buildroot -u $(id -u):$(id -g) tp_container
+docker run -it --rm -v $PWD:/src -w /src -u $(id -u):$(id -g) tp_container
 # NOTE: the shell prompt might be a bit garbled, this is fine
 #       the -u $(id -u):$(id -g) parameter ensures that the generated files
 #       are owned by your user
 
 # inside of the container: prepare buildroot
+setup_build.sh
+cd buildroot
 make BR2_EXTERNAL=../tp2bmc tp2bmc_defconfig
 
 # build
@@ -107,9 +109,11 @@ docker run -it -v turing-pi-bmc-firmware:/src -w /src tp_container \
   git clone https://github.com/turing-machines/BMC-Firmware.git
 
 # On OSX shell: enter the container
-docker run -it --rm -v turing-pi-bmc-firmware:/src -w /src/buildroot tp_container
+docker run -it --rm -v turing-pi-bmc-firmware:/src -w /src tp_container
 
 # inside of the container: prepare buildroot
+setup_build.sh
+cd buildroot
 make BR2_EXTERNAL=../tp2bmc tp2bmc_defconfig
 
 # build
@@ -140,6 +144,8 @@ sudo apt-get -y install \
   libstdc++6 libncurses-dev u-boot-tools mkbootimg
 
 # prepare buildroot
+setup_build.sh
+cd buildroot
 make BR2_EXTERNAL=../tp2bmc tp2bmc_defconfig
 
 # build

@@ -1,6 +1,0 @@
-config BR2_PACKAGE_PYTHON_AIORWLOCK
-	bool "python-aiorwlock"
-	help
-	  Read write lock for asyncio.
-
-	  https://github.com/aio-libs/aiorwlock

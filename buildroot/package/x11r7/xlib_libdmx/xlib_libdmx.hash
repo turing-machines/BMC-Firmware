@@ -1,5 +1,0 @@
-# From https://lists.x.org/archives/xorg-announce/2023-June/003403.html
-sha256  35a4e26a8b0b2b4fe36441dca463645c3fa52d282ac3520501a38ea942cbf74f  libdmx-1.1.5.tar.xz
-sha512  55df45a06bddbf19e0253362853e2f979d736ba1f1fdec5d392c0f6c0dc72684e7b8df0f0a99ac96ce9d9d59bc6c25146086b18c054b4dbe6be9aa3166f23464  libdmx-1.1.5.tar.xz
-# Locally computed
-sha256  819e8dcd3dd2a44850c350331aa492230f86bccb0983dd739dec5ba36d7d2b8e  COPYING

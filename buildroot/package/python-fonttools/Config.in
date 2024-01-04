@@ -1,6 +1,0 @@
-config BR2_PACKAGE_PYTHON_FONTTOOLS
-	bool "python-fonttools"
-	help
-	  Tools to manipulate font files.
-
-	  https://github.com/fonttools/fonttools

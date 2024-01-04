@@ -1,5 +1,0 @@
-# From https://lists.x.org/archives/xorg-announce/2023-April/003386.html
-sha256  c8c8bb56d3f6227c97e59c3a3c85a25133584ceb82ab5bc05a902a743ab7bf6d  xf86-video-ati-22.0.0.tar.xz
-sha512  fba9ffc7b0eeb0c369eb1a6f8ef0bb3061cfeca26bc269baf6e3d16dcd943fbf4092f1e37adfb1bc71051cee0b7a0e6fb253f0b8bcd210732ccaf99e8f2356fe  xf86-video-ati-22.0.0.tar.xz
-# Locally computed
-sha256  58847c8e97190c401afa84b3f0b8b147379c876a184e99af2cb51bfd40ac8936  COPYING

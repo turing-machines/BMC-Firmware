@@ -1,5 +1,0 @@
-# From https://lists.x.org/archives/xorg-announce/2023-June/003400.html
-sha256  dc121b84947eb4a3d1131bff1e9844cfa2124d95b47b35f9932340fa931fbd3f  xwd-1.0.9.tar.xz
-sha512  ae59661b05160f5658920fd79031b6b8548cb7bbfc734194edb0acef5c95f76b210ca4443e9506fc1a0cb9df47ee7c22948502971afe578b44c75aa2a1138d56  xwd-1.0.9.tar.xz
-# Locally computed
-sha256  7cfda56afd92a1ecd2f23bd0064e01b5141053390d854785504adfe2c0fbd946  COPYING

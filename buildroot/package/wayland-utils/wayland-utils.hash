@@ -1,4 +1,0 @@
-# From https://lists.freedesktop.org/archives/wayland-devel/2023-June/042736.html
-sha256  d9278c22554586881802540751bcc42569262bf80cd9ac9b0fd12ff4bd09a9e4  wayland-utils-1.2.0.tar.xz
-sha512  dc69a2d88215b54486954bd9f6e91cd158b0c0b94dccd2c863477cf6b1e83a83db4466f0718aa7d2be4de8d06484c0672c79318bc5c2b1f082f893fe795c2c00  wayland-utils-1.2.0.tar.xz
-sha256  1eba39c11640014a5841dd3017e5245fc31f47e1cf43a3287a286dd6a8de8a1a  COPYING

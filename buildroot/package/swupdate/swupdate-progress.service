@@ -1,9 +1,0 @@
-[Unit]
-Description=swupdate progress service
-After=swupdate.service
-
-[Service]
-ExecStart=/usr/bin/swupdate-progress -r -w
-
-[Install]
-WantedBy=swupdate.service
