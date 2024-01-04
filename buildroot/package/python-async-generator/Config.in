@@ -1,6 +1,0 @@
-config BR2_PACKAGE_PYTHON_ASYNC_GENERATOR
-	bool "python-async-generator"
-	help
-	  Async generators and context managers for Python 3.5+.
-
-	  https://github.com/python-trio/async_generator

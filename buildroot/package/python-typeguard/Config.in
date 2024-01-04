@@ -1,6 +1,0 @@
-config BR2_PACKAGE_PYTHON_TYPEGUARD
-	bool "python-typeguard"
-	help
-	  Run-time type checker for Python.
-
-	  https://github.com/agronholm/typeguard

@@ -1,6 +1,0 @@
-config BR2_PACKAGE_KODI_SCREENSAVER_BIOGENESIS
-	bool "kodi-screensaver-biogenesis"
-	help
-	  BioGenesis screensaver for Kodi
-
-	  https://github.com/xbmc/screensaver.biogenesis

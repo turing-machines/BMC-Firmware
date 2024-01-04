@@ -1,6 +1,0 @@
-config BR2_PACKAGE_LUA_INOTIFY
-	bool "lua-inotify"
-	help
-	  Inotify bindings for Lua.
-
-	  http://hoelz.ro/projects/linotify

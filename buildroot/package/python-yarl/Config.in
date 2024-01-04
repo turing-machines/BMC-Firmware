@@ -1,8 +1,0 @@
-config BR2_PACKAGE_PYTHON_YARL
-	bool "python-yarl"
-	select BR2_PACKAGE_PYTHON_MULTIDICT
-	select BR2_PACKAGE_PYTHON_IDNA
-	help
-	  Yet another URL library.
-
-	  http://yarl.readthedocs.io/

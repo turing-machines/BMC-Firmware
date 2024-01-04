@@ -1,5 +1,0 @@
-# From https://lists.x.org/archives/xorg-announce/2023-April/003389.html
-sha256  ad04d00d656884d133110eeddc34e9c69e626ebebbbab04dc95791c2907057c8  xinput-1.6.4.tar.xz
-sha512  6734860852715e5cb9d26259a173e42413fc037546ed7fa4173ffa802c2619ee0322bed228a28cd1911be759d860070867d9b89b115f37323cca1c9ef75354b9  xinput-1.6.4.tar.xz
-# Locally computed
-sha256  bbd35c7a8e8c5cb073935e84b29b0c53f7131a4ef1ce737dc2be5616941e07e1  COPYING

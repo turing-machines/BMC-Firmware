@@ -1,7 +1,0 @@
-config BR2_PACKAGE_SYSTEM_CONFIG_PRINTER
-	bool "system-config-printer"
-	depends on BR2_PACKAGE_CUPS
-	help
-	  Graphical user interface for CUPS administration
-
-	  https://github.com/OpenPrinting/system-config-printer

@@ -1,6 +1,0 @@
-# From https://ftp.osuosl.org/pub/xiph/releases/flac/SHA256SUMS.txt
-sha256  6c58e69cd22348f441b861092b825e591d0b822e106de6eb0ee4d05d27205b70  flac-1.4.3.tar.xz
-# Locally computed
-sha256  8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643  COPYING.GPL
-sha256  5df07007198989c622f5d41de8d703e7bef3d0e79d62e24332ee739a452af62a  COPYING.LGPL
-sha256  12600ea1a7affcbf469bd0d8b2cd725e4167114a2ee834b88f5d2857bfd7ddbf  COPYING.Xiph

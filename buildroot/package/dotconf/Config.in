@@ -1,6 +1,0 @@
-config BR2_PACKAGE_DOTCONF
-	bool "dotconf"
-	help
-	  Configuration file parser.
-
-	  https://github.com/williamh/dotconf

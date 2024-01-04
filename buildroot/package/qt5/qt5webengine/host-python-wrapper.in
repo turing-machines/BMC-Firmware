@@ -1,3 +1,0 @@
-#!/bin/sh
-LD_LIBRARY_PATH="@HOST_DIR@/lib" \
-exec @HOST_DIR@/bin/python "$@"

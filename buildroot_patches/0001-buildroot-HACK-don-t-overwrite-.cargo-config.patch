@@ -1,0 +1,25 @@
+From 21e340cde2c62f35fd04b5f4c576432f503472c6 Mon Sep 17 00:00:00 2001
+From: Sam Edwards <CFSworks@gmail.com>
+Date: Fri, 28 Jul 2023 15:31:29 -0600
+Subject: [PATCH] buildroot: HACK; don't overwrite .cargo/config!
+
+---
+ buildroot/support/download/cargo-post-process | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/buildroot/support/download/cargo-post-process b/buildroot/support/download/cargo-post-process
+index 3f4666c0..747845e5 100755
+--- a/buildroot/support/download/cargo-post-process
++++ b/buildroot/support/download/cargo-post-process
+@@ -30,7 +30,7 @@ flock "${CARGO_HOME}"/.br-lock \
+ cargo vendor \
+     --manifest-path ${BR_CARGO_MANIFEST_PATH-Cargo.toml} \
+     --locked VENDOR \
+-    > .cargo/config
++    >> .cargo/config
+ 
+ # "cargo vendor' outputs on stderr a message directing to add some data
+ # to the project's .cargo/config.toml, data that it outputs on stdout.
+-- 
+2.43.0
+

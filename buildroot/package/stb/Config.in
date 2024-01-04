@@ -1,6 +1,0 @@
-config BR2_PACKAGE_STB
-	bool "stb"
-	help
-	  Single-file image and audio processing libraries for C/C++.
-
-	  https://github.com/nothings/stb

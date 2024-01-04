@@ -1,5 +1,0 @@
-# From https://lists.x.org/archives/xorg-announce/2023-April/003379.html
-sha256  3518897c17448df9ba99ad6d9bb1ca0f17bc0ed7c0fd61281b34ceed29a9253f  xwininfo-1.1.6.tar.xz
-sha512  c6df4ed3dcf97772450612f2786ecab8313a43bb78e0b8020cc9ec228b3f466f55090313ad02c8159a73a6892d117322ad85e28d9d76e38bb84c9750712c20bc  xwininfo-1.1.6.tar.xz
-# Locally computed
-sha256  1be1f0763a5efd08e48089c52728a822bf769b690a2fd82fbab456cfffee822f  COPYING

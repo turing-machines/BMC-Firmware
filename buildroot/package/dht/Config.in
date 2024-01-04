@@ -1,6 +1,0 @@
-config BR2_PACKAGE_DHT
-	bool "dht"
-	help
-	  BitTorrent DHT library
-
-	  https://www.irif.fr/~jch/software/bittorrent

@@ -1,6 +1,0 @@
-config BR2_PACKAGE_PYTHON_AEXPECT
-	bool "python-aexpect"
-	help
-	  Aexpect.
-
-	  http://avocado-framework.github.io/

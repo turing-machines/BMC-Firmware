@@ -1,6 +1,0 @@
-config BR2_PACKAGE_PYTHON_TRAITLETS
-	bool "python-traitlets"
-	help
-	  A configuration system for Python applications.
-
-	  https://pypi.python.org/pypi/traitlets

@@ -1,5 +1,0 @@
-# From https://lists.x.org/archives/xorg-announce/2023-May/003391.html
-sha256  8578dfa1457e94289f6d6ed6146714307d8a73a1b54d2f42af1321b625fc1cd4  xcalc-1.1.2.tar.xz
-sha512  51da677dc88bcd7299ed8d678cb26b048fdb82a1983e1496a06253ee2dceefca4ac87d1a74432b4a76dcc11921a61339bb3d292607be46228164140b430bbad2  xcalc-1.1.2.tar.xz
-# Locally computed
-sha256  8dd69dbec37866a41d3040c5c478aca46e0b50c30319f178064d5e2ed9d3f912  COPYING
