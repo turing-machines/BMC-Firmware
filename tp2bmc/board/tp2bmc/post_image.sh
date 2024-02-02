@@ -12,9 +12,7 @@ INITRAMFS_DIR=$STAGING_DIR/initramfs/install
 
 # Prepare the SD image's FAT32 filesystem
 mkdir -p sdcard-bootpart/boot
-FDT_FILENAME=$(basename $TARGET_DIR/boot/*.dtb)
-sed s/FDT_FILENAME_HERE/${FDT_FILENAME}/g < $BOARD_DIR/install.scr > /tmp/install.scr
-mkimage -A arm -T script -d /tmp/install.scr sdcard-bootpart/boot/boot.scr.uimg
+mkimage -A arm -T script -d $BOARD_DIR/install.scr sdcard-bootpart/boot/boot.scr.uimg
 mkimage -A arm -T ramdisk -d installer.cpio.gz sdcard-bootpart/boot/install.img
 cp -r $BOARD_DIR/sdcard_overlay/* sdcard-bootpart/
 

@@ -1,11 +1,10 @@
 # SPDX-License-Identifier: GPL-2.0+
 # Copyright (C) 2023 Sam Edwards <CFSworks@gmail.com>
 
-fdt_filename="FDT_FILENAME_HERE"
+fdt_filename="sun8i-t113s-turingmachines-tp2-bmc.dtb"
 
 # Set bootargs:
-setenv bootargs earlycon=uart8250,mmio32,0x02500c00 console=ttyS3,115200 \
-	loglevel=8 cma=8M init=/sbin/preinit
+setenv bootargs loglevel=8 cma=8M init=/sbin/preinit rootwait=5
 
 if test ${devtype} = mmc; then
 	setenv bootargs ${bootargs} root=PARTUUID=${distro_bootpart_uuid}
@@ -14,7 +13,7 @@ if test ${devtype} = ubi; then
 	setenv bootargs ${bootargs} ubi.mtd=ubi ubi.block=${devnum},${distro_bootpart} root=254:0
 fi
 
-setenv bootargs ${bootargs} sunxi_gmac.mac_str=${ethaddr} ${bootmode}
+setenv bootargs ${bootargs} ${bootmode}
 
 # Load image, FDT
 load ${devtype} ${devnum}:${distro_bootpart} ${loadaddr} /boot/zImage

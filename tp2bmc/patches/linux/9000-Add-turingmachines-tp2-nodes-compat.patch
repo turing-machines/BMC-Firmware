@@ -16,8 +16,8 @@ index 9b0adbdddbfc..92afa9ce8a77 100644
  	 * Add GPIO-operated devices controlled from userspace below,
  	 * or use "driver_override" in sysfs
  	 */
-+	{ .compatible = "turingmachines,tp2-nodes", },
- 	{},
++	{ .compatible = "turing,pi2-nodes", },
+ 	{}
  };
  MODULE_DEVICE_TABLE(of, gpio_aggregator_dt_ids);
 -- 
