@@ -39,9 +39,6 @@ setup_configuration() {
     mkdir -p configs/c.1/strings/0x409
     echo "$name" > configs/c.1/strings/0x409/configuration
     ln -s functions/acm.usb0 configs/c.1
-
-    # enable udc, set the correct OTG role
-    echo usb_device > /sys/bus/platform/devices/soc@3000000:usbc0@0/otg_role > /dev/null 2>&1
 }
 
 case "$1" in

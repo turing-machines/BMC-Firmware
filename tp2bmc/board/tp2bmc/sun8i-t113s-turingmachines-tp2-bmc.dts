@@ -1,19 +1,32 @@
 // SPDX-License-Identifier: GPL-2.0+
-// Copyright (C) 2023 Sam Edwards <CFSworks@gmail.com>
+// Copyright (C) 2023-2024 Sam Edwards <CFSworks@gmail.com>
 
 /dts-v1/;
 
+#ifdef __ASSEMBLY__
+#define IS_UBOOT
+#endif
+
+#ifdef IS_UBOOT
 #include "sun8i-t113s.dtsi"
+#else
+#include "allwinner/sun8i-t113s.dtsi"
+#endif
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/input/input.h>
 
 / {
-	model = "Turing Machines Turing Pi 2 BMC";
-	compatible = "turingmachines,tp2bmc", "allwinner,sun8i-t113s", "allwinner,r528";
+	model = "Turing Pi 2";
+	compatible = "turing,pi2", "allwinner,sun8i-t113s";
 
 	aliases {
 		ethernet0 = &emac;
+		serial1 = &uart1;
+		serial2 = &uart2;
 		serial3 = &uart3;
+		serial4 = &uart4;
+		serial5 = &uart5;
+		flash0 = &flash0;
 	};
 
 	chosen {
@@ -24,42 +37,72 @@
 	leds {
 		compatible = "gpio-leds";
 
-		sys {
-			label = "fp:sys";
+		led-0 {
+			label = "fp::power";
 			gpios = <&pio 6 8 GPIO_ACTIVE_LOW>; /* PG8 */
 		};
 
-		reset {
-			label = "fp:reset";
+		led-1 {
+			label = "fp::status";
 			gpios = <&pio 6 9 GPIO_ACTIVE_LOW>; /* PG9 */
 		};
 	};
 
-	// The keys are also GPIO lines.
 	keys {
 		compatible = "gpio-keys";
 
 		// Part of the front-panel connector
-		power {
+		button-power {
 			label = "fp:power";
 			linux,code = <KEY_POWER>;
 			gpios = <&pio 6 10 GPIO_ACTIVE_HIGH>; /* PG10 */
 		};
 
-		reset {
+		button-reset {
 			label = "fp:reset";
 			linux,code = <KEY_RESTART>;
 			gpios = <&pio 6 11 GPIO_ACTIVE_HIGH>; /* PG11 */
 		};
 
 		// Located on the board itself
-		key1 {
+		key-1 {
 			label = "key1";
 			linux,code = <KEY_1>;
 			gpios = <&pio 6 15 GPIO_ACTIVE_LOW>; /* PG15 */
 		};
 	};
 
+	reg_atx_5vsb: regulator-5v {
+		compatible = "regulator-fixed";
+		regulator-name = "atx-5vsb";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		regulator-always-on;
+	};
+
+	reg_3v3: regulator-3v3 {
+		compatible = "regulator-fixed";
+		regulator-name = "vcc-3v3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		vin-supply = <&reg_atx_5vsb>;
+	};
+
+	reg_1v8: regulator-1v8 {
+		compatible = "regulator-fixed";
+		regulator-name = "vcc-1v8";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		vin-supply = <&reg_atx_5vsb>;
+	};
+
+	reg_vcc_core: regulator-core {
+		compatible = "regulator-fixed";
+		regulator-name = "vcc-core";
+		regulator-min-microvolt = <880000>;
+		regulator-max-microvolt = <880000>;
+		vin-supply = <&reg_atx_5vsb>;
+	};
 };
 
 &dcxo {
@@ -67,33 +110,80 @@
 };
 
 &cpu0 {
-	//cpu-supply = <&reg_vcc_core>;
+	clock-frequency = <1008000000>;
+	cpu-supply = <&reg_vcc_core>;
 };
 
 &cpu1 {
-	//cpu-supply = <&reg_vcc_core>;
+	clock-frequency = <1008000000>;
+	cpu-supply = <&reg_vcc_core>;
 };
 
 &pio {
-	i2c2_pe_pins: i2c2-pe-pins {
+	vcc-pb-supply = <&reg_3v3>;
+	vcc-pc-supply = <&reg_3v3>;
+	vcc-pd-supply = <&reg_1v8>;
+	vcc-pe-supply = <&reg_3v3>;
+	vcc-pf-supply = <&reg_3v3>;
+	vcc-pg-supply = <&reg_3v3>;
+
+	i2c2_pe12_pins: i2c2-pe12-pins {
 		pins = "PE12", "PE13";
 		function = "i2c2";
 		drive-strength = <10>;
+	};
+
+	uart2_pd_pins: uart2-pd-pins {
+		pins = "PD1", "PD2";
+		function = "uart2";
+		bias-pull-up;
+	};
+
+	uart4_pb_pins: uart4-pb-pins {
+		pins = "PB2", "PB3";
+		function = "uart4";
+		bias-pull-up;
+	};
+
+	uart5_pb_pins: uart5-pb-pins {
+		pins = "PB4", "PB5";
+		function = "uart5";
+		bias-pull-up;
 	};
 };
 
 &mmc0 {
 	status = "okay";
+	vmmc-supply = <&reg_3v3>;
 
 	pinctrl-names = "default";
 	pinctrl-0 = <&mmc0_pins>;
 
 	bus-width = <4>;
 	cd-gpios = <&pio 5 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>; /* PF6 */
-	cd-used-24M;
-	cap-sd-highspeed;
 	no-sdio;
-	no-mmc;
+};
+
+&uart1_pg6_pins {
+	bias-pull-up;
+};
+
+&uart1 {
+	status = "okay";
+
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart1_pg6_pins>;
+};
+
+&uart2 {
+	status = "okay";
+
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart2_pd_pins>;
+};
+
+&uart3_pb_pins {
+	bias-pull-up;
 };
 
 &uart3 {
@@ -103,11 +193,36 @@
 	pinctrl-0 = <&uart3_pb_pins>;
 };
 
+&uart4 {
+	status = "okay";
+
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart4_pb_pins>;
+};
+
+&uart5 {
+	status = "okay";
+
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart5_pb_pins>;
+};
+
 &i2c2 {
 	status = "okay";
 
 	pinctrl-names = "default";
-	pinctrl-0 = <&i2c2_pe_pins>;
+	pinctrl-0 = <&i2c2_pe12_pins>;
+
+	clock-frequency = <100000>;
+
+	eeprom@50 {
+		compatible = "microchip,24c02", "atmel,24c02";
+		reg = <0x50>;
+
+		vcc-supply = <&reg_3v3>;
+
+		pagesize = <16>;
+	};
 };
 
 &emac {
@@ -118,15 +233,21 @@
 
 	phy-handle = <&rtl8201f>;
 	phy-mode = "rmii";
+	phy-supply = <&reg_3v3>;
 	allwinner,tx-delay-ps = <300>;
 	allwinner,rx-delay-ps = <0>;
-	phy-rst = <&pio 4 10 GPIO_ACTIVE_HIGH>; /* PE10 */
 };
 
 &mdio {
 	rtl8201f: ethernet-phy@0 {
+		compatible = "ethernet-phy-ieee802.3-c22";
 		reg = <0>;
+		reset-gpios = <&pio 4 10 GPIO_ACTIVE_LOW>; /* PE10 */
 	};
+};
+
+&spi0_pins {
+	pins = "PC2", "PC3", "PC4", "PC5", "PC6", "PC7";
 };
 
 &spi0 {
@@ -135,13 +256,15 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&spi0_pins>;
 
-	spi-nand@0 {
+	flash0: flash@0 {
 		compatible = "spi-nand";
 		reg = <0x0>;
 
 		spi-max-frequency=<80000000>;
-		//spi-rx-bus-width=<4>;
-		//spi-tx-bus-width=<4>;
+#ifndef IS_UBOOT
+		spi-rx-bus-width=<4>;
+		spi-tx-bus-width=<4>;
+#endif
 
 		partitions {
 			compatible = "fixed-partitions";
@@ -163,9 +286,22 @@
 };
 
 &usb_otg {
+	dr_mode = "peripheral";
+	status = "okay";
+};
+
+&ehci1 {
+	status = "okay";
+};
+
+&ohci1 {
 	status = "okay";
 };
 
 &usbphy {
+	status = "okay";
+};
+
+&wdt {
 	status = "okay";
 };
