@@ -4,7 +4,7 @@
 #
 ###########################################################
 
-BMC_INSTALLER_VERSION = 0.1.0
+BMC_INSTALLER_VERSION = 0.1.1
 BMC_INSTALLER_SITE = $(call github,turing-machines,BMC-Installer,$(BMC_INSTALLER_VERSION))
 BMC_INSTALLER_LICENSE = Apache-2.0
 BMC_INSTALLER_LICENSE_FILES = LICENSE
