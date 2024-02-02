@@ -21,16 +21,16 @@
 
 	aliases {
 		ethernet0 = &emac;
-		serial1 = &uart1;
-		serial2 = &uart2;
-		serial3 = &uart3;
-		serial4 = &uart4;
-		serial5 = &uart5;
+		serial0 = &uart3;
+		serial1 = &uart2;
+		serial2 = &uart1;
+		serial3 = &uart4;
+		serial4 = &uart5;
 		flash0 = &flash0;
 	};
 
 	chosen {
-		stdout-path = "serial3:115200n8";
+		stdout-path = "serial0:115200n8";
 	};
 
 	// The LEDs are actually GPIO lines that go to the front-panel LEDs.
