@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0+
 # Copyright (C) 2023 Sam Edwards <CFSworks@gmail.com>
 
-fdt_filename="sun8i-t113s-turingmachines-tp2-bmc.dtb"
+fdt_filename="sun8i-t113s-turing-pi2-${tpi2_version:-v2.4}.dtb"
 
 # Set bootargs:
 setenv bootargs loglevel=8 cma=8M init=/sbin/preinit rootwait=5

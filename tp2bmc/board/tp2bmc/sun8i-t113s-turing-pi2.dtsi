@@ -16,7 +16,6 @@
 #include <dt-bindings/input/input.h>
 
 / {
-	model = "Turing Pi 2";
 	compatible = "turing,pi2", "allwinner,sun8i-t113s";
 
 	aliases {
@@ -27,10 +26,6 @@
 		serial3 = &uart4;
 		serial4 = &uart5;
 		flash0 = &flash0;
-	};
-
-	chosen {
-		stdout-path = "serial0:115200n8";
 	};
 
 	// The LEDs are actually GPIO lines that go to the front-panel LEDs.
