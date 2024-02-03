@@ -1,0 +1,14 @@
+// SPDX-License-Identifier: GPL-2.0+
+// Copyright (C) 2024 Sam Edwards <CFSworks@gmail.com>
+
+/dts-v1/;
+#include "sun8i-t113s-turing-pi2.dtsi"
+
+/ {
+	model = "Turing Pi 2 (v2.4)";
+	compatible = "turing,pi2", "allwinner,sun8i-t113s";
+
+	chosen {
+		stdout-path = "serial0:115200n8";
+	};
+};
