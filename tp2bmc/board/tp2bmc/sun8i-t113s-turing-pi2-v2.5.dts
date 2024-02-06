@@ -11,4 +11,139 @@
 	chosen {
 		stdout-path = "serial0:115200n8";
 	};
+
+	gpio_latch: gpio-latch {
+		#gpio-cells = <2>;
+		compatible = "gpio-latch";
+		gpio-controller;
+		setup-duration-ns = <5>;
+		clock-duration-ns = <5>;
+
+		clk-gpios = <&pio 3 20 GPIO_ACTIVE_HIGH>;	/* PD20 */
+		latched-gpios = <&pio 3 3 GPIO_ACTIVE_HIGH>,	/* PD3 */
+				<&pio 3 4 GPIO_ACTIVE_HIGH>,	/* PD4 */
+				<&pio 3 5 GPIO_ACTIVE_HIGH>,	/* PD5 */
+				<&pio 3 6 GPIO_ACTIVE_HIGH>,	/* PD6 */
+				<&pio 3 7 GPIO_ACTIVE_HIGH>,	/* PD7 */
+				<&pio 3 8 GPIO_ACTIVE_HIGH>,	/* PD8 */
+				<&pio 3 9 GPIO_ACTIVE_HIGH>,	/* PD9 */
+				<&pio 3 10 GPIO_ACTIVE_HIGH>,	/* PD10 */
+				<&pio 3 11 GPIO_ACTIVE_HIGH>;	/* PD11 */
+	};
+
+	nodes {
+		#gpio-cells = <2>;
+		compatible = "turing,pi2-nodes";
+		gpio-controller;
+
+		gpios = <&gpio_latch 8 GPIO_ACTIVE_LOW>,	/* node 1 */
+			<&pio 3 19 GPIO_ACTIVE_HIGH>,		/* PD19 */
+			<&pio 3 15 GPIO_ACTIVE_LOW>,		/* PD15 */
+			<&gpio_latch 7 GPIO_ACTIVE_LOW>,	/* node 2 */
+			<&pio 3 18 GPIO_ACTIVE_HIGH>,		/* PD18 */
+			<&pio 3 14 GPIO_ACTIVE_LOW>,		/* PD14 */
+			<&gpio_latch 6 GPIO_ACTIVE_LOW>,	/* node 3 */
+			<&pio 3 17 GPIO_ACTIVE_HIGH>,		/* PD17 */
+			<&pio 3 12 GPIO_ACTIVE_LOW>,		/* PD12 */
+			<&gpio_latch 5 GPIO_ACTIVE_LOW>,	/* node 4 */
+			<&pio 3 16 GPIO_ACTIVE_HIGH>,		/* PD16 */
+			<&pio 3 13 GPIO_ACTIVE_LOW>;		/* PD13 */
+
+		gpio-line-names = "node1-en", "node1-usbotg-dev",
+				  "node1-rpiboot",
+				  "node2-en", "node2-usbotg-dev",
+				  "node2-rpiboot",
+				  "node3-en", "node3-usbotg-dev",
+				  "node3-rpiboot",
+				  "node4-en", "node4-usbotg-dev",
+				  "node4-rpiboot";
+	};
+
+	reg_atx_psu: regulator-atx-psu {
+		compatible = "regulator-fixed";
+
+		regulator-name = "atx-psu";
+		regulator-min-microvolt = <12000000>;
+		regulator-max-microvolt = <12000000>;
+		startup-delay-us = <250000>;
+
+		gpio = <&gpio_latch 0 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+	};
+
+	reg_slot1: regulator-slot1 {
+		compatible = "regulator-fixed";
+
+		regulator-name = "slot1";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		startup-delay-us = <100000>;
+
+		gpio = <&gpio_latch 4 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+
+		vin-supply = <&reg_atx_psu>;
+	};
+
+	node1-power {
+		compatible = "regulator-output";
+		vout-supply = <&reg_slot1>;
+	};
+
+	reg_slot2: regulator-slot2 {
+		compatible = "regulator-fixed";
+
+		regulator-name = "slot2";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		startup-delay-us = <100000>;
+
+		gpio = <&gpio_latch 2 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+
+		vin-supply = <&reg_atx_psu>;
+	};
+
+	node2-power {
+		compatible = "regulator-output";
+		vout-supply = <&reg_slot2>;
+	};
+
+	reg_slot3: regulator-slot3 {
+		compatible = "regulator-fixed";
+
+		regulator-name = "slot3";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		startup-delay-us = <100000>;
+
+		gpio = <&gpio_latch 3 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+
+		vin-supply = <&reg_atx_psu>;
+	};
+
+	node3-power {
+		compatible = "regulator-output";
+		vout-supply = <&reg_slot3>;
+	};
+
+	reg_slot4: regulator-slot4 {
+		compatible = "regulator-fixed";
+
+		regulator-name = "slot4";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		startup-delay-us = <100000>;
+
+		gpio = <&gpio_latch 1 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+
+		vin-supply = <&reg_atx_psu>;
+	};
+
+	node4-power {
+		compatible = "regulator-output";
+		vout-supply = <&reg_slot4>;
+	};
 };
