@@ -35,6 +35,7 @@
 #MaxSessions 10
 
 #PubkeyAuthentication yes
+PermitRootLogin yes
 
 # The default is to check both .ssh/authorized_keys and .ssh/authorized_keys2
 # but this is overridden so installations will only check .ssh/authorized_keys
@@ -54,8 +55,8 @@ AuthorizedKeysFile	.ssh/authorized_keys
 #IgnoreRhosts yes
 
 # To disable tunneled clear text passwords, change to no here!
-#PasswordAuthentication yes
-#PermitEmptyPasswords no
+PasswordAuthentication yes
+PermitEmptyPasswords no
 
 # Change to no to disable s/key passwords
 #KbdInteractiveAuthentication yes
@@ -114,6 +115,3 @@ Subsystem	sftp	/usr/libexec/sftp-server
 #	AllowTcpForwarding no
 #	PermitTTY no
 #	ForceCommand cvs server
-PasswordAuthentication yes # add by wenyi
-PermitEmptyPasswords yes   # add by wenyi
-PermitRootLogin yes 
