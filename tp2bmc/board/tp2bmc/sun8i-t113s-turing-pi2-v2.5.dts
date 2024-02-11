@@ -146,4 +146,20 @@
 		compatible = "regulator-output";
 		vout-supply = <&reg_slot4>;
 	};
+
+#ifndef IS_UBOOT
+	pwm-fan {
+		compatible = "pwm-fan";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pwm5_pd_pin>;
+		pwms = <&pwm 5 50000 0>;
+		#cooling-cells = <2>;
+	};
+#endif
 };
+
+#ifndef IS_UBOOT
+&pwm {
+	status = "okay";
+};
+#endif
