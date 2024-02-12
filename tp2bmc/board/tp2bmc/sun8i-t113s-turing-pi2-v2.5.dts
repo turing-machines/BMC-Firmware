@@ -8,6 +8,11 @@
 	model = "Turing Pi 2 (v2.5)";
 	compatible = "turing,pi2", "allwinner,sun8i-t113s";
 
+	aliases {
+		rtc0 = &ext_rtc;
+		rtc1 = &rtc;
+	};
+
 	chosen {
 		stdout-path = "serial0:115200n8";
 	};
@@ -156,6 +161,21 @@
 		#cooling-cells = <2>;
 	};
 #endif
+};
+
+&i2c0 {
+	status = "okay";
+
+	pinctrl-names = "default";
+	pinctrl-0 = <&i2c0_pg_pins>;
+
+	clock-frequency = <400000>;
+
+	ext_rtc: rtc@51 {
+		compatible = "nxp,pcf8563";
+		reg = <0x51>;
+		#clock-cells = <0>;
+	};
 };
 
 #ifndef IS_UBOOT
