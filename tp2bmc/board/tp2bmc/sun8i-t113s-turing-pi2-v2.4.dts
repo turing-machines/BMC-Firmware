@@ -11,4 +11,183 @@
 	chosen {
 		stdout-path = "serial0:115200n8";
 	};
+
+	nodes {
+		#gpio-cells = <2>;
+		compatible = "turing,pi2-nodes";
+		gpio-controller;
+
+		gpios = <&pio 3 11 GPIO_ACTIVE_LOW>,	/* node 1 */
+			<&pio 3  0 GPIO_ACTIVE_LOW>,	/* PD0  */
+			<&pio 3 19 GPIO_ACTIVE_HIGH>,	/* PD19 */
+			<&pio 3 15 GPIO_ACTIVE_LOW>,	/* PD15 */
+			<&pio 3 10 GPIO_ACTIVE_LOW>,	/* node 2 */
+			<&pio 3 20 GPIO_ACTIVE_LOW>,	/* PD20 */
+			<&pio 3 18 GPIO_ACTIVE_HIGH>,	/* PD18 */
+			<&pio 3 14 GPIO_ACTIVE_LOW>,	/* PD14 */
+			<&pio 3  9 GPIO_ACTIVE_LOW>,	/* node 3 */
+			<&pio 3 21 GPIO_ACTIVE_LOW>,	/* PD21 */
+			<&pio 3 17 GPIO_ACTIVE_HIGH>,	/* PD17 */
+			<&pio 3 12 GPIO_ACTIVE_LOW>,	/* PD12 */
+			<&pio 3  8 GPIO_ACTIVE_LOW>,	/* node 4 */
+			<&pio 3 22 GPIO_ACTIVE_LOW>,	/* PD22 */
+			<&pio 3 16 GPIO_ACTIVE_HIGH>,	/* PD16 */
+			<&pio 3 13 GPIO_ACTIVE_LOW>;	/* PD13 */
+
+		gpio-line-names = "node1-en", "node1-rst",
+				  "node1-usbotg-dev", "node1-rpiboot",
+				  "node2-en", "node2-rst",
+				  "node2-usbotg-dev", "node2-rpiboot",
+				  "node3-en", "node3-rst",
+				  "node3-usbotg-dev", "node3-rpiboot",
+				  "node4-en", "node4-rst",
+				  "node4-usbotg-dev", "node4-rpiboot";
+	};
+
+	reg_atx_psu: regulator-atx-psu {
+		compatible = "regulator-fixed";
+
+		regulator-name = "atx-psu";
+		regulator-min-microvolt = <12000000>;
+		regulator-max-microvolt = <12000000>;
+		startup-delay-us = <250000>;
+
+		gpio = <&pio 3 3 GPIO_ACTIVE_HIGH>;	/* PD3 */
+		enable-active-high;
+	};
+
+	reg_slot1: regulator-slot1 {
+		compatible = "regulator-fixed";
+
+		regulator-name = "slot1";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		startup-delay-us = <100000>;
+
+		gpio = <&pio 3 7 GPIO_ACTIVE_HIGH>;	/* PD7 */
+		enable-active-high;
+
+		vin-supply = <&reg_atx_psu>;
+	};
+
+	node1-power {
+		compatible = "regulator-output";
+		vout-supply = <&reg_slot1>;
+	};
+
+	reg_slot2: regulator-slot2 {
+		compatible = "regulator-fixed";
+
+		regulator-name = "slot2";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		startup-delay-us = <100000>;
+
+		gpio = <&pio 3 6 GPIO_ACTIVE_HIGH>;	/* PD6 */
+		enable-active-high;
+
+		vin-supply = <&reg_atx_psu>;
+	};
+
+	node2-power {
+		compatible = "regulator-output";
+		vout-supply = <&reg_slot2>;
+	};
+
+	reg_slot3: regulator-slot3 {
+		compatible = "regulator-fixed";
+
+		regulator-name = "slot3";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		startup-delay-us = <100000>;
+
+		gpio = <&pio 3 5 GPIO_ACTIVE_HIGH>;	/* PD5 */
+		enable-active-high;
+
+		vin-supply = <&reg_atx_psu>;
+	};
+
+	node3-power {
+		compatible = "regulator-output";
+		vout-supply = <&reg_slot3>;
+	};
+
+	reg_slot4: regulator-slot4 {
+		compatible = "regulator-fixed";
+
+		regulator-name = "slot4";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		startup-delay-us = <100000>;
+
+		gpio = <&pio 3 4 GPIO_ACTIVE_HIGH>;	/* PD4 */
+		enable-active-high;
+
+		vin-supply = <&reg_atx_psu>;
+	};
+
+	node4-power {
+		compatible = "regulator-output";
+		vout-supply = <&reg_slot4>;
+	};
+
+	reg_usb_port_vbus: regulator-usb-port-vbus {
+		compatible = "regulator-fixed";
+
+		regulator-name = "usb-port-vbus";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		startup-delay-us = <5000>;
+
+		gpio = <&pio 6 4 GPIO_ACTIVE_LOW>;	/* PG4 */
+
+		vin-supply = <&reg_atx_5vsb>;
+	};
+
+	usb-port-power {
+		compatible = "regulator-output";
+		vout-supply = <&reg_usb_port_vbus>;
+	};
+
+	reg_usb_otg_vbus: regulator-usb-otg-vbus {
+		compatible = "regulator-fixed";
+
+		regulator-name = "usb-otg-vbus";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		startup-delay-us = <5000>;
+
+		gpio = <&pio 6 12 GPIO_ACTIVE_LOW>;	/* PG12 */
+
+		vin-supply = <&reg_atx_5vsb>;
+	};
+};
+
+&i2c2 {
+	/*
+	 * The TP2 board design includes a 4-pin fan header (J16) and
+	 * SMBus-compatible fan speed controller (U109). They are not populated
+	 * on current production boards, but some users choose to solder on a
+	 * Molex 47053-1000 and Microchip EMC2301, respectively, to gain this
+	 * functionality. This node is here to enable probing for the EMC2301
+	 * on boot, even though most boards lack it.
+	 */
+	emc2301@2f {
+		status = "okay";
+		compatible = "microchip,emc2301";
+		reg = <0x2f>;
+	};
+};
+
+&usb_otg {
+	dr_mode = "otg";
+	adp-disable;
+	hnp-disable;
+	srp-disable;
+	usb-role-switch;
+};
+
+&usbphy {
+	usb0_vbus-supply = <&reg_usb_otg_vbus>;
 };
