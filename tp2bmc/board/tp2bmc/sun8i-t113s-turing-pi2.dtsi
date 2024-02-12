@@ -243,6 +243,12 @@
 
 &pio {
 	/omit-if-no-ref/
+	i2c0_pg_pins: i2c0-pg-pins {
+		pins = "PG12", "PG13";
+		function = "i2c0";
+	};
+
+	/omit-if-no-ref/
 	pwm5_pd_pin: pwm5-pd-pin {
 		pins = "PD21";
 		function = "pwm5";
