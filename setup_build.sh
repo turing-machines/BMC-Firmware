@@ -31,4 +31,8 @@ if [ -e "$install_dir/buildroot" ]; then
 fi
 
 mv "$download_dir/$buildroot_folder" "$install_dir/buildroot"
-cd "$project_root" && patch -p1 < "$project_root"/buildroot_patches/*
+for patchfile in "$project_root"/buildroot_patches/*; do
+    if [ -f "$patchfile" ]; then
+        patch -p1 < "$patchfile"
+    fi
+done
