@@ -1,0 +1,35 @@
+diff --git a/Makefile b/Makefile
+index 9300bc6..168402c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -20,18 +20,18 @@ STATE_FILE := /run/ifstate
+ CONFIG_FILE := /etc/network/ifupdown-ng.conf
+ EXECUTOR_PATH := /usr/libexec/ifupdown-ng
+ 
+-CFLAGS ?= -ggdb3 -Os
+-CFLAGS += -Wall -Wextra -Werror
+-CFLAGS += -Wmissing-declarations -Wmissing-prototypes -Wcast-align -Wpointer-arith -Wreturn-type
+-CFLAGS += ${LIBBSD_CFLAGS}
+-CPPFLAGS = -I.
+-CPPFLAGS += -DINTERFACES_FILE=\"${INTERFACES_FILE}\"
+-CPPFLAGS += -DSTATE_FILE=\"${STATE_FILE}\"
+-CPPFLAGS += -DCONFIG_FILE=\"${CONFIG_FILE}\"
+-CPPFLAGS += -DPACKAGE_NAME=\"${PACKAGE_NAME}\"
+-CPPFLAGS += -DPACKAGE_VERSION=\"${PACKAGE_VERSION}\"
+-CPPFLAGS += -DPACKAGE_BUGREPORT=\"${PACKAGE_BUGREPORT}\"
+-CPPFLAGS += -DEXECUTOR_PATH=\"${EXECUTOR_PATH}\"
++override CFLAGS += -ggdb3 -Os
++override CFLAGS += -Wall -Wextra -Werror
++override CFLAGS += -Wmissing-declarations -Wmissing-prototypes -Wcast-align -Wpointer-arith -Wreturn-type
++override CFLAGS += ${LIBBSD_CFLAGS}
++override CPPFLAGS += -I.
++override CPPFLAGS += -DINTERFACES_FILE=\"${INTERFACES_FILE}\"
++override CPPFLAGS += -DSTATE_FILE=\"${STATE_FILE}\"
++override CPPFLAGS += -DCONFIG_FILE=\"${CONFIG_FILE}\"
++override CPPFLAGS += -DPACKAGE_NAME=\"${PACKAGE_NAME}\"
++override CPPFLAGS += -DPACKAGE_VERSION=\"${PACKAGE_VERSION}\"
++override CPPFLAGS += -DPACKAGE_BUGREPORT=\"${PACKAGE_BUGREPORT}\"
++override CPPFLAGS += -DEXECUTOR_PATH=\"${EXECUTOR_PATH}\"
+ 
+ 
+ LIBIFUPDOWN_SRC = \
