@@ -6,3 +6,5 @@ menu "tpi2 app packages"
 	source "$BR2_EXTERNAL_TP2BMC_PATH/package/tpi/Config.in"
 	source "$BR2_EXTERNAL_TP2BMC_PATH/package/raspberrypi-target-usbboot/Config.in"
 endmenu
+
+source "$BR2_EXTERNAL_TP2BMC_PATH/package/ifupdown-ng/Config.in"
