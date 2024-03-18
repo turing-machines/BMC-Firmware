@@ -9,12 +9,8 @@
 	compatible = "turing,pi2", "allwinner,sun8i-t113s";
 
 	aliases {
-#ifndef IS_UBOOT
 		rtc0 = &ext_rtc;
 		rtc1 = &rtc;
-#else
-		rtc0 = &rtc;
-#endif
 	};
 
 	chosen {
@@ -195,7 +191,10 @@
 	};
 };
 
-#ifndef IS_UBOOT
+&ethernet_switch {
+		reset-gpios = <&pio 6 3 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+};
+
 &i2c0 {
 	status = "okay";
 

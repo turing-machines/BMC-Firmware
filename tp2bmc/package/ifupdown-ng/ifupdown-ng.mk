@@ -5,7 +5,7 @@
 ################################################################################
 
 IFUPDOWN_NG_VERSION = 0.12.1
-IFUPDOWN_NG_SITE = $(call github,ifupdown-ng,ifupdown-ng,$(IFUPDOWN_NG_VERSION))
+IFUPDOWN_NG_SITE = $(call github,ifupdown-ng,ifupdown-ng,ifupdown-ng-$(IFUPDOWN_NG_VERSION))
 IFUPDOWN_NG_LICENSE = GPL-2.0+
 IFUPDOWN_NG_LICENSE_FILES = COPYING
 
