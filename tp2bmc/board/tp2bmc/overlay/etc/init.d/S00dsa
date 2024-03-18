@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Kind of a hack, don't know where else to put this
+# Rename `eth0` to `dsa` on boot, so that it is not confused for a usable
+# Ethernet interface
+
+case "$1" in
+    start|"")
+    	exec ip link set eth0 name dsa
+    	;;
+    *)
+        echo "Usage: $0 {start}"
+        exit 1
+        ;;
+esac

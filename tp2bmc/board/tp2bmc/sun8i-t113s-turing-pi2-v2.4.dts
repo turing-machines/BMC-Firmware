@@ -164,6 +164,10 @@
 	};
 };
 
+&ethernet_switch {
+		reset-gpios = <&pio 6 13 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+};
+
 &i2c2 {
 	/*
 	 * The TP2 board design includes a 4-pin fan header (J16) and

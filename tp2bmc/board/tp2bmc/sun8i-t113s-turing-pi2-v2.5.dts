@@ -195,6 +195,10 @@
 	};
 };
 
+&ethernet_switch {
+		reset-gpios = <&pio 6 3 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+};
+
 #ifndef IS_UBOOT
 &i2c0 {
 	status = "okay";

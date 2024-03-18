@@ -19,14 +19,6 @@ load ${devtype} ${devnum}:${distro_bootpart} ${loadaddr} /boot/turing-pi2.itb
 # read hardware version from EEPROM
 tpi_info hw_version tpi_hw_version
 
-# Our build of Linux doesn't yet know how to manage the switch, so:
-if test "${tpi_hw_version}" = "v2.4.0"; then
-    env set ethsw_reset_pin PG13
-else
-    env set ethsw_reset_pin PG3
-fi
-run ethsw_do_reset
-
 setenv fit_boot_args "${loadaddr}#config-${tpi_hw_version:-v2.4.0}"
 if env exists boot_unlocked; then
     echo "disabling write protection.."
