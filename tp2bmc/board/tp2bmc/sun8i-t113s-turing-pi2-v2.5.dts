@@ -163,6 +163,31 @@
 #endif
 };
 
+&ehci1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	hub@1 {
+		compatible = "usb5e3,608";
+		reg = <1>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		node1@1 {
+			reg = <1>;
+		};
+		node2@2 {
+			reg = <2>;
+		};
+		node3@3 {
+			reg = <3>;
+		};
+		node4@4 {
+			reg = <4>;
+		};
+	};
+};
+
 &i2c0 {
 	status = "okay";
 
