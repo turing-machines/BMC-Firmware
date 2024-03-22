@@ -4,18 +4,18 @@ Date: Wed, 13 Mar 2024 15:55:30 +0000
 Subject: [PATCH] bump rust to 1.75
 
 ---
- package/rust-bin/rust-bin.hash | 111 ---------------------------------
- package/rust-bin/rust-bin.mk   |   2 +-
- package/rust/rust.hash         |   6 --
- package/rust/rust.mk           |   2 +-
+ buildroot/package/rust-bin/rust-bin.hash | 111 ---------------------------------
+ buildroot/package/rust-bin/rust-bin.mk   |   2 +-
+ buildroot/package/rust/rust.hash         |   6 --
+ buildroot/package/rust/rust.mk           |   2 +-
  4 files changed, 2 insertions(+), 119 deletions(-)
- delete mode 100644 package/rust-bin/rust-bin.hash
- delete mode 100644 package/rust/rust.hash
+ delete mode 100644 buildroot/package/rust-bin/rust-bin.hash
+ delete mode 100644 buildroot/package/rust/rust.hash
 
-diff --git a/package/rust-bin/rust-bin.hash b/package/rust-bin/rust-bin.hash
+diff --git a/buildroot/package/rust-bin/rust-bin.hash b/buildroot/package/rust-bin/rust-bin.hash
 deleted file mode 100644
 index d44cb2cb67..0000000000
---- a/package/rust-bin/rust-bin.hash
+--- a/buildroot/package/rust-bin/rust-bin.hash
 +++ /dev/null
 @@ -1,111 +0,0 @@
 -# From https://static.rust-lang.org/dist/rust-1.74.1-aarch64-unknown-linux-gnu.tar.xz.sha256
@@ -129,10 +129,10 @@ index d44cb2cb67..0000000000
 -# Locally  generated
 -sha256  62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a  LICENSE-APACHE
 -sha256  23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3  LICENSE-MIT
-diff --git a/package/rust-bin/rust-bin.mk b/package/rust-bin/rust-bin.mk
+diff --git a/buildroot/package/rust-bin/rust-bin.mk b/buildroot/package/rust-bin/rust-bin.mk
 index ca35d27d1c..6cee57ece9 100644
---- a/package/rust-bin/rust-bin.mk
-+++ b/package/rust-bin/rust-bin.mk
+--- a/buildroot/package/rust-bin/rust-bin.mk
++++ b/buildroot/package/rust-bin/rust-bin.mk
 @@ -6,7 +6,7 @@
  
  # When updating this version, check whether support/download/cargo-post-process
@@ -142,10 +142,10 @@ index ca35d27d1c..6cee57ece9 100644
  RUST_BIN_SITE = https://static.rust-lang.org/dist
  RUST_BIN_LICENSE = Apache-2.0 or MIT
  RUST_BIN_LICENSE_FILES = LICENSE-APACHE LICENSE-MIT
-diff --git a/package/rust/rust.hash b/package/rust/rust.hash
+diff --git a/buildroot/package/rust/rust.hash b/buildroot/package/rust/rust.hash
 deleted file mode 100644
 index 175fa71baf..0000000000
---- a/package/rust/rust.hash
+--- a/buildroot/package/rust/rust.hash
 +++ /dev/null
 @@ -1,6 +0,0 @@
 -# From https://static.rust-lang.org/dist/rustc-1.74.1-src.tar.xz.sha256
@@ -154,10 +154,10 @@ index 175fa71baf..0000000000
 -# Locally generated
 -sha256  62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a  LICENSE-APACHE
 -sha256  23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3  LICENSE-MIT
-diff --git a/package/rust/rust.mk b/package/rust/rust.mk
+diff --git a/buildroot/package/rust/rust.mk b/buildroot/package/rust/rust.mk
 index c544582c99..23e46fca2c 100644
---- a/package/rust/rust.mk
-+++ b/package/rust/rust.mk
+--- a/buildroot/package/rust/rust.mk
++++ b/buildroot/package/rust/rust.mk
 @@ -6,7 +6,7 @@
  
  # When updating this version, check whether support/download/cargo-post-process
