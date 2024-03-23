@@ -1,5 +1,4 @@
 #!/bin/bash
-#
 # This script downloads, unpacks and installs the buildroot system to a given
 # location. The default install location will be used when no install dir is
 # passed, this is the root directory of this repository.
@@ -8,6 +7,8 @@
 #
 #   ./setup_build.sh <install dir> (optional)
 #
+
+set -x
 
 download_dir=$(mktemp -d)
 install_dir="$1"
