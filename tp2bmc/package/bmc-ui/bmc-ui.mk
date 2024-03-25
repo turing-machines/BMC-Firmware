@@ -3,7 +3,7 @@
 # bmc-ui
 ###########################################################
 
-BMC_UI_VERSION = d52e9d5d578355c31cd3485c85c12769986107ba
+BMC_UI_VERSION = 18c45c3a62d2cf2d682e864be303adf13568fc7a
 BMC_UI_SITE = $(call github,turing-machines,BMC-UI,$(BMC_UI_VERSION))
 BMC_UI_LICENSE = GPL-2.0
 BMC_UI_LICENSE_FILES = LICENSE
