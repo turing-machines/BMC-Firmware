@@ -1,4 +1,4 @@
-From dce98d8ba7530ac6f3865a027eb27e6d005cf82f Mon Sep 17 00:00:00 2001
+From f5e4faf3f5871e911d786f646f62048759e79686 Mon Sep 17 00:00:00 2001
 From: Sam Edwards <CFSworks@gmail.com>
 Date: Thu, 8 Jun 2023 13:32:51 -0600
 Subject: [PATCH 03/17] usb: musb-new: sunxi: remove unwanted printfs
@@ -42,5 +42,5 @@ index 91f082fe05..f6e1f147f8 100644
  
  static int musb_usb_remove(struct udevice *dev)
 -- 
-2.41.0
+2.44.0
 

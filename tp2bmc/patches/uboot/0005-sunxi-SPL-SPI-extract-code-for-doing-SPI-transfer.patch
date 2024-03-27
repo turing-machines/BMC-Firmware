@@ -1,4 +1,4 @@
-From b8322608eacdf7eab26631899a10c50a70f8f7a3 Mon Sep 17 00:00:00 2001
+From c1232af3e89dd1509ee334be665434eee294fd55 Mon Sep 17 00:00:00 2001
 From: Icenowy Zheng <uwu@icenowy.me>
 Date: Fri, 14 Oct 2022 11:05:13 +0800
 Subject: [PATCH 05/17] sunxi: SPL SPI: extract code for doing SPI transfer
@@ -155,5 +155,5 @@ index 3cfbf56d59..2e97ad818b 100644
  		len  -= chunk_len;
  		buf8 += chunk_len;
 -- 
-2.41.0
+2.44.0
 

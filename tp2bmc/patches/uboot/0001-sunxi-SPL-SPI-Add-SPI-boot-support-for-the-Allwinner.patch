@@ -1,4 +1,4 @@
-From bd1bd1a7480bbaed580ce4e5249ac8266098b588 Mon Sep 17 00:00:00 2001
+From b0d009654478ee46d37405cadea86197e008cac2 Mon Sep 17 00:00:00 2001
 From: Maxim Kiselev <bigunclemax@gmail.com>
 Date: Fri, 19 May 2023 16:40:07 +0300
 Subject: [PATCH 01/17] sunxi: SPL SPI: Add SPI boot support for the Allwinner
@@ -24,10 +24,10 @@ Signed-off-by: Maxim Kiselev <bigunclemax@gmail.com>
  2 files changed, 58 insertions(+), 22 deletions(-)
 
 diff --git a/arch/arm/mach-sunxi/Kconfig b/arch/arm/mach-sunxi/Kconfig
-index 40ca7d7b3a..e42128064c 100644
+index a4a8d8e944..d1acb88704 100644
 --- a/arch/arm/mach-sunxi/Kconfig
 +++ b/arch/arm/mach-sunxi/Kconfig
-@@ -1045,7 +1045,7 @@ config SPL_STACK_R_ADDR
+@@ -1061,7 +1061,7 @@ config SPL_STACK_R_ADDR
  
  config SPL_SPI_SUNXI
  	bool "Support for SPI Flash on Allwinner SoCs in SPL"
@@ -201,5 +201,5 @@ index c2410dd7bb..3cfbf56d59 100644
  
  	spi0_pinmux_setup(pin_function);
 -- 
-2.41.0
+2.44.0
 

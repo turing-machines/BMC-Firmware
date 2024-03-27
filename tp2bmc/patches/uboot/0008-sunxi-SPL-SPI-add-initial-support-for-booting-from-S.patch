@@ -1,4 +1,4 @@
-From c255edef3ea31b9fb0cbee59aa02be82e7dd3059 Mon Sep 17 00:00:00 2001
+From 19f135537edef9fa180e00da00113ba1574f2784 Mon Sep 17 00:00:00 2001
 From: Icenowy Zheng <uwu@icenowy.me>
 Date: Fri, 14 Oct 2022 11:05:16 +0800
 Subject: [PATCH 08/17] sunxi: SPL SPI: add initial support for booting from
@@ -15,10 +15,10 @@ Signed-off-by: Icenowy Zheng <uwu@icenowy.me>
  2 files changed, 90 insertions(+)
 
 diff --git a/arch/arm/mach-sunxi/Kconfig b/arch/arm/mach-sunxi/Kconfig
-index e42128064c..cfec265656 100644
+index d1acb88704..1924967f14 100644
 --- a/arch/arm/mach-sunxi/Kconfig
 +++ b/arch/arm/mach-sunxi/Kconfig
-@@ -1051,6 +1051,22 @@ config SPL_SPI_SUNXI
+@@ -1067,6 +1067,22 @@ config SPL_SPI_SUNXI
  	  sunxi SPI Flash. It uses the same method as the boot ROM, so does
  	  not need any extra configuration.
  
@@ -144,5 +144,5 @@ index 474c3276a1..182b40ca93 100644
  
  	return ret;
 -- 
-2.41.0
+2.44.0
 

@@ -1,4 +1,4 @@
-From afc2a0c74ab1544471b3e01bdda70c975fe794de Mon Sep 17 00:00:00 2001
+From bc875604bbc8c16b4a69b77272759aab2a06cd4d Mon Sep 17 00:00:00 2001
 From: Sam Edwards <CFSworks@gmail.com>
 Date: Mon, 24 Jul 2023 01:32:31 -0600
 Subject: [PATCH 11/17] mtd: ubi: register UBI attachments as DM devices
@@ -139,10 +139,10 @@ index 0000000000..f8971e793e
 +	.name		= "ubi",
 +};
 diff --git a/include/dm/uclass-id.h b/include/dm/uclass-id.h
-index a6045f5cc8..3dabf20351 100644
+index 5271e646bb..b2a8db28f7 100644
 --- a/include/dm/uclass-id.h
 +++ b/include/dm/uclass-id.h
-@@ -142,6 +142,7 @@ enum uclass_id {
+@@ -143,6 +143,7 @@ enum uclass_id {
  	UCLASS_THERMAL,		/* Thermal sensor */
  	UCLASS_TIMER,		/* Timer device */
  	UCLASS_TPM,		/* Trusted Platform Module TIS interface */
@@ -167,5 +167,5 @@ index 6da348eb62..9d37848f03 100644
  int cmd_ubifs_mount(char *vol_name);
  int cmd_ubifs_umount(void);
 -- 
-2.41.0
+2.44.0
 

@@ -1,4 +1,4 @@
-From cf066006debf397e504aa70fa1c02b057d168dda Mon Sep 17 00:00:00 2001
+From b85b9ca0e9faea17f6e7ad49f692d6f18c26de73 Mon Sep 17 00:00:00 2001
 From: Sam Edwards <CFSworks@gmail.com>
 Date: Tue, 25 Jul 2023 02:03:53 -0600
 Subject: [PATCH 13/17] disk: part: fall-through if "ubi" requested but ubifs
@@ -23,10 +23,10 @@ Signed-off-by: Sam Edwards <CFSworks@gmail.com>
  1 file changed, 6 insertions(+), 8 deletions(-)
 
 diff --git a/disk/part.c b/disk/part.c
-index 85244b09f3..311e548f27 100644
+index 36b88205ec..fe830deca8 100644
 --- a/disk/part.c
 +++ b/disk/part.c
-@@ -514,15 +514,13 @@ int blk_get_device_part_str(const char *ifname, const char *dev_part_str,
+@@ -518,15 +518,13 @@ int blk_get_device_part_str(const char *ifname, const char *dev_part_str,
  
  #if IS_ENABLED(CONFIG_CMD_UBIFS) && !IS_ENABLED(CONFIG_SPL_BUILD)
  	/*
@@ -49,5 +49,5 @@ index 85244b09f3..311e548f27 100644
  		strcpy((char *)info->name, "UBI");
  		return 0;
 -- 
-2.41.0
+2.44.0
 

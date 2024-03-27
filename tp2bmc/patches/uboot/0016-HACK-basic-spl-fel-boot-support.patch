@@ -1,4 +1,4 @@
-From d222de8a6650fb7994acbea9459531c9a15d8456 Mon Sep 17 00:00:00 2001
+From 591ceb86fba53d44d0f88de9bd4ba79e810a6c97 Mon Sep 17 00:00:00 2001
 From: Sam Edwards <CFSworks@gmail.com>
 Date: Mon, 12 Jun 2023 13:59:38 -0600
 Subject: [PATCH 16/17] HACK: basic spl->fel boot support
@@ -8,7 +8,7 @@ Subject: [PATCH 16/17] HACK: basic spl->fel boot support
  1 file changed, 18 insertions(+)
 
 diff --git a/arch/arm/mach-sunxi/board.c b/arch/arm/mach-sunxi/board.c
-index 21f321f9ca..418af26b6a 100644
+index d493075fc0..829d170aeb 100644
 --- a/arch/arm/mach-sunxi/board.c
 +++ b/arch/arm/mach-sunxi/board.c
 @@ -210,6 +210,16 @@ static int spl_board_load_image(struct spl_image_info *spl_image,
@@ -46,5 +46,5 @@ index 21f321f9ca..418af26b6a 100644
  
  #if defined CONFIG_MACH_SUN6I || defined CONFIG_MACH_SUN8I_H3
 -- 
-2.41.0
+2.44.0
 

@@ -1,4 +1,4 @@
-From 611e7ae031760d57f42fa6ff4c269a8be8f54e8e Mon Sep 17 00:00:00 2001
+From cda8ea74003881a36ba14037a13ea86d5f1762a2 Mon Sep 17 00:00:00 2001
 From: Sam Edwards <CFSworks@gmail.com>
 Date: Mon, 5 Jun 2023 12:43:56 -0600
 Subject: [PATCH 10/17] HACK: handle boot from SPI_NAND
@@ -30,7 +30,7 @@ index 14944a20ea..703aa70a49 100644
  #define SUNXI_BOOTED_FROM_MMC2_HIGH	0x12
  
 diff --git a/arch/arm/mach-sunxi/board.c b/arch/arm/mach-sunxi/board.c
-index 061d52d31a..21f321f9ca 100644
+index ed2720129e..d493075fc0 100644
 --- a/arch/arm/mach-sunxi/board.c
 +++ b/arch/arm/mach-sunxi/board.c
 @@ -306,6 +306,7 @@ uint32_t sunxi_get_boot_device(void)
@@ -42,10 +42,10 @@ index 061d52d31a..21f321f9ca 100644
  	}
  
 diff --git a/board/sunxi/board.c b/board/sunxi/board.c
-index 39ecbe988f..5b484c318a 100644
+index 8c12c8dead..80601eeaa7 100644
 --- a/board/sunxi/board.c
 +++ b/board/sunxi/board.c
-@@ -156,8 +156,8 @@ enum env_location env_get_location(enum env_operation op, int prio)
+@@ -157,8 +157,8 @@ enum env_location env_get_location(enum env_operation op, int prio)
  			return ENVL_NAND;
  		break;
  	case BOOT_DEVICE_SPI:
@@ -57,5 +57,5 @@ index 39ecbe988f..5b484c318a 100644
  			return ENVL_FAT;
  		break;
 -- 
-2.41.0
+2.44.0
 

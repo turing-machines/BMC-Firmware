@@ -1,4 +1,4 @@
-From e9d11d8977345917eed1a387aa8be143a7d4b8e3 Mon Sep 17 00:00:00 2001
+From 558f61a0f4770dd778cc9f1282ca2be4598a5bd5 Mon Sep 17 00:00:00 2001
 From: Icenowy Zheng <uwu@icenowy.me>
 Date: Fri, 14 Oct 2022 11:05:15 +0800
 Subject: [PATCH 07/17] sunxi: SPL SPI: allow multiple boot attempt
@@ -109,5 +109,5 @@ index 834f431701..474c3276a1 100644
  
  	return ret;
 -- 
-2.41.0
+2.44.0
 
