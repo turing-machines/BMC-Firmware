@@ -1,4 +1,4 @@
-From d9c8d7c438d27cc17a5e5c6c0617540dbc49ef26 Mon Sep 17 00:00:00 2001
+From 89c44de63b092d0393657f147d99504d56401153 Mon Sep 17 00:00:00 2001
 From: Icenowy Zheng <uwu@icenowy.me>
 Date: Fri, 14 Oct 2022 11:05:14 +0800
 Subject: [PATCH 06/17] sunxi: SPL SPI: add support for read command with 2
@@ -75,5 +75,5 @@ index 2e97ad818b..834f431701 100644
  
  	spi0_deinit();
 -- 
-2.41.0
+2.44.0
 

@@ -1,4 +1,4 @@
-From c659cbecde91c27ffc825d19c69179dd839caebb Mon Sep 17 00:00:00 2001
+From cf78a04f00b270b78703b11160a8918a6b05ad09 Mon Sep 17 00:00:00 2001
 From: Sam Edwards <CFSworks@gmail.com>
 Date: Mon, 24 Jul 2023 21:48:18 -0600
 Subject: [PATCH 12/17] mtd: ubi: bind block device driver for static volumes
@@ -143,5 +143,5 @@ index f8971e793e..b2c47bfe0c 100644
 +	.post_bind	= ubi_post_bind,
  };
 -- 
-2.41.0
+2.44.0
 

@@ -1,4 +1,4 @@
-From 46c9eb895663471327ddb67e1f525fe2f7d2eaf2 Mon Sep 17 00:00:00 2001
+From 6ba132a427722851805b6792af7e55c25e468754 Mon Sep 17 00:00:00 2001
 From: Sam Edwards <CFSworks@gmail.com>
 Date: Fri, 27 Oct 2023 15:34:28 -0700
 Subject: [PATCH 17/17] board: turing: pi2: add board definition
@@ -15,10 +15,10 @@ which is difficult since sunxi doesn't seem friendly to board/ dirs??
  create mode 100644 board/turing/pi2/turingpi2-spl.c
 
 diff --git a/arch/arm/mach-sunxi/Kconfig b/arch/arm/mach-sunxi/Kconfig
-index cfec265656..e3dc4acaaa 100644
+index 1924967f14..011e46ccff 100644
 --- a/arch/arm/mach-sunxi/Kconfig
 +++ b/arch/arm/mach-sunxi/Kconfig
-@@ -1095,6 +1095,10 @@ config BLUETOOTH_DT_DEVICE_FIXUP
+@@ -1111,6 +1111,10 @@ config BLUETOOTH_DT_DEVICE_FIXUP
  	  The used address is "bdaddr" if set, and "ethaddr" with the LSB
  	  flipped elsewise.
  
@@ -30,7 +30,7 @@ index cfec265656..e3dc4acaaa 100644
  
  endif
 diff --git a/arch/arm/mach-sunxi/board.c b/arch/arm/mach-sunxi/board.c
-index 418af26b6a..b03bb19ede 100644
+index 829d170aeb..59f58f77e9 100644
 --- a/arch/arm/mach-sunxi/board.c
 +++ b/arch/arm/mach-sunxi/board.c
 @@ -481,6 +481,10 @@ void board_init_f(ulong dummy)
@@ -90,5 +90,5 @@ index 0000000000..6df32f53d4
 +	return 0;
 +}
 -- 
-2.41.0
+2.44.0
 

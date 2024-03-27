@@ -1,4 +1,4 @@
-From 7010bea82958b09a594aef5909b009f1f0c1f66b Mon Sep 17 00:00:00 2001
+From be5c499fa0a5efe1017e4dd38394d95e30403284 Mon Sep 17 00:00:00 2001
 From: Sam Edwards <CFSworks@gmail.com>
 Date: Tue, 25 Jul 2023 02:07:58 -0600
 Subject: [PATCH 14/17] HACK: enable access to `ubi 0:volname` block devices
@@ -8,7 +8,7 @@ Subject: [PATCH 14/17] HACK: enable access to `ubi 0:volname` block devices
  1 file changed, 55 insertions(+)
 
 diff --git a/disk/part.c b/disk/part.c
-index 311e548f27..d531ca13f3 100644
+index fe830deca8..24325a71fe 100644
 --- a/disk/part.c
 +++ b/disk/part.c
 @@ -14,6 +14,9 @@
@@ -21,7 +21,7 @@ index 311e548f27..d531ca13f3 100644
  
  #undef	PART_DEBUG
  
-@@ -527,6 +530,58 @@ int blk_get_device_part_str(const char *ifname, const char *dev_part_str,
+@@ -531,6 +534,58 @@ int blk_get_device_part_str(const char *ifname, const char *dev_part_str,
  	}
  #endif
  
@@ -81,5 +81,5 @@ index 311e548f27..d531ca13f3 100644
  	if (CONFIG_IS_ENABLED(ENV_SUPPORT)) {
  		if (!dev_part_str || !strlen(dev_part_str) ||
 -- 
-2.41.0
+2.44.0
 

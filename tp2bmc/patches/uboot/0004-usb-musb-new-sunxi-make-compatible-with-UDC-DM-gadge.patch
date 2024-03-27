@@ -1,4 +1,4 @@
-From d723ebf551df06c208acfeed98edfbdf35aff5f4 Mon Sep 17 00:00:00 2001
+From 3a43b1bdaed6bd6103de32a81df7c21191507223 Mon Sep 17 00:00:00 2001
 From: Sam Edwards <CFSworks@gmail.com>
 Date: Fri, 2 Jun 2023 14:43:19 -0600
 Subject: [PATCH 04/17] usb: musb-new: sunxi: make compatible with UDC/DM
@@ -94,5 +94,5 @@ index f6e1f147f8..969a16ea0a 100644
  
  static int musb_usb_remove(struct udevice *dev)
 -- 
-2.41.0
+2.44.0
 

@@ -1,4 +1,4 @@
-From c0f9856108145611fa192985bf056db2631447f8 Mon Sep 17 00:00:00 2001
+From f068a12c569d72a858b3de56a636795fe931918b Mon Sep 17 00:00:00 2001
 From: Icenowy Zheng <uwu@icenowy.me>
 Date: Fri, 14 Oct 2022 11:05:17 +0800
 Subject: [PATCH 09/17] sunxi: enable support for SPI NAND booting on SUNIV
@@ -14,7 +14,7 @@ Signed-off-by: Icenowy Zheng <uwu@icenowy.me>
  1 file changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/arch/arm/mach-sunxi/board.c b/arch/arm/mach-sunxi/board.c
-index c2fadf7536..061d52d31a 100644
+index 11a4941822..ed2720129e 100644
 --- a/arch/arm/mach-sunxi/board.c
 +++ b/arch/arm/mach-sunxi/board.c
 @@ -224,12 +224,10 @@ static int suniv_get_boot_source(void)
@@ -32,5 +32,5 @@ index c2fadf7536..061d52d31a 100644
  	/* If we get here something went wrong try to boot from FEL.*/
  	printf("Unknown boot source from BROM: 0x%x\n", brom_call);
 -- 
-2.41.0
+2.44.0
 
