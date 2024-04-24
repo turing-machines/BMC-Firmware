@@ -1,8 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0+
 # Copyright (C) 2023 Sam Edwards <CFSworks@gmail.com>
 
-fdt_filename="sun8i-t113s-turing-pi2-${tpi2_version:-v2.4}.dtb"
-
 # Set bootargs:
 setenv bootargs loglevel=8 cma=8M init=/sbin/preinit rootwait=5
 
@@ -15,12 +13,13 @@ fi
 
 setenv bootargs ${bootargs} ${bootmode}
 
-# Load image, FDT
-load ${devtype} ${devnum}:${distro_bootpart} ${loadaddr} /boot/zImage
-load ${devtype} ${devnum}:${distro_bootpart} ${fdt_addr_r} /boot/${fdt_filename}
-fdt addr ${fdt_addr_r}
+# Load FIT-image
+load ${devtype} ${devnum}:${distro_bootpart} ${loadaddr} /boot/turing-pi2.itb
 
 # Our build of Linux doesn't yet know how to manage the switch, so:
 run ethsw_do_reset
 
-bootz ${loadaddr} - ${fdt_addr_r}
+# read hardware version from EEPROM
+tpi_info hw_version tpi_hw_version
+
+bootm ${loadaddr}#config-${tpi_hw_version:-v2.4.0}#locked

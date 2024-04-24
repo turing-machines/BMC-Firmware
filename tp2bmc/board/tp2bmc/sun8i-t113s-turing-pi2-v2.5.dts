@@ -200,13 +200,13 @@
 	};
 };
 
-&flash0 {
-    partitions {
-        partition@100000 {
-            reg = <0x00100000 0x0FF00000>;
-        };
-    };
-};
+//&flash0 {
+//    partitions {
+//        partition@100000 {
+//            reg = <0x00100000 0x0FF00000>;
+//        };
+//    };
+//};
 
 #ifndef IS_UBOOT
 &pwm {
