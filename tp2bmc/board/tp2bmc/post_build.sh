@@ -1,9 +1,16 @@
 #!/bin/bash
 
 set -euo pipefail
+# buildroots uboot-tools are ancient. Use the one from our uboot build.
+mkimage="$BUILD_DIR/uboot-*/tools/mkimage"
+
 cd "${0%/*}"
 
-mkimage -A arm -T script -d boot.scr $TARGET_DIR/boot/boot.scr.uimg
+$mkimage -A arm -T script -d boot.scr $TARGET_DIR/boot/boot.scr.uimg
+
+cp $PWD/*.its "$BINARIES_DIR/"
+cd "$BINARIES_DIR"
+$mkimage -E -f "turing-pi2.its" "$TARGET_DIR/boot/turing-pi2.itb"
 
 if [ -e ${TARGET_DIR}/etc/inittab ]; then
 	grep -qE '^GS0::' ${TARGET_DIR}/etc/inittab || \

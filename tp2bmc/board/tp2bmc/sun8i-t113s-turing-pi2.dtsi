@@ -283,7 +283,6 @@
 			partition@0 {
 				label = "boot";
 				reg = <0x00000000 0x00100000>;
-				read-only;
 			};
 
 			partition@100000 {

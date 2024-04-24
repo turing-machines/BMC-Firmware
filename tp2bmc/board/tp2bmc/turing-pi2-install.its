@@ -1,0 +1,31 @@
+/* SPDX-License-Identifier: GPL-2.0+
+ * Copyright (C) 2024 Sven Rademakers <sven@turingpi.com>
+ */
+
+/dts-v1/;
+
+/ {
+    description = "install ramdisk";
+    #address-cells = <1>;
+
+    images {
+        install-1 {
+            description = "install ramdisk";
+            data = /incbin/("./sdcard-bootpart/boot/install.img");
+            type = "ramdisk";
+            arch = "arm";
+            os = "linux";
+            compression = "none";
+            load = <0x41C00000>;
+        };
+    };
+
+    configurations {
+        default = "config-1";
+
+        config-1 {
+            description = "tpi2 install ramdisk";
+            ramdisk = "install-1";
+        };
+    };
+};

@@ -1,0 +1,105 @@
+
+/* SPDX-License-Identifier: GPL-2.0+
+ * Copyright (C) 2024 Sven Rademakers <sven@turingpi.com>
+ */
+
+/dts-v1/;
+
+/ {
+    description = "turingpi kernel with FDT blobs";
+    #address-cells = <1>;
+
+    images {
+        kernel-1 {
+            description = "turingpi 6.6.18";
+            data = /incbin/("./zImage");
+            type = "kernel";
+            arch = "arm";
+            os = "linux";
+            compression = "none";
+            load = <0x41000000>;
+            entry = <0x41000000>;
+            hash-1 {
+                algo = "sha1";
+            };
+        };
+
+        fdt-v2.4.0 {
+            description = "sun8i-t113s-turing-pi2-v2.4.0";
+            data = /incbin/("./sun8i-t113s-turing-pi2-v2.4.dtb");
+            type = "flat_dt";
+            arch = "arm";
+            compression = "none";
+            load = <0x41800000>;
+            hash-1 {
+                algo = "sha1";
+            };
+        };
+
+        fdt-v2.5.0 {
+            description = "sun8i-t113s-turing-pi2-v2.5.0";
+            data = /incbin/("./sun8i-t113s-turing-pi2-v2.5.dtb");
+            type = "flat_dt";
+            arch = "arm";
+            compression = "none";
+            load = <0x41800000>;
+            hash-1 {
+                algo = "sha1";
+            };
+        };
+
+        fdt-v2.5.1 {
+            description = "sun8i-t113s-turing-pi2-v2.5.1";
+            data = /incbin/("./sun8i-t113s-turing-pi2-v2.5.1.dtb");
+            type = "flat_dt";
+            arch = "arm";
+            compression = "none";
+            load = <0x41800000>;
+            hash-1 {
+                algo = "sha1";
+            };
+        };
+
+        fdt-locked {
+            description = "sun8i-t113s-turing-pi2-locked";
+            data = /incbin/("./sun8i-t113s-turing-pi2-locked.dtb");
+            type = "flat_dt";
+            arch = "arm";
+            compression = "none";
+            load = <0x41800000>;
+            hash-1 {
+                algo = "sha1";
+            };
+        };
+    };
+
+    configurations {
+        default = "config-v2.4.0";
+
+        config-v2.4.0 {
+            description = "turing-pi v2.4 6.6.18 configuration";
+            kernel = "kernel-1";
+            fdt = "fdt-v2.4.0";
+            compatible = "turing,pi2", "allwinner,sun8i-t113s";
+        };
+
+        config-v2.5.0 {
+            description = "turing-pi v2.5 6.6.18 configuration";
+            kernel = "kernel-1";
+            fdt = "fdt-v2.5.0";
+            compatible = "turing,pi2", "allwinner,sun8i-t113s";
+        };
+
+        config-v2.5.1 {
+            description = "turing-pi v2.5.1 6.6.18 configuration";
+            kernel = "kernel-1";
+            fdt = "fdt-v2.5.1";
+            compatible = "turing,pi2", "allwinner,sun8i-t113s";
+        };
+
+        locked {
+            description = "disable write access for boot partition and eeprom";
+            fdt = "fdt-locked";
+        };
+    };
+};

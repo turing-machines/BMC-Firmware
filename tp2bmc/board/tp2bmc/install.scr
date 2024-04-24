@@ -12,6 +12,9 @@ if test "${bootmode}" != "safemode"; then
 	if test -e ${devtype} ${devnum}:${distro_bootpart} ${installer_marker}; then
 		echo ...exists: entering installer
 
+        # This custom commands reads the hw_version maj+minor as a string
+        tpi_info hw_version tpi2_version 2
+
 		fdt_filename="sun8i-t113s-turing-pi2-${tpi2_version:-v2.4}.dtb"
 		linux_bootpart=2
 
