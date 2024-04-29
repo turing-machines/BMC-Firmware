@@ -19,9 +19,9 @@ if test "${bootmode}" != "safemode"; then
 		linux_bootpart=2
 
 		# Load image, initramfs, and FDT
-		if load ${devtype} ${devnum}:${linux_bootpart} ${loadaddr} /boot/zImage \
+		if load ${devtype} ${devnum}:${distro_bootpart} ${loadaddr} /boot/zImage \
 			&& load ${devtype} ${devnum}:${distro_bootpart} ${ramdisk_addr_r} /boot/install.img \
-			&& load ${devtype} ${devnum}:${linux_bootpart} ${fdt_addr_r} /boot/${fdt_filename}
+			&& load ${devtype} ${devnum}:${distro_bootpart} ${fdt_addr_r} /boot/${fdt_filename}
 		then
 			# Patch FDT to allow write access to the bootloader partition
 			fdt addr ${fdt_addr_r}
