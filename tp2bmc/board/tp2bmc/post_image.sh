@@ -15,6 +15,7 @@ mkdir -p sdcard-bootpart/boot
 mkimage -A arm -T script -d $BOARD_DIR/install.scr sdcard-bootpart/boot/boot.scr.uimg
 mkimage -A arm -T ramdisk -d installer.cpio.gz sdcard-bootpart/boot/install.img
 cp -r $BOARD_DIR/sdcard_overlay/* sdcard-bootpart/
+cp zImage *.dtb sdcard-bootpart/boot/
 
 # Generate the SD image
 [ -d tmp/ ] && rm -fr tmp/

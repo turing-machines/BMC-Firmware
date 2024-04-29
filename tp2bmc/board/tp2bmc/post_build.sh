@@ -5,7 +5,7 @@ set -euo pipefail
 mkimage="$BUILD_DIR/uboot-*/tools/mkimage"
 
 cd "${0%/*}"
-
+mkdir -p $TARGET_DIR/boot/
 $mkimage -A arm -T script -d boot.scr $TARGET_DIR/boot/boot.scr.uimg
 
 cp $PWD/*.its "$BINARIES_DIR/"
