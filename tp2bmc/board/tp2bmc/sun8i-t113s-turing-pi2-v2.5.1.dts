@@ -1,0 +1,28 @@
+// SPDX-License-Identifier: GPL-2.0+
+// Copyright (C) 2024 Sven Rademakers <sven@turingpi.com>
+#include "sun8i-t113s-turing-pi2-v2.5.dts"
+
+/ {
+    model = "Turing Pi 2 (v2.5.1)";
+};
+
+&reg_slot2 {
+    gpio = <&gpio_latch 3 GPIO_ACTIVE_HIGH>;
+};
+
+&reg_slot3 {
+    gpio = <&gpio_latch 2 GPIO_ACTIVE_HIGH>;
+};
+
+&i2c0 {
+	/delete-node/ rtc@51;
+};
+
+&i2c2 {
+	ext_rtc: rtc@51 {
+		compatible = "nxp,pcf8563";
+		reg = <0x51>;
+		#clock-cells = <0>;
+	};
+};
+

@@ -45,22 +45,19 @@
 			<&pio 3 19 GPIO_ACTIVE_HIGH>,		/* PD19 */
 			<&pio 3 15 GPIO_ACTIVE_LOW>,		/* PD15 */
 			<&gpio_latch 7 GPIO_ACTIVE_LOW>,	/* node 2 */
-			<&pio 3 18 GPIO_ACTIVE_HIGH>,		/* PD18 */
 			<&pio 3 14 GPIO_ACTIVE_LOW>,		/* PD14 */
 			<&gpio_latch 6 GPIO_ACTIVE_LOW>,	/* node 3 */
-			<&pio 3 17 GPIO_ACTIVE_HIGH>,		/* PD17 */
 			<&pio 3 12 GPIO_ACTIVE_LOW>,		/* PD12 */
 			<&gpio_latch 5 GPIO_ACTIVE_LOW>,	/* node 4 */
-			<&pio 3 16 GPIO_ACTIVE_HIGH>,		/* PD16 */
 			<&pio 3 13 GPIO_ACTIVE_LOW>;		/* PD13 */
 
 		gpio-line-names = "node1-en", "node1-usbotg-dev",
 				  "node1-rpiboot",
-				  "node2-en", "node2-usbotg-dev",
+				  "node2-en",
 				  "node2-rpiboot",
-				  "node3-en", "node3-usbotg-dev",
+				  "node3-en",
 				  "node3-rpiboot",
-				  "node4-en", "node4-usbotg-dev",
+				  "node4-en",
 				  "node4-rpiboot";
 	};
 
@@ -201,6 +198,14 @@
 		reg = <0x51>;
 		#clock-cells = <0>;
 	};
+};
+
+&flash0 {
+    partitions {
+        partition@100000 {
+            reg = <0x00100000 0x0FF00000>;
+        };
+    };
 };
 
 #ifndef IS_UBOOT
