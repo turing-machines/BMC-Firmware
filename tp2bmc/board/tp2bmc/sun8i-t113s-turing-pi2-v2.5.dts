@@ -9,8 +9,12 @@
 	compatible = "turing,pi2", "allwinner,sun8i-t113s";
 
 	aliases {
+#ifndef IS_UBOOT
 		rtc0 = &ext_rtc;
 		rtc1 = &rtc;
+#else
+		rtc0 = &rtc;
+#endif
 	};
 
 	chosen {
@@ -185,6 +189,7 @@
 	};
 };
 
+#ifndef IS_UBOOT
 &i2c0 {
 	status = "okay";
 
@@ -200,6 +205,11 @@
 	};
 };
 
+&pwm {
+	status = "okay";
+};
+#endif
+
 //&flash0 {
 //    partitions {
 //        partition@100000 {
@@ -207,9 +217,3 @@
 //        };
 //    };
 //};
-
-#ifndef IS_UBOOT
-&pwm {
-	status = "okay";
-};
-#endif
