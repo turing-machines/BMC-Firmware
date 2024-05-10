@@ -5,7 +5,7 @@ set -euo pipefail
 MOUNTPOINT=/mnt/overlay
 MMC_PARTLABEL=overlay
 UBI_OVERLAY=overlay
-UBI_SIZE=29204480 # 230 LEBs
+UBI_SIZE=$((126976*1691)) # 1691 LEB
 
 #
 # setup_mmc DEVPATH
