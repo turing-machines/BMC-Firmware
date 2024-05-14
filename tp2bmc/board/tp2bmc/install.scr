@@ -12,23 +12,16 @@ if test "${bootmode}" != "safemode"; then
 	if test -e ${devtype} ${devnum}:${distro_bootpart} ${installer_marker}; then
 		echo ...exists: entering installer
 
-        # This custom commands reads the hw_version maj+minor as a string
-        tpi_info hw_version tpi2_version 2
-
-		fdt_filename="sun8i-t113s-turing-pi2-${tpi2_version:-v2.4}.dtb"
-		linux_bootpart=2
+        # read hardware version from EEPROM
+        tpi_info hw_version tpi_hw_version
+        linux_bootpart=2
 
 		# Load image, initramfs, and FDT
-		if load ${devtype} ${devnum}:${distro_bootpart} ${loadaddr} /boot/zImage \
-			&& load ${devtype} ${devnum}:${distro_bootpart} ${ramdisk_addr_r} /boot/install.img \
-			&& load ${devtype} ${devnum}:${distro_bootpart} ${fdt_addr_r} /boot/${fdt_filename}
+		if load ${devtype} ${devnum}:${linux_bootpart} ${loadaddr} /boot/turing-pi2.itb \
+			&& load ${devtype} ${devnum}:${distro_bootpart} ${ramdisk_addr_r} /boot/install.img
 		then
-			# Patch FDT to allow write access to the bootloader partition
-			fdt addr ${fdt_addr_r}
-			fdt rm flash0/partitions/partition@0 read-only
-
 			env set bootargs loglevel=4
-			bootz ${loadaddr} ${ramdisk_addr_r} ${fdt_addr_r}
+            bootm ${loadaddr}#config-${tpi_hw_version:-v2.4.0} ${ramdisk_addr_r}
 		fi
 	else
 		echo ...does not exist: proceeding with normal boot
