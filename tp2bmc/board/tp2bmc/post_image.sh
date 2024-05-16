@@ -21,3 +21,12 @@ cp zImage *.dtb sdcard-bootpart/boot/
 [ -d tmp/ ] && rm -fr tmp/
 genimage --inputpath . --outputpath . --rootpath sdcard-bootpart \
 	--config $BOARD_DIR/genimage.cfg
+
+# generate initramfs purposed for FEL upgrades
+FEL_INITRAMFS_DIR=$STAGING_DIR/usb_initramfs
+(cd $FEL_INITRAMFS_DIR && find .) |\
+cpio -oH newc -D $FEL_INITRAMFS_DIR |\
+gzip > usb_installer.cpio.gz
+
+mkimage -A arm -T ramdisk -d usb_installer.cpio.gz usb_initramfs.img
+mkimage -A arm -T script -d $BOARD_DIR/ram_runner.scr ram_runner.scr.uimg

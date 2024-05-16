@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: GPL-2.0+
+# Copyright (C) 2024 Sven Rademakers <sven.rademakers@gmail.com>
+
+echo running from RAM...
+tpi_info hw_version tpi2_version
+env set bootargs loglevel=4
+setexpr initramfs_addr_r ${loadaddr} + 0x470000
+bootm ${loadaddr}#config-${tpi2_version:-v2.4.0} ${initramfs_addr_r}
