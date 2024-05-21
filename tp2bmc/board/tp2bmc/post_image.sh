@@ -30,3 +30,12 @@ gzip > usb_installer.cpio.gz
 
 mkimage -A arm -T ramdisk -d usb_installer.cpio.gz usb_initramfs.img
 mkimage -A arm -T script -d $BOARD_DIR/ram_runner.scr ram_runner.scr.uimg
+
+# create FEL upgrade tar
+cp $BOARD_DIR/fel_boot_contents.txt contents.txt
+tar -cvf fel_upgrade.tpf \
+    u-boot-sunxi-with-spl.bin \
+    rootfs.erofs \
+    fel_initramfs.img \
+    ram_runner.scr.uimg \
+    contents.txt

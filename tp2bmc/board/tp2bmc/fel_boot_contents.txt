@@ -1,0 +1,4 @@
+0, u-boot-sunxi-with-spl.bin
+1, rootfs.erofs
+3, ram_runner.scr.uimg
+4, fel_initramfs.img

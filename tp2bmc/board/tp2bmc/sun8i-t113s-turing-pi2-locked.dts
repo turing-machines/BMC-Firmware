@@ -17,12 +17,12 @@
         };
     };
 
-    fragment@1 {
-        target = <&i2c2>;
-        __overlay__ {
-            eeprom@50 {
-                read-only;
-            };
-        };
-    };
+   // fragment@1 {
+   //     target = <&i2c2>;
+   //     __overlay__ {
+   //         eeprom@50 {
+   //             read-only;
+   //         };
+   //     };
+   // };
 };
