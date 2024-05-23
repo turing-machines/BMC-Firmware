@@ -1,7 +1,7 @@
 ###########################################################
 # turing pi CLI
 ###########################################################
-TPI_VERSION:= b6772ed0516db04b14bd7ec50511fb16eeb4a641
+TPI_VERSION:= v1.0.6
 TPI_SITE = $(call github,turing-machines,tpi,$(TPI_VERSION))
 TPI_LICENSE = Apache-2.0
 TPI_LICENSE_FILES = LICENSE
