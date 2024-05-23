@@ -1,0 +1,54 @@
+#!/bin/sh
+
+DAEMON="bmcd"
+BIN="/usr/bin/$DAEMON"
+PIDFILE="/var/run/$DAEMON.pid"
+CERTFILE="/etc/ssl/certs/bmcd_cert.pem"
+KEYFILE="/etc/ssl/certs/bmcd_key.pem"
+
+start() {
+    printf 'Starting %s...\n' "$DAEMON"
+
+    [ ! -f "$CERTFILE" ] || [ ! -f "$KEYFILE" ] && /etc/bmcd/generate_self_signedx509.sh
+
+    start-stop-daemon --start --quiet --background --make-pidfile --pidfile "$PIDFILE" --no-close \
+        --exec "$BIN" -- --config "/etc/bmcd/config.yaml" > /dev/null
+
+    # Note: there are a lot of init.d scripts in buildroot packages that use -b/--background flag
+    # for programs that don't daemonize themselves. Contrary to the vast majority of them, it's
+    # pointless to check exit code ($?) here because in that case start-stop-daemon(8) "cannot
+    # check the exit status if the process fails to execute for any reason". Because of that, we
+    # rely on `bmcd` itself to notify where, and if, it failed.
+}
+
+stop() {
+    printf 'Stopping %s: ' "$DAEMON"
+
+    start-stop-daemon --stop --quiet --pidfile "$PIDFILE"
+
+    status=$?
+    if [ "$status" -eq 0 ]; then
+        rm -f "$PIDFILE"
+        echo "OK"
+    else
+        echo "FAIL"
+    fi
+
+    return "$status"
+}
+
+restart() {
+    stop
+    sleep 1
+    start
+}
+
+case "$1" in
+    start|stop|restart)
+        "$1";;
+    reload)
+        restart;;
+    *)
+        echo "Usage: $0 {start|stop|restart|reload}"
+        exit 1
+esac

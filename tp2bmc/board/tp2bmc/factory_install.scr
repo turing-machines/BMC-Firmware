@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: GPL-2.0+
+# Copyright (C) 2024 Sven Rademakers <sven.rademakers@gmail.com>
+
+# read hardware version from EEPROM
+tpi_info hw_version tpi_hw_version
+if test -z "$tpi_crc_ok"; then
+	echo eeprom crc failure, rewrite version ${eeprom_ver}
+	run burn_eeprom
+fi
+
+install_magic=0x12341234
+install_addr=0x0709010C
+mw ${loadaddr} ${install_magic}
+
+if cmp ${loadaddr} ${install_addr} 1; then
+	echo post firmware install, skipping factory boot
+	mw ${install_addr} 0x00000000
+	ubi part ubi
+	env set devtype ubi
+	env set devnum 0
+	run bootcmd_ubi_primary
+else
+	echo booting factory image
+	# let the boot.scr scan the rootfs partition on the
+	# SDcard and boot it. `boot_unlocked` signals that we want to release the write
+	# protection on the boot partition and eeprom.
+	env set boot_unlocked 0
+fi
