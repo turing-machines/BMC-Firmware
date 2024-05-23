@@ -25,7 +25,13 @@ if test "${tpi_hw_version}" = "v2.4.0"; then
 else
     env set ethsw_reset_pin PG3
 fi
-
 run ethsw_do_reset
 
-bootm ${loadaddr}#config-${tpi_hw_version:-v2.4.0}#locked
+setenv fit_boot_args "${loadaddr}#config-${tpi_hw_version:-v2.4.0}"
+if env exists boot_unlocked; then
+    echo "disabling write protection.."
+else
+    setenv fit_boot_args "${fit_boot_args}#locked"
+fi
+
+bootm ${fit_boot_args}

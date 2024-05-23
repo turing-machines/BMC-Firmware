@@ -1,0 +1,33 @@
+diff --git a/factory-genimage.cfg b/factory-genimage.cfg
+index 37a90c51..e97aee89 100644
+--- a/factory-genimage.cfg
++++ b/factory-genimage.cfg
+@@ -1,4 +1,4 @@
+-image tp2-bmc-firmware-sdcard.img {
++image tp2-factory-sdcard.img {
+ 	hdimage {
+ 		partition-table-type = "hybrid"
+ 		gpt-location = 992K
+@@ -27,9 +27,22 @@ image tp2-bmc-firmware-sdcard.img {
+ 		# Equivalent to 370 LEBs of NAND:
+ 		size = 45880K
+ 	}
++
++    partition overlay {
++		image = "factory_overlay.ext4"
++	}
+ }
+ 
+ image sdcard-bootpart.img {
+ 	vfat {}
+ 	size = 16M
+ }
++
++image factory_overlay.ext4 {
++    ext4 {
++        label = "overlay"
++        features = "filetype"
++    }
++    srcpath = "factory_overlay"
++    size = 32M
++}
