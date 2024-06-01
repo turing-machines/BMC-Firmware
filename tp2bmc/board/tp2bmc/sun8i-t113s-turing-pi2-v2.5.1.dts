@@ -15,6 +15,7 @@
 };
 
 &i2c0 {
+    status = "disabled";
 	/delete-node/ rtc@51;
 };
 
