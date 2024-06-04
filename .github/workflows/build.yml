@@ -77,6 +77,7 @@ jobs:
       - name: stamp images
         run: |
           mkdir artifacts
+          sudo mv buildroot/output/images/tp2-factory-sdcard.img artifacts/tp2-factory-sdcard-${{ env.BUILD_VERSION }}.img
           sudo mv buildroot/output/images/tp2-bmc-firmware-sdcard.img artifacts/tp2-firmware-sdcard-${{ env.BUILD_VERSION }}.img
           sudo mv buildroot/output/images/rootfs.erofs artifacts/tp2-ota-${{ env.BUILD_VERSION }}.tpu
 
