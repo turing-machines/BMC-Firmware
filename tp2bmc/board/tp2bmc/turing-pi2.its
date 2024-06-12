@@ -10,7 +10,7 @@
     #address-cells = <1>;
 
     images {
-        kernel-1 {
+        kernel6_6 {
             description = "turingpi 6.6.18";
             data = /incbin/("./zImage");
             type = "kernel";
@@ -77,22 +77,29 @@
         default = "config-v2.4.0";
 
         config-v2.4.0 {
-            description = "turing-pi v2.4 6.6.18 configuration";
-            kernel = "kernel-1";
+            description = "turing-pi v2.4 configuration";
+            kernel = "kernel6_6";
             fdt = "fdt-v2.4.0";
             compatible = "turing,pi2", "allwinner,sun8i-t113s";
         };
 
         config-v2.5.0 {
-            description = "turing-pi v2.5 6.6.18 configuration";
-            kernel = "kernel-1";
+            description = "turing-pi v2.5 configuration";
+            kernel = "kernel6_6";
             fdt = "fdt-v2.5.0";
             compatible = "turing,pi2", "allwinner,sun8i-t113s";
         };
 
         config-v2.5.1 {
-            description = "turing-pi v2.5.1 6.6.18 configuration";
-            kernel = "kernel-1";
+            description = "turing-pi v2.5.1 configuration";
+            kernel = "kernel6_6";
+            fdt = "fdt-v2.5.1";
+            compatible = "turing,pi2", "allwinner,sun8i-t113s";
+        };
+
+        config-v2.5.2 {
+            description = "turing-pi v2.5.2 configuration";
+            kernel = "kernel6_6";
             fdt = "fdt-v2.5.1";
             compatible = "turing,pi2", "allwinner,sun8i-t113s";
         };
