@@ -18,3 +18,4 @@ do
 done
 
 sleep 7
+tpi power off

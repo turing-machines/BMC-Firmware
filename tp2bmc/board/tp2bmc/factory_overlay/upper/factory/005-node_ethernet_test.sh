@@ -30,7 +30,6 @@ get_ip_and_ping() {
 
     wait_until_booted $n
     if [[ $? -ne 0 ]]; then
-        echo "$(uart_output_node "$n")"
         echo "Error: Timeout occurred waiting for node ${n} to boot"
         exit 1
     fi
@@ -48,7 +47,6 @@ get_ip_and_ping() {
     # Ping the IP address
     ping -c 4 "$ip" > /dev/null
     if [ "$?" -ne 0 ]; then
-        echo "$(uart_output_node "$n")"
         echo "Error: could not ping node $n"
         exit 1
     fi
@@ -77,9 +75,14 @@ tpi power on > /dev/null
 
 echo -e "\tWaiting for modules to boot, this can take up to a minute.."
 
-node1_test &
-node2_test &
-node3_test &
-node4_test &
-wait
+node1_test & pid1=$!
+node2_test & pid2=$!
+node3_test & pid3=$!
+node4_test & pid4=$!
+
+# Wait for each job and check their exit status
+wait $pid1 || { exit 1; }
+wait $pid2 || { exit 1; }
+wait $pid3 || { exit 1; }
+wait $pid4 || { exit 1; }
 

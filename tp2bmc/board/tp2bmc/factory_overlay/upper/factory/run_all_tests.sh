@@ -39,9 +39,9 @@ for FILE in "$TEST_DIR"/[0-9][0-9][0-9]-*; do
             FAILED_TESTS+=("$FILE")
 		else
             echo -e "${GREEN}PASSED${NC}"
-            # Increment the counter
-            ((nr_of_executed_tests++))
         fi
+        # Increment the counter
+        ((nr_of_executed_tests++))
     else
         NON_EXECUTABLE_FILES+=("$FILE")
     fi
@@ -54,17 +54,18 @@ if [[ ${#NON_EXECUTABLE_FILES[@]} -ne 0 ]]; then
     done
 fi
 
+echo "running post test script.."
+./post_test.sh &
+
 if [[ ${#FAILED_TESTS[@]} -eq 0 ]]; then
     echo -ne "${GREEN}"
 else
     echo -ne "${RED}"
 fi
 
-echo "running post test script.."
-./post_test.sh &
-
 failed_count=$(printf '%s\n' "${FAILED_TESTS[@]}" | wc -w)
-echo -e "FINISHED TESTS:\t(${failed_count}/${nr_of_executed_tests}) tests passed"
+passed=$((nr_of_executed_tests - failed_count))
+echo -e "FINISHED TESTS:\t(${passed}/${nr_of_executed_tests}) tests passed"
 
 if [[ ${#FAILED_TESTS[@]} -ne 0 ]]; then
     echo "Failed tests:"

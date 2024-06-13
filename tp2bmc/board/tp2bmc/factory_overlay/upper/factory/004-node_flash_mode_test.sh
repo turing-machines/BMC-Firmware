@@ -41,14 +41,12 @@ last_added_device=$(get_latest_device_sys)
 
 for n in {1..4}
 do
-    echo -e "\tNode $n"
     res=$(tpi advanced msd --node "${n}")
     exit_code=$?
     sleep 3
     new_block=$(get_latest_device_sys)
     if [[ "$last_added_device" == "$new_block" ]]; then
         echo "$res"
-        echo -e "\n$(uart_output_node "${n}")"
         echo "Error: can not detect node $n over USB"
         tpi power off > /dev/null
         exit 1

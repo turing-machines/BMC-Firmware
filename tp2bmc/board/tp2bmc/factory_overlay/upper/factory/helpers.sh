@@ -60,7 +60,7 @@ send_command() {
     local node_ip_var="NODE${n}_IP"
     local node_ip_value=$(eval echo \$$node_ip_var)
 
-    sshpass -p "$RK1_PASSWORD" ssh -o StrictHostKeyChecking=no "${RK1_USERNAME}@${node_ip_value}" "$cmd"
+    sshpass -p "$RK1_PASSWORD" ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 "${RK1_USERNAME}@${node_ip_value}" "$cmd"
 }
 
 uart_output_node() {
@@ -79,31 +79,10 @@ wait_until_booted() {
 
     while ! ping -c 1 -W 1 $HOST &> /dev/null; do
         if [ $SECONDS -ge $END_TIME ]; then
-            echo "Error: node $node ($HOST) is not reachable within $PING_TIMEOUT seconds."
-            exit 1
+            echo "Error: node $node ($HOST) is not reachable within $PING_TIMEOUT seconds.">&2
+            return 1
         fi
         sleep $INTERVAL
     done
 }
 
-get_usb_devices() {
-    local node="$1"
-
-    result=$(send_command $node "lsusb")
-    if [[ $? -ne 0 ]]; then
-        echo "Error: USB3X2 NODE4 ports error: ${result}"
-        exit 1
-    fi
-    # dont include the controller on the bus
-    echo "$result" | grep -v 'Device 001'
-}
-
-get_pci_devices() {
-    local n="$1"
-    result=$(send_command "$n" "lspci | grep -v RK3588 | grep -v 'PCI bridge: Broadcom Inc'")
-    if [[ $? -ne 0 ]]; then
-        echo "Error: could not get pci information on Node ${n}"
-        exit 1
-    fi
-    echo "$result"
-}
