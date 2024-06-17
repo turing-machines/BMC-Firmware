@@ -1,0 +1,1 @@
+exec picocom /dev/ttyS1 -b 115200
