@@ -12,6 +12,11 @@ get_usb_devices() {
     echo "$result" | grep -v 'Device 001' | grep -v '2109:3431'
 }
 
+get_sata_devices() {
+    local node="$1"
+    send_command $node "lsblk -d -o name,tran | grep sata | awk '{print \$1}'"
+}
+
 get_pci_devices() {
     local n="$1"
     send_command "$n" "lspci | grep -v RK3588 | grep -v 'PCI bridge: Broadcom Inc'"
@@ -44,7 +49,6 @@ assert_usb_devices() {
     local usb_count="$2"
     local usb_devices=$(get_usb_devices "$node")
 
-
     if [ -z "$usb_devices" ]; then
         line_count=0
     else
@@ -54,6 +58,24 @@ assert_usb_devices() {
 
     if [[ "$line_count" -lt "$usb_count" ]]; then
         echo "Error: the test requires ${usb_count} USB devices connected to ${node}, found ${line_count}" >&2
+        exit 1
+    fi
+}
+
+assert_sata_devices() {
+    local node="$1"
+    local count="$2"
+    local devices=$(get_sata_devices "$node")
+
+    if [ -z "$devices" ]; then
+        line_count=0
+    else
+        line_count=$(echo "$devices" | wc -l)
+        print_sata_drives "$devices"
+    fi
+
+    if [[ "$line_count" -lt "$count" ]]; then
+        echo "Error: the test requires ${count} SATA devices connected to ${node}, found ${line_count}" >&2
         exit 1
     fi
 }
@@ -77,6 +99,16 @@ print_pci_names() {
     echo "$pci_devices" | while IFS= read -r line; do
     local dev=$(echo "$line" | awk '{for(i=5;i<=NF;i++) printf $i" "; print ""}')
     echo -e "\t\t${counter}. ${dev}"
+    ((counter++))
+done
+}
+
+print_sata_drives() {
+    local sata_devices="$1"
+    local counter=1
+    echo -e "\tSATA:"
+    echo "$sata_devices" | while IFS= read -r line; do
+    echo -e "\t\t${counter}. ${line}"
     ((counter++))
 done
 }

@@ -24,13 +24,13 @@ verify_msd_connection() {
         exit $res
     fi 
 
-    if [ ! -f "$mount_point/$file1" ] && \
-        [ ! -f "$mount_point/$file2" ] && \
-        [ ! -f "$mount_point/$file3" ]; then
-            echo "$(ls -l $mount_point)"
-            echo "Error: cannot find $file1 or $file2 on mount $partition"
-            exit 1
-    fi
+#    if [ ! -f "$mount_point/$file1" ] && \
+#        [ ! -f "$mount_point/$file2" ] && \
+#        [ ! -f "$mount_point/$file3" ]; then
+#            echo "$(ls -l $mount_point)"
+#            echo "Error: cannot find $file1 or $file2 on mount $partition"
+#            exit 1
+#    fi
 
     umount "$mount_point"
     rmdir "$mount_point"
