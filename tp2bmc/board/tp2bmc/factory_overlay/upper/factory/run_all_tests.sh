@@ -11,10 +11,38 @@ NC='\033[0m' # No Color
 # Define the directory to search
 TEST_DIR="/factory"
 NON_EXECUTABLE_FILES=()
-FAILED_TESTS=()
 EXIT_CODE=0
 
 echo "TURING PI FACTORY TESTING STARTED"
+
+try_run_test() {
+    local file="$1"
+    local retries="$2"
+
+    FILENAME=$(basename "$file")
+    local test_id="${FILENAME:0:3}"
+    local test_name="${FILENAME:4}"
+    test_name="${test_name%%.*}"
+    test_name="${test_name//_/ }"
+
+    echo -e "\n* [${test_id}] Running ${test_name}.."
+    "$FILE"
+    EXIT_CODE=$?
+
+    if [[ $EXIT_CODE -ne 0 ]]; then
+        echo -e "  [${test_id}] ${RED}FAILED${NC}"
+        if [[ "$retries" -ne 0 ]]; then
+            ((retries--))
+            confirm "try again?"
+            try_run_test "$1" "$retries"
+        else
+            echo "Exiting program. the tests can be started again with running './run_all_tests.sh'"
+            exit 1
+        fi
+    else
+        echo -e "  [${test_id}] ${GREEN}PASSED${NC}"
+    fi
+}
 
 nr_of_executed_tests=0
 # Iterate over files in the test directory that are prefixed with 3 numbers
@@ -22,25 +50,7 @@ nr_of_executed_tests=0
 for FILE in "$TEST_DIR"/[0-9][0-9][0-9]-*; do
     # Check if the file exists and is executable
     if [[ -x "$FILE" ]]; then
-		FILENAME=$(basename "$FILE")
-		test_id="${FILENAME:0:3}"
-		test_name="${FILENAME:4}"
-		test_name="${test_name%%.*}"
-        test_name="${test_name//_/ }"
-
-		echo -e "\n* [${test_id}] Running ${test_name}.."
-        "$FILE"
-        EXIT_CODE=$?
-
-
-		echo -ne "  [${test_id}] "
-        if [[ $EXIT_CODE -ne 0 ]]; then
-            echo -e "${RED}FAILED${NC} exited with code $EXIT_CODE"
-            FAILED_TESTS+=("$FILE")
-		else
-            echo -e "${GREEN}PASSED${NC}"
-        fi
-        # Increment the counter
+        try_run_test "$FILE" "2"
         ((nr_of_executed_tests++))
     else
         NON_EXECUTABLE_FILES+=("$FILE")
@@ -57,39 +67,8 @@ fi
 echo "running post test script.."
 ./post_test.sh &
 
-if [[ ${#FAILED_TESTS[@]} -eq 0 ]]; then
-    echo -ne "${GREEN}"
-else
-    echo -ne "${RED}"
-fi
-
-failed_count=$(printf '%s\n' "${FAILED_TESTS[@]}" | wc -w)
-passed=$((nr_of_executed_tests - failed_count))
-echo -e "FINISHED TESTS:\t(${passed}/${nr_of_executed_tests}) tests passed"
-
-if [[ ${#FAILED_TESTS[@]} -ne 0 ]]; then
-    echo "Failed tests:"
-    for FAILED_TEST in "${FAILED_TESTS[@]}"; do
-        FILENAME=$(basename "$FAILED_TEST")
-        test_name="${FILENAME:4}"
-        test_name="${test_name%%.*}"
-        test_name="${test_name//_/ }"
-        echo -e "\t$test_name"
-    done
-    echo -en "${NC}"
-
-    confirm "You have failed tests, Do you still want to flash firmware to the board?"
-    if [[ $? -ne 0 ]]; then
-        exit 1
-    fi
-else
-    echo "You are about to install the official firmware.."
-    confirm
-    if [[ $? -ne 0 ]]; then
-        exit 1
-    fi
-fi
-
 source install_official_firmware.sh
-echo "THIS IS THE END, press the power button on the front panel to test power down"
 wait
+
+echo -e "${GREEN}ALL TESTS PASSED (${nr_of_executed_tests})${NC}"
+echo "eject the SD card, restart the system"
