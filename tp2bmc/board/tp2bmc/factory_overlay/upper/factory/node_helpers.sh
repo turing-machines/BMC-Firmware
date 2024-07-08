@@ -19,7 +19,7 @@ get_sata_devices() {
 
 get_pci_devices() {
     local n="$1"
-    send_command "$n" "lspci | grep -v RK3588 | grep -v 'PCI bridge: Broadcom Inc'"
+    send_command "$n" "lspci | grep -v ASM1061 | grep -v RK3588 | grep -v 'PCI bridge: Broadcom Inc'"
 }
 
 assert_pci_devices() {
@@ -37,8 +37,8 @@ assert_pci_devices() {
         print_pci_names "$devices"
     fi
 
-    if [ "$line_count" -lt "${count}" ]; then
-        echo "Error: The test requires ${count} PCI devices connected to $node, found $line_count." >&2
+    if [ "$line_count" != "${count}" ]; then
+        echo "Error: The test requires ${count} PCI device(s) connected to node $node, found $line_count." >&2
         echo "Error: Verify the connected NVMe or MPCIe modules" >&2
         exit 1
     fi
@@ -56,8 +56,8 @@ assert_usb_devices() {
         print_usb_names "$usb_devices"
     fi
 
-    if [[ "$line_count" -lt "$usb_count" ]]; then
-        echo "Error: the test requires ${usb_count} USB devices connected to ${node}, found ${line_count}" >&2
+    if [[ "$line_count" ==  "$usb_count" ]]; then
+        echo "Error: the test requires ${usb_count} USB device(s) connected to node ${node}, found ${line_count}" >&2
         exit 1
     fi
 }
@@ -74,8 +74,8 @@ assert_sata_devices() {
         print_sata_drives "$devices"
     fi
 
-    if [[ "$line_count" -lt "$count" ]]; then
-        echo "Error: the test requires ${count} SATA devices connected to ${node}, found ${line_count}" >&2
+    if [[ "$line_count" == "$count" ]]; then
+        echo "Error: the test requires ${count} SATA device(s) connected to node ${node}, found ${line_count}" >&2
         exit 1
     fi
 }
