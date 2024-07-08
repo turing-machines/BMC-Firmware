@@ -70,7 +70,7 @@ jobs:
             /work/setup_build.sh
             cd /work/buildroot
             make BR2_EXTERNAL=../tp2bmc tp2bmc_defconfig
-            make
+            FORCE_UNSAFE_CONFIGURE=1 make
 
       - name: stamp images
         run: |
