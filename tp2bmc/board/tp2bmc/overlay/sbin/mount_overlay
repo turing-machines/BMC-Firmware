@@ -5,9 +5,20 @@ set -euo pipefail
 MOUNTPOINT=/mnt/overlay
 MMC_PARTLABEL=overlay
 UBI_OVERLAY=overlay
-UBI_SIZE=$((126976*1350)) # 1350 LEB
+UBI_SIZE2_4=$((126976*230)) # 230 LEBs
+UBI_SIZE2_5=$((126976*1310)) # 1310 LEB
 
-#
+# returns the maximum allowed size of the user overlay (defined in LEB's)
+overlay_size() {
+    local ubi_partition=$(grep -l 'ubi' /sys/class/mtd/*/name | xargs dirname)
+    local mtd_size=$(<"$ubi_partition/size")
+    if [[ "$mtd_size"  -le 133169152 ]]; then
+        echo "$UBI_SIZE2_4"
+    else
+        echo "$UBI_SIZE2_5"
+    fi
+}
+
 # setup_mmc DEVPATH
 #
 # Set up the overlay partition (resizing the GPT to fill whole SD)
@@ -97,7 +108,8 @@ ubi_resolve() {
 #
 mount_ubifs() {
 	if ! ubidev=$(ubi_resolve "$UBI_OVERLAY"); then
-		ubimkvol /dev/ubi0 -N $UBI_OVERLAY -s "$UBI_SIZE"
+		local ubi_size=$(overlay_size)
+		ubimkvol /dev/ubi0 -N $UBI_OVERLAY -s "$ubi_size"
 		ubidev=$(ubi_resolve "$UBI_OVERLAY")
 		mkfs.ubifs "$ubidev"
 	fi
