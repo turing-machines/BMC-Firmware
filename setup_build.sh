@@ -9,7 +9,7 @@
 #
 
 set -x
-BUILDROOT_VER="2024.05"
+BUILDROOT_VER="2024.05.1"
 
 download_dir=$(mktemp -d)
 install_dir="$1"
