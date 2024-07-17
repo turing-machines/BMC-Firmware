@@ -165,6 +165,7 @@
 		pinctrl-0 = <&pwm5_pd_pin>;
 		pwms = <&pwm 5 50000 0>;
 		#cooling-cells = <2>;
+		cooling-levels = <0 16 32 64 102 170 254>;
 	};
 #endif
 };
