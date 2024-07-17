@@ -75,6 +75,7 @@
 
 		gpio = <&gpio_latch 0 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
+		perserve-boot-state;
 	};
 
 	reg_slot1: regulator-slot1 {
@@ -87,6 +88,7 @@
 
 		gpio = <&gpio_latch 4 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
+		perserve-boot-state;
 
 		vin-supply = <&reg_atx_psu>;
 	};
@@ -106,6 +108,7 @@
 
 		gpio = <&gpio_latch 2 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
+		perserve-boot-state;
 
 		vin-supply = <&reg_atx_psu>;
 	};
@@ -125,6 +128,7 @@
 
 		gpio = <&gpio_latch 3 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
+		perserve-boot-state;
 
 		vin-supply = <&reg_atx_psu>;
 	};
@@ -144,6 +148,7 @@
 
 		gpio = <&gpio_latch 1 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
+		perserve-boot-state;
 
 		vin-supply = <&reg_atx_psu>;
 	};
