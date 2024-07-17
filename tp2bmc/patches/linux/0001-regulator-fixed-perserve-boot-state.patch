@@ -1,0 +1,231 @@
+From 0b07e2ee094cf855450eaade75836d8cf446664a Mon Sep 17 00:00:00 2001
+From: Sven Rademakers <sven.rademakers@gmail.com>
+Date: Sun, 14 Jul 2024 17:26:39 +0100
+Subject: [PATCH] regulator-fixed: perserve boot state
+
+Maintain a shadow bitmap of the latches in memory, so that when hot rebooting
+the initialization of those latches can be omitted.
+
+* added a new dts node attribute perserve-boot-state
+* omits initialization when this attribute is present
+* added an get function that reads the shadow bitmap to check which
+  latches are currently on.
+---
+ drivers/gpio/gpio-latch.c       | 80 ++++++++++++++++++++++++++++++---
+ drivers/regulator/fixed.c       | 23 ++++++----
+ include/linux/regulator/fixed.h |  1 +
+ 3 files changed, 91 insertions(+), 13 deletions(-)
+
+diff --git a/drivers/gpio/gpio-latch.c b/drivers/gpio/gpio-latch.c
+index d7c3b20c8482..71a9d43eed33 100644
+--- a/drivers/gpio/gpio-latch.c
++++ b/drivers/gpio/gpio-latch.c
+@@ -45,8 +45,12 @@
+ #include <linux/mod_devicetable.h>
+ #include <linux/platform_device.h>
+ #include <linux/delay.h>
++#include <linux/io.h>
++#include <linux/nvmem-consumer.h>
+ 
+ #include "gpiolib.h"
++#define LABEL_NVMEM_CELL "latch_state"
++#define TURING_PI2_LATCH_STATE_ADDR 0x0709010c
+ 
+ struct gpio_latch_priv {
+ 	struct gpio_chip gc;
+@@ -56,6 +60,7 @@ struct gpio_latch_priv {
+ 	unsigned int setup_duration_ns;
+ 	unsigned int clock_duration_ns;
+ 	unsigned long *shadow;
++	unsigned long direction;
+ 	/*
+ 	 * Depending on whether any of the underlying GPIOs may sleep we either
+ 	 * use a mutex or a spinlock to protect our shadow map.
+@@ -68,7 +73,16 @@ struct gpio_latch_priv {
+ 
+ static int gpio_latch_get_direction(struct gpio_chip *gc, unsigned int offset)
+ {
+-	return GPIO_LINE_DIRECTION_OUT;
++	struct gpio_latch_priv *priv = gpiochip_get_data(gc);
++	unsigned long flags;
++	int direction = 0;
++
++	spin_lock_irqsave(&priv->spinlock, flags);
++
++	direction = test_bit(offset, &priv->direction);
++
++	spin_unlock_irqrestore(&priv->spinlock, flags);
++	return direction;
+ }
+ 
+ static void gpio_latch_set_unlocked(struct gpio_latch_priv *priv,
+@@ -78,16 +92,21 @@ static void gpio_latch_set_unlocked(struct gpio_latch_priv *priv,
+ 	int latch = offset / priv->n_latched_gpios;
+ 	int i;
+ 
+-	assign_bit(offset, priv->shadow, val);
++	unsigned long buffer = 0;
++	memcpy_fromio(&buffer, priv->shadow, sizeof(unsigned long));
++	assign_bit(offset, &buffer, val);
+ 
+ 	for (i = 0; i < priv->n_latched_gpios; i++)
+ 		set(priv->latched_gpios->desc[i],
+-		    test_bit(latch * priv->n_latched_gpios + i, priv->shadow));
++		    test_bit(latch * priv->n_latched_gpios + i, &buffer));
+ 
+ 	ndelay(priv->setup_duration_ns);
+ 	set(priv->clk_gpios->desc[latch], 1);
+ 	ndelay(priv->clock_duration_ns);
+ 	set(priv->clk_gpios->desc[latch], 0);
++
++	printk(KERN_DEBUG "gpio_latch: write: 0x%x", buffer);
++	memcpy_toio(priv->shadow, &buffer, sizeof(unsigned long));
+ }
+ 
+ static void gpio_latch_set(struct gpio_chip *gc, unsigned int offset, int val)
+@@ -128,6 +147,48 @@ static bool gpio_latch_can_sleep(struct gpio_latch_priv *priv, unsigned int n_la
+ 	return false;
+ }
+ 
++static int gpio_latch_get(struct gpio_chip *gc, unsigned gpio) {
++	struct gpio_latch_priv *priv = gpiochip_get_data(gc);
++	unsigned long flags;
++
++	spin_lock_irqsave(&priv->spinlock, flags);
++
++	unsigned long buffer = 0;
++	memcpy_fromio(&buffer, priv->shadow, sizeof(unsigned long));
++	int value = test_bit(gpio, &buffer);
++
++	spin_unlock_irqrestore(&priv->spinlock, flags);
++	return value;
++}
++
++static int gpio_latch_direction_input(struct gpio_chip *gc,
++		unsigned int offset) {
++
++	struct gpio_latch_priv *priv = gpiochip_get_data(gc);
++	unsigned long flags;
++
++	spin_lock_irqsave(&priv->spinlock, flags);
++	priv->direction |= (GPIO_LINE_DIRECTION_IN << offset);
++	spin_unlock_irqrestore(&priv->spinlock, flags);
++	return 0;
++}
++
++// The GPIO line is not set on purpose in this function. e.g. the GPIO line is
++// not updated to the given 'value' argument. This is sort of a workaround for
++// the fact that we dont have means to pass a default to gpiochip from the
++// consumer side via gpiod, and secondly it saves us an additional call to
++// retrieve the current state of the line first.
++static int gpio_latch_direction_output(struct gpio_chip *gc,
++		unsigned int offset, int value) {
++
++	struct gpio_latch_priv *priv = gpiochip_get_data(gc);
++	unsigned long flags;
++	spin_lock_irqsave(&priv->spinlock, flags);
++	priv->direction &= ~(1 << offset);
++	spin_unlock_irqrestore(&priv->spinlock, flags);
++	return 0;
++}
++
+ /*
+  * Some value which is still acceptable to delay in atomic context.
+  * If we need to go higher we might have to switch to usleep_range(),
+@@ -157,8 +218,7 @@ static int gpio_latch_probe(struct platform_device *pdev)
+ 	n_latches = priv->clk_gpios->ndescs;
+ 	priv->n_latched_gpios = priv->latched_gpios->ndescs;
+ 
+-	priv->shadow = devm_bitmap_zalloc(&pdev->dev, n_latches * priv->n_latched_gpios,
+-					  GFP_KERNEL);
++	priv->shadow = (unsigned long*)ioremap(TURING_PI2_LATCH_STATE_ADDR, sizeof(unsigned long));
+ 	if (!priv->shadow)
+ 		return -ENOMEM;
+ 
+@@ -187,6 +247,9 @@ static int gpio_latch_probe(struct platform_device *pdev)
+ 	}
+ 
+ 	priv->gc.get_direction = gpio_latch_get_direction;
++	priv->gc.get = gpio_latch_get;
++	priv->gc.direction_input = gpio_latch_direction_input;
++	priv->gc.direction_output = gpio_latch_direction_output;
+ 	priv->gc.ngpio = n_latches * priv->n_latched_gpios;
+ 	priv->gc.owner = THIS_MODULE;
+ 	priv->gc.base = -1;
+@@ -197,6 +260,12 @@ static int gpio_latch_probe(struct platform_device *pdev)
+ 	return devm_gpiochip_add_data(&pdev->dev, &priv->gc, priv);
+ }
+ 
++static int gpio_latch_remove(struct platform_device *pdev) {
++	struct gpio_latch_priv *priv = platform_get_drvdata(pdev);
++	iounmap(priv->shadow);
++	return 0;
++}
++
+ static const struct of_device_id gpio_latch_ids[] = {
+ 	{
+ 		.compatible = "gpio-latch",
+@@ -211,6 +280,7 @@ static struct platform_driver gpio_latch_driver = {
+ 		.of_match_table	= gpio_latch_ids,
+ 	},
+ 	.probe	= gpio_latch_probe,
++	.remove = gpio_latch_remove,
+ };
+ module_platform_driver(gpio_latch_driver);
+ 
+diff --git a/drivers/regulator/fixed.c b/drivers/regulator/fixed.c
+index cb93e5cdcfa9..e1f9cc088b00 100644
+--- a/drivers/regulator/fixed.c
++++ b/drivers/regulator/fixed.c
+@@ -195,6 +195,9 @@ of_get_fixed_voltage_config(struct device *dev,
+ 
+ 	of_property_read_u32(np, "startup-delay-us", &config->startup_delay);
+ 	of_property_read_u32(np, "off-on-delay-us", &config->off_on_delay);
++	if (of_property_present(np, "perserve-boot-state")) {
++		config->perserve_boot_state = 1;
++	}
+ 
+ 	if (of_property_present(np, "vin-supply"))
+ 		config->input_supply = "vin";
+@@ -290,14 +293,18 @@ static int reg_fixed_voltage_probe(struct platform_device *pdev)
+ 
+ 	drvdata->desc.fixed_uV = config->microvolts;
+ 
+-	/*
+-	 * The signal will be inverted by the GPIO core if flagged so in the
+-	 * descriptor.
+-	 */
+-	if (config->enabled_at_boot)
+-		gflags = GPIOD_OUT_HIGH;
+-	else
+-		gflags = GPIOD_OUT_LOW;
++	if (config->perserve_boot_state) {
++		gflags = GPIOD_ASIS;
++	} else {
++		/*
++		 * The signal will be inverted by the GPIO core if flagged so in the
++		 * descriptor.
++		 */
++		if (config->enabled_at_boot)
++			gflags = GPIOD_OUT_HIGH;
++		else
++			gflags = GPIOD_OUT_LOW;
++	}
+ 
+ 	/*
+ 	 * Some fixed regulators share the enable line between two
+diff --git a/include/linux/regulator/fixed.h b/include/linux/regulator/fixed.h
+index 55319943fcc5..b9d0d84d65be 100644
+--- a/include/linux/regulator/fixed.h
++++ b/include/linux/regulator/fixed.h
+@@ -38,6 +38,7 @@ struct fixed_voltage_config {
+ 	unsigned startup_delay;
+ 	unsigned int off_on_delay;
+ 	unsigned enabled_at_boot:1;
++	unsigned perserve_boot_state;
+ 	struct regulator_init_data *init_data;
+ };
+ 
+-- 
+2.45.2
+
