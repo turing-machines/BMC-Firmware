@@ -6,7 +6,7 @@ MOUNTPOINT=/mnt/overlay
 MMC_PARTLABEL=overlay
 UBI_OVERLAY=overlay
 UBI_SIZE2_4=$((126976*230)) # 230 LEBs
-UBI_SIZE2_5=$((126976*1310)) # 1310 LEB
+UBI_SIZE2_5=$((126976*1250)) # 1250 LEB
 
 # returns the maximum allowed size of the user overlay (defined in LEB's)
 overlay_size() {
