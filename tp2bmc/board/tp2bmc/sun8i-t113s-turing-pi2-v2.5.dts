@@ -159,7 +159,7 @@
 	};
 
 #ifndef IS_UBOOT
-	pwm-fan {
+	system_fan {
 		compatible = "pwm-fan";
 		pinctrl-names = "default";
 		pinctrl-0 = <&pwm5_pd_pin>;
