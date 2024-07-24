@@ -1,7 +1,7 @@
-From 0b07e2ee094cf855450eaade75836d8cf446664a Mon Sep 17 00:00:00 2001
+From c6135e0fbf2e5e1d6a5aa57b84179956bb45faba Mon Sep 17 00:00:00 2001
 From: Sven Rademakers <sven.rademakers@gmail.com>
 Date: Sun, 14 Jul 2024 17:26:39 +0100
-Subject: [PATCH] regulator-fixed: perserve boot state
+Subject: [PATCH 1/2] regulator-fixed: perserve boot state
 
 Maintain a shadow bitmap of the latches in memory, so that when hot rebooting
 the initialization of those latches can be omitted.
@@ -11,16 +11,16 @@ the initialization of those latches can be omitted.
 * added an get function that reads the shadow bitmap to check which
   latches are currently on.
 ---
- drivers/gpio/gpio-latch.c       | 80 ++++++++++++++++++++++++++++++---
+ drivers/gpio/gpio-latch.c       | 78 ++++++++++++++++++++++++++++++---
  drivers/regulator/fixed.c       | 23 ++++++----
  include/linux/regulator/fixed.h |  1 +
- 3 files changed, 91 insertions(+), 13 deletions(-)
+ 3 files changed, 89 insertions(+), 13 deletions(-)
 
 diff --git a/drivers/gpio/gpio-latch.c b/drivers/gpio/gpio-latch.c
-index d7c3b20c8482..71a9d43eed33 100644
+index d7c3b20c8482..ee6b17cab53b 100644
 --- a/drivers/gpio/gpio-latch.c
 +++ b/drivers/gpio/gpio-latch.c
-@@ -45,8 +45,12 @@
+@@ -45,8 +45,11 @@
  #include <linux/mod_devicetable.h>
  #include <linux/platform_device.h>
  #include <linux/delay.h>
@@ -28,12 +28,11 @@ index d7c3b20c8482..71a9d43eed33 100644
 +#include <linux/nvmem-consumer.h>
  
  #include "gpiolib.h"
-+#define LABEL_NVMEM_CELL "latch_state"
 +#define TURING_PI2_LATCH_STATE_ADDR 0x0709010c
  
  struct gpio_latch_priv {
  	struct gpio_chip gc;
-@@ -56,6 +60,7 @@ struct gpio_latch_priv {
+@@ -56,6 +59,7 @@ struct gpio_latch_priv {
  	unsigned int setup_duration_ns;
  	unsigned int clock_duration_ns;
  	unsigned long *shadow;
@@ -41,7 +40,7 @@ index d7c3b20c8482..71a9d43eed33 100644
  	/*
  	 * Depending on whether any of the underlying GPIOs may sleep we either
  	 * use a mutex or a spinlock to protect our shadow map.
-@@ -68,7 +73,16 @@ struct gpio_latch_priv {
+@@ -68,7 +72,16 @@ struct gpio_latch_priv {
  
  static int gpio_latch_get_direction(struct gpio_chip *gc, unsigned int offset)
  {
@@ -59,7 +58,7 @@ index d7c3b20c8482..71a9d43eed33 100644
  }
  
  static void gpio_latch_set_unlocked(struct gpio_latch_priv *priv,
-@@ -78,16 +92,21 @@ static void gpio_latch_set_unlocked(struct gpio_latch_priv *priv,
+@@ -78,16 +91,20 @@ static void gpio_latch_set_unlocked(struct gpio_latch_priv *priv,
  	int latch = offset / priv->n_latched_gpios;
  	int i;
  
@@ -78,12 +77,11 @@ index d7c3b20c8482..71a9d43eed33 100644
  	ndelay(priv->clock_duration_ns);
  	set(priv->clk_gpios->desc[latch], 0);
 +
-+	printk(KERN_DEBUG "gpio_latch: write: 0x%x", buffer);
 +	memcpy_toio(priv->shadow, &buffer, sizeof(unsigned long));
  }
  
  static void gpio_latch_set(struct gpio_chip *gc, unsigned int offset, int val)
-@@ -128,6 +147,48 @@ static bool gpio_latch_can_sleep(struct gpio_latch_priv *priv, unsigned int n_la
+@@ -128,6 +145,48 @@ static bool gpio_latch_can_sleep(struct gpio_latch_priv *priv, unsigned int n_la
  	return false;
  }
  
@@ -132,7 +130,7 @@ index d7c3b20c8482..71a9d43eed33 100644
  /*
   * Some value which is still acceptable to delay in atomic context.
   * If we need to go higher we might have to switch to usleep_range(),
-@@ -157,8 +218,7 @@ static int gpio_latch_probe(struct platform_device *pdev)
+@@ -157,8 +216,7 @@ static int gpio_latch_probe(struct platform_device *pdev)
  	n_latches = priv->clk_gpios->ndescs;
  	priv->n_latched_gpios = priv->latched_gpios->ndescs;
  
@@ -142,7 +140,7 @@ index d7c3b20c8482..71a9d43eed33 100644
  	if (!priv->shadow)
  		return -ENOMEM;
  
-@@ -187,6 +247,9 @@ static int gpio_latch_probe(struct platform_device *pdev)
+@@ -187,6 +245,9 @@ static int gpio_latch_probe(struct platform_device *pdev)
  	}
  
  	priv->gc.get_direction = gpio_latch_get_direction;
@@ -152,7 +150,7 @@ index d7c3b20c8482..71a9d43eed33 100644
  	priv->gc.ngpio = n_latches * priv->n_latched_gpios;
  	priv->gc.owner = THIS_MODULE;
  	priv->gc.base = -1;
-@@ -197,6 +260,12 @@ static int gpio_latch_probe(struct platform_device *pdev)
+@@ -197,6 +258,12 @@ static int gpio_latch_probe(struct platform_device *pdev)
  	return devm_gpiochip_add_data(&pdev->dev, &priv->gc, priv);
  }
  
@@ -165,7 +163,7 @@ index d7c3b20c8482..71a9d43eed33 100644
  static const struct of_device_id gpio_latch_ids[] = {
  	{
  		.compatible = "gpio-latch",
-@@ -211,6 +280,7 @@ static struct platform_driver gpio_latch_driver = {
+@@ -211,6 +278,7 @@ static struct platform_driver gpio_latch_driver = {
  		.of_match_table	= gpio_latch_ids,
  	},
  	.probe	= gpio_latch_probe,
