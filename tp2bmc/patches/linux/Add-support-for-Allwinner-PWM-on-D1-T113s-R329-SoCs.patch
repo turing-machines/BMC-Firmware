@@ -1,127 +1,8 @@
-From patchwork Wed Jan 31 12:59:14 2024
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Patchwork-Submitter: Aleksandr Shubin <privatesub2@gmail.com>
-X-Patchwork-Id: 13539410
-Return-Path: 
- <linux-arm-kernel-bounces+linux-arm-kernel=archiver.kernel.org@lists.infradead.org>
-X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
-	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-Received: from bombadil.infradead.org (bombadil.infradead.org
- [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.lore.kernel.org (Postfix) with ESMTPS id 1BEEAC47258
-	for <linux-arm-kernel@archiver.kernel.org>;
- Wed, 31 Jan 2024 13:00:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=lists.infradead.org; s=bombadil.20210309; h=Sender:
-	Content-Transfer-Encoding:Content-Type:List-Subscribe:List-Help:List-Post:
-	List-Archive:List-Unsubscribe:List-Id:MIME-Version:References:In-Reply-To:
-	Message-Id:Date:Subject:Cc:To:From:Reply-To:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	List-Owner; bh=g1avdJr9EJbJhAmFKWysfcYn65vylVycwGiaX+hUb+o=; b=qJtfaBnCTnBg9f
-	YZ84ncy3NjfvP6YVQs++N3Xrikv42qq6A+jZvX3dB+8spts2/YuHy9/hD46xKkB/UVV/97W85eRdx
-	I3v9z0huZmP0ogDJhL6UcTSgX+0yORQyW16fU0FJE8ut0frM4xixzO6IzAEFTXE2OFVJcGxpkyiOa
-	S1D/ZgzPmLweQhBebygjUNIyfWaeifVx2ivI1BKIXOIAAHhYQerbmdWReNfECOk9BuJ4TY44888cK
-	YbGK4JqBp1bggdAH0XqDxHQGtC/HJe2aNNzOaRAWs8CUgcK3dINLPDKXUSFNamEuDuSdNXbUnj5f1
-	kMUKFRoNwhbDyJrdTcUw==;
-Received: from localhost ([::1] helo=bombadil.infradead.org)
-	by bombadil.infradead.org with esmtp (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rVAC1-00000003TNy-3ecH;
-	Wed, 31 Jan 2024 12:59:53 +0000
-Received: from mail-lf1-x135.google.com ([2a00:1450:4864:20::135])
-	by bombadil.infradead.org with esmtps (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rVABy-00000003TJP-1XnP;
-	Wed, 31 Jan 2024 12:59:51 +0000
-Received: by mail-lf1-x135.google.com with SMTP id
- 2adb3069b0e04-511207d62b6so2041513e87.1;
-        Wed, 31 Jan 2024 04:59:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706705987; x=1707310787;
- darn=lists.infradead.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oAfvNX5JYKiOP5F5+HHWWQpkc2VYumz0VDstxq+2dC0=;
-        b=CVhEpK0EuUx9RJ9FqqEJVNWrQvaFplEK6S+34FR9Dd/e3HumsXMlt+cdMdLD5dVTwL
-         Bv4cA3+I11kmI8UOsEyZyFwYScwmYE59DXsOFt/QGdDwo82VfAXV20cw/s2bf5F8Sh7e
-         J7hdugbWtX8VZoi0RYMCu/nkhkxqOPHaUQ6tOlqIeX7gMaOyphyQs/1dz8yJB2Olq/vE
-         donWx67qVjpTCOvoNPUbXxUXqCVIKc0tGI4DztRgZ82KOwJby50oos2XgLagZ/cmA2wY
-         aAPq/ZVBOytX4VJlv85a8/s9gyOS/ZUzNljl0Fd3VoOnOOxSFahMq/WsyGY2DtVpvIOQ
-         uYfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706705987; x=1707310787;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oAfvNX5JYKiOP5F5+HHWWQpkc2VYumz0VDstxq+2dC0=;
-        b=LzLnyq20+YKN1ZefzSuKqNoEU+9QTxnjnUw7PzG2NxJ3Qa44bRvy3N/o+EJ/pMjWuA
-         vdZjmrhZ6ZloyxF027pOTEJXI9FrvJJcAGsJm7LoF1drBKdO5UQfUJqlIMGIqms+UaSb
-         yYzmwW6HgmTjjC2Zp0Lsrlzw1WGt7bHA7oLfH32bX07I2cdJbqP/9kSZBOWAiyM8Rwj/
-         4JFxuQ1v2YQTl0r0jh/2S1s+OJpZm1SSY4nm5Tb0sMoHmwXrKEbh4DKrRQVXu/V1VU3x
-         E5levz55NwMzh560trRUOQ8UX1J9mj8YKp/XzRd7cFQUPysme5UCIH9p2+ksSLVziXbN
-         +dsQ==
-X-Gm-Message-State: AOJu0YxPUJbxjg/91sbZzmMZcVyA6CP+2kbxoaSCMg8Rg8MMN0s5IvSf
-	lKyMT4ZAAp1/l0miyYmByMqBEZyAYI3fcXo5gajcwJ/kK+6J940=
-X-Google-Smtp-Source: 
- AGHT+IHozbh85wcnYCXZXYDLJCLM9XGLrWwtHro3SkQvoxBuxVb086cAn/J1lYCBdkXRqYub3zJ7qw==
-X-Received: by 2002:ac2:4950:0:b0:50e:9355:a24b with SMTP id
- o16-20020ac24950000000b0050e9355a24bmr1003200lfi.22.1706705986343;
-        Wed, 31 Jan 2024 04:59:46 -0800 (PST)
-Received: from localhost.localdomain ([188.162.49.60])
-        by smtp.gmail.com with ESMTPSA id
- h25-20020a19ca59000000b00510faaa62cfsm1361135lfj.222.2024.01.31.04.59.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jan 2024 04:59:45 -0800 (PST)
+From 0ade3a4309c6f9ef34aba51aaf1a866cae48481e Mon Sep 17 00:00:00 2001
 From: Aleksandr Shubin <privatesub2@gmail.com>
-To: linux-kernel@vger.kernel.org
-Cc: Aleksandr Shubin <privatesub2@gmail.com>,
- Conor Dooley <conor.dooley@microchip.com>,
- =?utf-8?q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
- Jernej Skrabec <jernej.skrabec@gmail.com>,
- Samuel Holland <samuel@sholland.org>,
- Paul Walmsley <paul.walmsley@sifive.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Philipp Zabel <p.zabel@pengutronix.de>,
- Marc Kleine-Budde <mkl@pengutronix.de>,
- Maksim Kiselev <bigunclemax@gmail.com>,
- Cristian Ciocaltea <cristian.ciocaltea@collabora.com>,
- John Watts <contact@jookia.org>, Cheo Fusi <fusibrandon13@gmail.com>,
- linux-pwm@vger.kernel.org, devicetree@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
- linux-riscv@lists.infradead.org
-Subject: [PATCH v8 1/3] dt-bindings: pwm: Add binding for Allwinner
- D1/T113-S3/R329 PWM controller
 Date: Wed, 31 Jan 2024 15:59:14 +0300
-Message-Id: <20240131125920.2879433-2-privatesub2@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240131125920.2879433-1-privatesub2@gmail.com>
-References: <20240131125920.2879433-1-privatesub2@gmail.com>
-MIME-Version: 1.0
-X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-646709E3 
-X-CRM114-CacheID: sfid-20240131_045950_454851_364D21BE 
-X-CRM114-Status: GOOD (  15.47  )
-X-BeenThere: linux-arm-kernel@lists.infradead.org
-X-Mailman-Version: 2.1.34
-Precedence: list
-List-Id: <linux-arm-kernel.lists.infradead.org>
-List-Unsubscribe: 
- <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: 
- <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: 
- linux-arm-kernel-bounces+linux-arm-kernel=archiver.kernel.org@lists.infradead.org
+Subject: [PATCH 1/3] dt-bindings: pwm: Add binding for Allwinner
+ D1/T113-S3/R329 PWM controller
 
 Allwinner's D1, T113-S3 and R329 SoCs have a new pwm
 controller witch is different from the previous pwm-sun4i.
@@ -241,128 +122,14 @@ index 000000000000..716f75776006
 +    };
 +
 +...
+-- 
+2.45.2
 
-From patchwork Wed Jan 31 12:59:15 2024
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Patchwork-Submitter: Aleksandr Shubin <privatesub2@gmail.com>
-X-Patchwork-Id: 13539411
-Return-Path: 
- <linux-arm-kernel-bounces+linux-arm-kernel=archiver.kernel.org@lists.infradead.org>
-X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
-	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-Received: from bombadil.infradead.org (bombadil.infradead.org
- [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.lore.kernel.org (Postfix) with ESMTPS id 03CF9C47DB3
-	for <linux-arm-kernel@archiver.kernel.org>;
- Wed, 31 Jan 2024 13:00:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=lists.infradead.org; s=bombadil.20210309; h=Sender:
-	Content-Transfer-Encoding:Content-Type:List-Subscribe:List-Help:List-Post:
-	List-Archive:List-Unsubscribe:List-Id:MIME-Version:References:In-Reply-To:
-	Message-Id:Date:Subject:Cc:To:From:Reply-To:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	List-Owner; bh=s0NxbtQs25ewdS+vQ+JYVT89daQdLz5+ks95gu+AWN0=; b=n4SyeHnbtYg49M
-	672QEfb6Zcm8Mlq1MUyeMMlIhFQs0oinHZctMe/0zV1ZGZ5i5wNrpR8m21JOcEXtI9N2PTVU+GtJm
-	6Ska4t6ZCS4ejfkVqoVkuSe4F8Yy+urA6TqOP8puECL8IFnasytXrSCiuU0O99TCNivN8i2D0088d
-	oG8LeiieGlLVx1uq58yS9pijxOVTMyt+poGxrFbm1xCuhLesc98t0HXcoh9Ut+lKbbr7ACU9DBhGM
-	wxRAjG+cOeq3wNikWxJucRq/Wis7KHZ3D0XGj9F69kKLaAHxYu9+8DulbkmdMKqR741Qy5FmGBs+O
-	Awjp428vTr0pXxwYInLg==;
-Received: from localhost ([::1] helo=bombadil.infradead.org)
-	by bombadil.infradead.org with esmtp (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rVACK-00000003TdO-1hFY;
-	Wed, 31 Jan 2024 13:00:12 +0000
-Received: from mail-lf1-x133.google.com ([2a00:1450:4864:20::133])
-	by bombadil.infradead.org with esmtps (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rVAC5-00000003TOW-1ggL;
-	Wed, 31 Jan 2024 13:00:00 +0000
-Received: by mail-lf1-x133.google.com with SMTP id
- 2adb3069b0e04-511207d62b6so2041717e87.1;
-        Wed, 31 Jan 2024 04:59:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706705994; x=1707310794;
- darn=lists.infradead.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LJEpMRsYLlgFAcmZofqzHXt8kLBT+ut7O+m2hghOxj0=;
-        b=hxHe2gaiQULu5vEkbW8wwFAGL/Hf609zhJVJw3f4WYhl+RuhK4+aO72wxObzzeUI25
-         bn5rrWfkLm1JYi4KGzsG5eKZshNmtXj6aqSD5qlfrlukL16aBWK3wJvZts/2Ti5N4QSK
-         nv7zsPAvVRJq+oZwU93rsBNDuX4eZqGX6sghWKTVgoWsW8LcHKc7pRULn+gwXXOf6G4l
-         YS7YWqatVs0LGfZnzA5rYwxSpcdGDkI9Dfxbz38Nnz7XOjwlcQgQ32/X9raTVqxxOICa
-         kpZKigNB/rXmyTTEn69Vfw5EsaIICCrXBeeLl+jctSIN9X0uICwloEFY3K0uHZQKQSSd
-         E75g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706705994; x=1707310794;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LJEpMRsYLlgFAcmZofqzHXt8kLBT+ut7O+m2hghOxj0=;
-        b=jDFR+WsuUNfHnbJWLK84JOb2/VHg1iaDfuYF91dfug2Mwh9i6XSHXGunU31z2ScaU7
-         Pg4vR4gSbN1wKwM+yPerEoWdvMus57PpUyUp/fAzU8UTiJZ2I1NWL9U4xEm6JKebokLs
-         D62DsJs+6ZmSdKVhBhCFB9RTL4lBXQqbcsqsz16CncBS+dhKC8Y615QM692eyMsfdugo
-         55N4pGwEmCudCAimOIM2pMvLesOkEwTv8Ca3MZewyU645rL0elBf53B3Y3hk1Y/yyMT6
-         GvLxSEMY2XgS6+KonU4sonHQqakSlUn5SGagcFe10nYoJzt+7LzAiqC13zjnT6+B6j6P
-         9dwg==
-X-Gm-Message-State: AOJu0YxDo1dgJrid0u1rqbfrQDdSGpXdKVofRaw7o7ji1Qn1WUvSipCO
-	GSiXBKCqaUCuvJn6WwBvkToEYnBVq7nKQIFWTo+sDaFbd4hcUdM=
-X-Google-Smtp-Source: 
- AGHT+IGtgxJeyTQhG/aZasLr02uoyai6dB5Gw7iYCnTUM1O222ECB10oOjsvDI3WT6CNzRqjzcrFkA==
-X-Received: by 2002:a05:6512:ea0:b0:510:1b51:e431 with SMTP id
- bi32-20020a0565120ea000b005101b51e431mr1592192lfb.4.1706705993605;
-        Wed, 31 Jan 2024 04:59:53 -0800 (PST)
-Received: from localhost.localdomain ([188.162.49.60])
-        by smtp.gmail.com with ESMTPSA id
- h25-20020a19ca59000000b00510faaa62cfsm1361135lfj.222.2024.01.31.04.59.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jan 2024 04:59:53 -0800 (PST)
+
+From c512c54f99e61e40c6363f5a03a8d4ca5abddf05 Mon Sep 17 00:00:00 2001
 From: Aleksandr Shubin <privatesub2@gmail.com>
-To: linux-kernel@vger.kernel.org
-Cc: Aleksandr Shubin <privatesub2@gmail.com>,
- Brandon Cheo Fusi <fusibrandon13@gmail.com>, =?utf-8?q?Uwe_Kleine-K=C3=B6ni?=
-	=?utf-8?q?g?= <u.kleine-koenig@pengutronix.de>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
- Jernej Skrabec <jernej.skrabec@gmail.com>,
- Samuel Holland <samuel@sholland.org>,
- Paul Walmsley <paul.walmsley@sifive.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Philipp Zabel <p.zabel@pengutronix.de>,
- Cristian Ciocaltea <cristian.ciocaltea@collabora.com>,
- John Watts <contact@jookia.org>, Marc Kleine-Budde <mkl@pengutronix.de>,
- Maksim Kiselev <bigunclemax@gmail.com>, linux-pwm@vger.kernel.org,
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-sunxi@lists.linux.dev, linux-riscv@lists.infradead.org
-Subject: [PATCH v8 2/3] pwm: Add Allwinner's D1/T113-S3/R329 SoCs PWM support
 Date: Wed, 31 Jan 2024 15:59:15 +0300
-Message-Id: <20240131125920.2879433-3-privatesub2@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240131125920.2879433-1-privatesub2@gmail.com>
-References: <20240131125920.2879433-1-privatesub2@gmail.com>
-MIME-Version: 1.0
-X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-646709E3 
-X-CRM114-CacheID: sfid-20240131_045957_628592_EEA312F1 
-X-CRM114-Status: GOOD (  31.42  )
-X-BeenThere: linux-arm-kernel@lists.infradead.org
-X-Mailman-Version: 2.1.34
-Precedence: list
-List-Id: <linux-arm-kernel.lists.infradead.org>
-List-Unsubscribe: 
- <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: 
- <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: 
- linux-arm-kernel-bounces+linux-arm-kernel=archiver.kernel.org@lists.infradead.org
+Subject: [PATCH 2/3] pwm: Add Allwinner's D1/T113-S3/R329 SoCs PWM support
 
 Allwinner's D1, T113-S3 and R329 SoCs have a quite different PWM
 controllers with ones supported by pwm-sun4i driver.
@@ -800,128 +567,14 @@ index 000000000000..19bf3f495155
 +MODULE_AUTHOR("Aleksandr Shubin <privatesub2@gmail.com>");
 +MODULE_DESCRIPTION("Allwinner sun20i PWM driver");
 +MODULE_LICENSE("GPL");
+-- 
+2.45.2
 
-From patchwork Wed Jan 31 12:59:16 2024
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Patchwork-Submitter: Aleksandr Shubin <privatesub2@gmail.com>
-X-Patchwork-Id: 13539412
-Return-Path: 
- <linux-arm-kernel-bounces+linux-arm-kernel=archiver.kernel.org@lists.infradead.org>
-X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
-	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-Received: from bombadil.infradead.org (bombadil.infradead.org
- [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.lore.kernel.org (Postfix) with ESMTPS id 51419C47258
-	for <linux-arm-kernel@archiver.kernel.org>;
- Wed, 31 Jan 2024 13:00:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=lists.infradead.org; s=bombadil.20210309; h=Sender:
-	Content-Transfer-Encoding:Content-Type:List-Subscribe:List-Help:List-Post:
-	List-Archive:List-Unsubscribe:List-Id:MIME-Version:References:In-Reply-To:
-	Message-Id:Date:Subject:Cc:To:From:Reply-To:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	List-Owner; bh=c2S3MnnlfH3cC6yGru/ZdOx4a33A75T+65kq7cjRgkE=; b=WHXjWaL/e1NiPQ
-	eGJjN3b5I3tYI9D8fhDRMpQA3N7K4pcjJN2I5UM2vmdVoqvw0BLRBs8XXD/solz9f6uoBYim3N2EX
-	OxYyvzMCs9mgQ/Uk47sv2DEzHmCtkJUUNQT+AoAHTPxk8eMPVyhFb2p1AbQW0MpZ9qpq/tTikqN1m
-	tvNvqKLy+kUQcqyr1nfxB3PRrk1iSDWnFpWJ402otIcQPtiOhcI9Oy0SjIEkRRF0QgUcXMDKWCn9X
-	Odzr3Hq8mLK3rAnv7P7IClXtySm0KtTo5NLANaakf7OOhtCZZu/VaXUBfrdsX8PJvJPFaxR4fnZgd
-	kDyjcsvZOIkiBbOLfSBw==;
-Received: from localhost ([::1] helo=bombadil.infradead.org)
-	by bombadil.infradead.org with esmtp (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rVACX-00000003Tmd-0BOT;
-	Wed, 31 Jan 2024 13:00:25 +0000
-Received: from mail-lf1-x12f.google.com ([2a00:1450:4864:20::12f])
-	by bombadil.infradead.org with esmtps (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rVACB-00000003TTo-2f1o;
-	Wed, 31 Jan 2024 13:00:06 +0000
-Received: by mail-lf1-x12f.google.com with SMTP id
- 2adb3069b0e04-51025cafb51so7505797e87.2;
-        Wed, 31 Jan 2024 05:00:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706706000; x=1707310800;
- darn=lists.infradead.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Qk5axihAKFS9+0dIUTMZ/jrL2YTkFropx3eyJ2mG6qU=;
-        b=XXPay0935Bp3pcCfiTxOn6Snscj9Nw7mGd+7gjuCwgc5LUKMv7ZsEJ3hVQtIp2WKqV
-         KAdMVnQgC/mEGsxAREUUDhlKEiuI6DSRsck4312ZRQ6EtnZ3Cc8B/QrXq4tGIpXDqGCn
-         wG/PCG0hnkKev8JmTsTOdoTVqhUQeuxAp3cKJsrzWzlq5C8+W48kVU5QWM2v7/7o6LiV
-         bxqMEidvvY9UuP+GgLkogYAp6+ZM9369xaWoIQVVpOavqXhQiXfpDE9eX2XQGAg6etl+
-         2eneFQJHS79KiWae0ZRbl3wBarv6XEVpx/VLPFXzcgCzDtfRQJbRWS0x3TzSKcQiaIz2
-         +Tfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706706000; x=1707310800;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Qk5axihAKFS9+0dIUTMZ/jrL2YTkFropx3eyJ2mG6qU=;
-        b=EYGM5gI80pwV/nUPGWTbaVpk8itS3amBZfU61xVQYpoPfZ+1nci7PmKeycitnMisb5
-         s9ZLDtXa45W8xcav5kKFWlXL1BkqqKjz0dZXQ57NSbIlCmgDutDx5P+PE8snq2PevdQ9
-         Vo6Ol7xeDXsVQRPgrCYeIFnRJ70/3wJKtKDM60NT/SKNpjMzCNs663SitWsC4kZeqX6S
-         ivtV9/HMc0oJe2IIdoOwcjC9S4iZA1VXn3qvXK2OJRZ6shMaZ4tniKZS1k2tTQlo+jgo
-         cBbAM6j18gdqe7V+qV95p0aMYEcWU3mBDMD0A8vLO/3Dr8OworeWqnhwPIb0n24ahDWj
-         ZTnw==
-X-Gm-Message-State: AOJu0Yxaw92L+7QpsBH4rCE3NXOZWq6wwt7+AwMlx1hOGok+a+V5iXLn
-	wluPIJKfm4yZ4OxQzM8zZtGiNI3tpob6VJCEXSX6kSn8R14GYb8=
-X-Google-Smtp-Source: 
- AGHT+IFlj/2UQlXVTsP85U+sX9Z4Xg+m+7M8urgFGxXNNIrMtV2ixCb6BE8A2Y9DZeChVhyFjSIIgA==
-X-Received: by 2002:a05:6512:3b93:b0:511:1ed7:61bd with SMTP id
- g19-20020a0565123b9300b005111ed761bdmr1608967lfv.54.1706706000644;
-        Wed, 31 Jan 2024 05:00:00 -0800 (PST)
-Received: from localhost.localdomain ([188.162.49.60])
-        by smtp.gmail.com with ESMTPSA id
- h25-20020a19ca59000000b00510faaa62cfsm1361135lfj.222.2024.01.31.04.59.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jan 2024 04:59:59 -0800 (PST)
+
+From 8ff94844f724956f6b2a28a2b5a7a2f28061fa7a Mon Sep 17 00:00:00 2001
 From: Aleksandr Shubin <privatesub2@gmail.com>
-To: linux-kernel@vger.kernel.org
-Cc: Aleksandr Shubin <privatesub2@gmail.com>, =?utf-8?q?Uwe_Kleine-K=C3=B6ni?=
-	=?utf-8?q?g?= <u.kleine-koenig@pengutronix.de>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
- Jernej Skrabec <jernej.skrabec@gmail.com>,
- Samuel Holland <samuel@sholland.org>,
- Paul Walmsley <paul.walmsley@sifive.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Philipp Zabel <p.zabel@pengutronix.de>,
- Maksim Kiselev <bigunclemax@gmail.com>,
- Cristian Ciocaltea <cristian.ciocaltea@collabora.com>,
- Marc Kleine-Budde <mkl@pengutronix.de>, John Watts <contact@jookia.org>,
- Cheo Fusi <fusibrandon13@gmail.com>, linux-pwm@vger.kernel.org,
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-sunxi@lists.linux.dev, linux-riscv@lists.infradead.org
-Subject: [PATCH v8 3/3] riscv: dts: allwinner: d1: Add pwm node
 Date: Wed, 31 Jan 2024 15:59:16 +0300
-Message-Id: <20240131125920.2879433-4-privatesub2@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240131125920.2879433-1-privatesub2@gmail.com>
-References: <20240131125920.2879433-1-privatesub2@gmail.com>
-MIME-Version: 1.0
-X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-646709E3 
-X-CRM114-CacheID: sfid-20240131_050003_781094_6C718EFA 
-X-CRM114-Status: GOOD (  11.29  )
-X-BeenThere: linux-arm-kernel@lists.infradead.org
-X-Mailman-Version: 2.1.34
-Precedence: list
-List-Id: <linux-arm-kernel.lists.infradead.org>
-List-Unsubscribe: 
- <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: 
- <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: 
- linux-arm-kernel-bounces+linux-arm-kernel=archiver.kernel.org@lists.infradead.org
+Subject: [PATCH 3/3] riscv: dts: allwinner: d1: Add pwm node
 
 D1 and T113s contain a pwm controller with 8 channels.
 This controller is supported by the sun20i-pwm driver.
@@ -957,3 +610,6 @@ index 5a9d7f5a75b4..435a1e66aa6a 100644
  		ccu: clock-controller@2001000 {
  			compatible = "allwinner,sun20i-d1-ccu";
  			reg = <0x2001000 0x1000>;
+-- 
+2.45.2
+
