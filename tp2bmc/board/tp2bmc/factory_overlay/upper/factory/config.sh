@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PRODUCT_NAME="TuringPi2"
-PRODUCT_SERIAL_PREFIX="XZCT"
+PRODUCT_SERIAL_PREFIX=""
 # production month. format= 'YYmm'
 PRODUCTION_TIME="2406"
 
