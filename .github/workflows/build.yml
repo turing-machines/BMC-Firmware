@@ -35,11 +35,11 @@ jobs:
 
     steps:
       - name: Maximize build space
-        uses: AdityaGarg8/remove-unwanted-software@v1
+        uses: AdityaGarg8/remove-unwanted-software@v4.1
         with:
           remove-android: 'true'
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: '0'
       
@@ -52,7 +52,7 @@ jobs:
          sed -ir 's#^BMCD_VERSION.*#BMCD_VERSION=${{ inputs.bmcd_version }}#g' ${{ github.workspace }}/tp2bmc/package/bmcd/bmcd.mk
 
       - uses: docker/setup-buildx-action@v3
-      - uses: docker/build-push-action@v4
+      - uses: docker/build-push-action@v6
         with:
           context: .
           tags: buildroot_local:latest
@@ -60,6 +60,8 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           push: false
+        env:
+          DOCKER_BUILD_SUMMARY: false
 
       - name: build firmware
         uses: addnab/docker-run-action@v3
@@ -79,9 +81,8 @@ jobs:
           sudo mv buildroot/output/images/rootfs.erofs artifacts/tp2-ota-${{ env.BUILD_VERSION }}.tpu
 
       - name: archive artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           if-no-files-found: error 
           name: tp2-${{ env.BUILD_VERSION }}
           path: artifacts/*
-
