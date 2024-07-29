@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/base:ubuntu22.04
+FROM mcr.microsoft.com/devcontainers/base:ubuntu24.04
 
 RUN apt-get update && apt-get install -y \
     build-essential \
@@ -24,4 +24,6 @@ RUN apt-get update && apt-get install -y \
     libncurses-dev \
     u-boot-tools \
     mkbootimg \
-    && rm -rf /var/lib/apt/lists/*
+    xxd \
+    && rm -rf /var/lib/apt/ \
+    && rm -rf /var/cache/apt/
