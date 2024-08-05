@@ -1,20 +1,7 @@
 #!/bin/bash
 
-read -p "Enter the the last digits of product serial from the sticker: ${PRODUCT_SERIAL_PREFIX}${PRODUCTION_TIME}" serial
-
-./install_firmware
-if [[ $? -ne 0 ]]; then
-    echo -e "${RED} installation of firmware failed!${NC}"
-    exit 1
-fi
-
-# insert cookie to be picked up by bootloader.
-# This signals the bootloader not load the factory image, but too boot from
-# flash
-install_magic=0x12341234
-install_addr=0x0709010C
-devmem  $install_addr 32 $install_magic
-
+source config.sh
+read -p "Enter product serial from the sticker: ${PRODUCT_SERIAL_PREFIX}" serial
 
 days_since_may() {
 # Extract year and month from PRODUCTION_TIME
@@ -35,13 +22,47 @@ local diff_days=$((diff_seconds / 86400))
 echo "$diff_days"
 }
 
+generate_mac() {
+    # its been told that the factory serial is composed out of the following
+    # elements:
+    # XZC:Our company name initial
+    # T: project name of Turing PI initial
+    # 2211:Production time November 2022
+    # 00605:Product serial number
+
+    # get the last five digits
+    local product_digits=$((10#${serial: -5}))
+    if ! [[ "$product_digits" =~ ^[0-9]+$ ]]; then
+        echo -e "${RED} ERROR: provided serial is not correct. Expected a serial ending with at least containing 5 digits${NC}"
+        exit 1
+    fi
+
+    eui_48=$(printf "%05X" "$product_digits")
+    echo "${TPI_MAC_BASE}${eui_48}"
+}
+
+generated_mac=$(generate_mac)
 
 tpi_factory_serial="${PRODUCT_SERIAL_PREFIX}${serial}" \
 tpi_product_name="$PRODUCT_NAME" \
 tpi_production_time="$(days_since_may)" \
+tpi_mac="$generated_mac" \
 tpi eeprom set
 
 if [[ $? -ne 0 ]]; then
     echo -e "${RED} Error burning eeprom!${NC}"
     exit 1
 fi
+
+./install_firmware
+if [[ $? -ne 0 ]]; then
+    echo -e "${RED} installation of firmware failed!${NC}"
+    exit 1
+fi
+
+# insert cookie to be picked up by bootloader.
+# This signals the bootloader not load the factory image, but too boot from
+# flash
+install_magic=0x12341234
+install_addr=0x0709010C
+devmem  $install_addr 32 $install_magic
