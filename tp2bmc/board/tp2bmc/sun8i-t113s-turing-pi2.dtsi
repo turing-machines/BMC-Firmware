@@ -213,10 +213,15 @@
 	eeprom@50 {
 		compatible = "microchip,24c02", "atmel,24c02";
 		reg = <0x50>;
-
 		vcc-supply = <&reg_3v3>;
-
 		pagesize = <16>;
+
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		mac_address: mac-address@2c {
+			reg = <0x2c 0x06>;
+		};
 	};
 
 	ethernet_switch: ethernet-switch@5c {
@@ -304,10 +309,10 @@
 
 &emac {
 	status = "okay";
-
+	nvmem-cells = <&mac_address>;
+	nvmem-cell-names = "mac-address";
 	pinctrl-names = "default";
 	pinctrl-0 = <&rmii_pe_pins>;
-
 	phy-handle = <&rtl8201f>;
 	phy-mode = "rmii";
 	phy-supply = <&reg_3v3>;
