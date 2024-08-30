@@ -125,7 +125,7 @@
 	i2c2_pe12_pins: i2c2-pe12-pins {
 		pins = "PE12", "PE13";
 		function = "i2c2";
-		drive-strength = <10>;
+		drive-strength = <20>;
 	};
 
 	uart2_pd_pins: uart2-pd-pins {
