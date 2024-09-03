@@ -19,7 +19,7 @@ get_sata_devices() {
 
 get_pci_devices() {
     local n="$1"
-    send_command "$n" "lspci | grep -v ASM1061 | grep -v RK3588 | grep -v 'PCI bridge: Broadcom Inc' | grep -v 'Technologies, Inc. VL805/806 xHCI USB 3.0 Controller (rev 01)'"
+    send_command "$n" "lspci | grep -v ASM1061 | grep -v 'Ltd Device 3588' | grep -v RK3588 | grep -v 'PCI bridge: Broadcom Inc' | grep -v 'Technologies, Inc. VL805/806 xHCI USB 3.0 Controller (rev 01)'"
 }
 
 assert_pci_devices() {
