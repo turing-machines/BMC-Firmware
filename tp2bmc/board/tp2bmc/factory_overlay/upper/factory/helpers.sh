@@ -60,7 +60,7 @@ send_command() {
     local node_ip_var="NODE${n}_IP"
     local node_ip_value=$(eval echo \$$node_ip_var)
 
-    sshpass -p "$RK1_PASSWORD" ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 "${RK1_USERNAME}@${node_ip_value}" "$cmd"
+    sshpass -p "$RK1_PASSWORD" ssh -o LogLevel=ERROR -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o ConnectTimeout=10 "${RK1_USERNAME}@${node_ip_value}" "$cmd"
 }
 
 uart_output_node() {
