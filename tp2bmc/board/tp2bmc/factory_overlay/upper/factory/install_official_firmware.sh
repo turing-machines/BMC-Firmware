@@ -1,7 +1,13 @@
 #!/bin/bash
 
 source config.sh
-read -p "Enter product serial from the sticker: ${PRODUCT_SERIAL_PREFIX}" serial
+echo -e "\n"
+echo -e "${YELLOW}Verify now if:${NC}"
+echo -e "${YELLOW}  - the fan is spinning${NC}"
+echo -e "${YELLOW}  - there is picture on the monitor${NC}"
+confirm "Confirm verification"
+echo -e "\n"
+read -p "Enter product serial from the sticker: " serial
 
 days_since_may() {
 # Extract year and month from PRODUCTION_TIME
@@ -43,7 +49,7 @@ generate_mac() {
 
 generated_mac=$(generate_mac)
 
-tpi_factory_serial="${PRODUCT_SERIAL_PREFIX}${serial}" \
+tpi_factory_serial="${serial}" \
 tpi_product_name="$PRODUCT_NAME" \
 tpi_production_time="$(days_since_may)" \
 tpi_mac="$generated_mac" \
@@ -53,6 +59,9 @@ if [[ $? -ne 0 ]]; then
     echo -e "${RED} Error burning eeprom!${NC}"
     exit 1
 fi
+
+echo "Running post test script.."
+./post_test.sh &
 
 ./install_firmware
 if [[ $? -ne 0 ]]; then

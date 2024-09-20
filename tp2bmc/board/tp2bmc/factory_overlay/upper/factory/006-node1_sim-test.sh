@@ -3,7 +3,7 @@
 # inserted. According the documentation of Quectel, there are 2 tty's created,
 # where the second one is the AT shell.
 # tested with:  Quectel EC25 LTE modem
-
+exit 0
 source node_helpers.sh
 at_modem="/dev/ttyUSB2"
 

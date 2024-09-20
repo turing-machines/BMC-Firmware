@@ -45,10 +45,10 @@ get_ip_and_ping() {
     fi
 
     # Ping the IP address
-    ping -c 4 "$ip" > /dev/null
+    ping -c 4 -i 0.1 "$ip" > /dev/null
     if [ "$?" -ne 0 ]; then
         echo "Error: could not ping node $n"
-        exit 1
+        return 1
     fi
 
     echo -e "\tNode $n $ip => OK"
@@ -70,19 +70,40 @@ node4_test() {
     get_ip_and_ping "4"
 }
 
-tpi power off > /dev/null
-tpi power on > /dev/null
+#tpi power off > /dev/null
+#tpi power on > /dev/null
 
-echo -e "\tWaiting for modules to boot, this can take up to a minute.."
+echo -e "\tWaiting for the modules..."
 
 node1_test & pid1=$!
 node2_test & pid2=$!
 node3_test & pid3=$!
 node4_test & pid4=$!
 
-# Wait for each job and check their exit status
-wait $pid1 || { exit 1; }
-wait $pid2 || { exit 1; }
-wait $pid3 || { exit 1; }
-wait $pid4 || { exit 1; }
+result=0
 
+wait $pid1
+status1=$?
+if [ $status1 -ne 0 ]; then
+    result=$((result + 1))
+fi
+
+wait $pid2
+status2=$?
+if [ $status2 -ne 0 ]; then
+    result=$((result + 2))
+fi
+
+wait $pid3
+status3=$?
+if [ $status3 -ne 0 ]; then
+    result=$((result + 4))
+fi
+
+wait $pid4
+status4=$?
+if [ $status4 -ne 0 ]; then
+    result=$((result + 8))
+fi
+
+exit $result
