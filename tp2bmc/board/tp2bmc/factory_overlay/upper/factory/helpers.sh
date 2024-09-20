@@ -35,7 +35,7 @@ confirm() {
             return 0
         # If the user types 'n'/'N'
         elif [[ "$REPLY" =~ ^[Nn]$ ]]; then
-            exit 1
+            return 1
         else
             # Prompt the user to try again for invalid input
             echo "Invalid input, please try again."
@@ -60,7 +60,21 @@ send_command() {
     local node_ip_var="NODE${n}_IP"
     local node_ip_value=$(eval echo \$$node_ip_var)
 
-    sshpass -p "$RK1_PASSWORD" ssh -o LogLevel=ERROR -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o ConnectTimeout=10 "${RK1_USERNAME}@${node_ip_value}" "$cmd"
+    retries=0
+    while true; do
+        output=$(sshpass -p "$RK1_PASSWORD" ssh -o LogLevel=ERROR -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o ConnectTimeout=1 "${RK1_USERNAME}@${node_ip_value}" "$cmd" 2>/dev/null)
+        return_code=$?
+        if [ $return_code -eq 0 ] || [ $return_code -eq 1 ]; then
+            echo "$output"
+            return $return_code
+        fi
+        (( retries += 1 ))
+        if [ $retries -eq 500 ]; then
+            break
+        fi
+        sleep 0.1
+    done
+    return $return_code
 }
 
 uart_output_node() {
@@ -74,15 +88,16 @@ wait_until_booted() {
     local node_ip_value=$(eval echo \$$node_ip_var)
 
     local HOST="$node_ip_value"
-    local INTERVAL=5
-    local END_TIME=$((SECONDS + PING_TIMEOUT))
+    #local INTERVAL=5
+    #local END_TIME=$((SECONDS + PING_TIMEOUT))
 
+    local counter=$PING_TIMEOUT
     while ! ping -c 1 -W 1 $HOST &> /dev/null; do
-        if [ $SECONDS -ge $END_TIME ]; then
+        if [ $counter -eq 0 ]; then
             echo "Error: node $node ($HOST) is not reachable within $PING_TIMEOUT seconds.">&2
             return 1
         fi
-        sleep $INTERVAL
+        #sleep $INTERVAL
+        ((counter--))
     done
 }
-

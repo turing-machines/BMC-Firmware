@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# Turn on the node power as soosn as possible
+# to speed up factory testing
+
+case "$1" in
+    start|"")
+        echo "enabled" > /sys/devices/platform/node1-power/state
+        echo "enabled" > /sys/devices/platform/node2-power/state
+        echo "enabled" > /sys/devices/platform/node3-power/state
+        echo "enabled" > /sys/devices/platform/node4-power/state
+        ;;
+    *)
+        echo "Usage: $0 {start}"
+        exit 1
+        ;;
+esac
+

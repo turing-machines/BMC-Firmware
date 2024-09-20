@@ -25,22 +25,36 @@ get_pci_devices() {
 assert_pci_devices() {
     local node="$1"
     local count="$2"
-    local devices=$(get_pci_devices "$node")
-    local lte_modem=$(send_command $node "lsusb -d ${LTE_MODEM}" | awk '{for(i=3;i<=NF;i++) printf $i" "; print ""}')
-    devices=$(echo -e "${devices}\n${lte_modem}" | grep -v '^$')
+    local pcie_devices=$(get_pci_devices "$node")
+    local lte_modem=$(send_command $node "lsusb" | grep "$LTE_MODEM" | awk '{for(i=3;i<=NF;i++) printf $i" "; print ""}')
+    #echo 1
+    #local pcie_devices=$(get_pci_devices "$node")
+    #echo 2
+    #local lte_modem=$(send_command $node "lsusb -d ${LTE_MODEM}")
+    #echo 3
+    devices=$(echo -e "${pcie_devices}\n${lte_modem}" | grep -v '^$')
+    pcie_devices=$(echo -e "${pcie_devices}" | grep -v '^$')
+    lte_modems=$(echo -e "${lte_modem}" | grep -v '^$')
 
+    line_count=0
+    return_code=0
 
-    if [ -z "$devices" ]; then
-        line_count=0
-    else
-        line_count=$(echo "$devices" | wc -l)
+    if [ -n "$pcie_devices" ]; then
+        (( line_count += $(echo "$pcie_devices" | wc -l) ))
+    fi
+
+    if [ -n "$lte_modems" ]; then
+        (( line_count += $(echo "$lte_modems" | wc -l) ))
+    fi
+
+    if [ $line_count -ne 0 ]; then
         print_pci_names "$devices"
     fi
 
     if [ $line_count -ne ${count} ]; then
         echo "Error: The test requires ${count} PCI device(s) connected to node $node, found $line_count." >&2
         echo "Error: Verify the connected NVMe or MPCIe modules" >&2
-        exit 1
+        return 1
     fi
 }
 
@@ -58,7 +72,7 @@ assert_usb_devices() {
 
     if [[ $line_count -ne $usb_count ]]; then
         echo "Error: the test requires ${usb_count} USB device(s) connected to node ${node}, found ${line_count}" >&2
-        exit 1
+        return 1
     fi
 }
 
@@ -76,7 +90,7 @@ assert_sata_devices() {
 
     if [[ $line_count -ne $count ]]; then
         echo "Error: the test requires ${count} SATA device(s) connected to node ${node}, found ${line_count}" >&2
-        exit 1
+        return 1
     fi
 }
 
