@@ -189,7 +189,7 @@ while true; do
             stage_3=1
         fi
         if [ "$node4_not_ok" -ne 0 ]; then
-            print_failed "005-4" "${GREEN} #14${NC}" result_test_005
+            print_failed "005-4" "${GREEN}FIX #14${NC}" result_test_005
             stage_3=1
         fi
         if [ "$node1_not_ok" -eq 0 ] && [ "$node2_not_ok" -eq 0 ] && [ "$node3_not_ok" -eq 0 ] && [ "$node4_not_ok" -eq 0 ]; then
