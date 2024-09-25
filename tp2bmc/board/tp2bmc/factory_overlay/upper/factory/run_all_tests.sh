@@ -64,10 +64,8 @@ try_run_test() {
 
 #tpi advanced normal --node 2 >/dev/null
 #tpi power on > /dev/null
-tpi power --node 1 on >/dev/null &
-tpi power --node 2 on >/dev/null &
-tpi power --node 3 on >/dev/null &
-tpi power --node 4 on >/dev/null &
+tpi power on >/dev/null &
+
 
 test_results=""
 
@@ -159,10 +157,7 @@ while true; do
 
     stage_3=0
 
-    tpi power --node 1 on >/dev/null &
-    tpi power --node 2 on >/dev/null &
-    tpi power --node 3 on >/dev/null &
-    tpi power --node 4 on >/dev/null &
+    tpi power on >/dev/null &
 
 
     if [ "$run_test_005" -eq 1 ]; then

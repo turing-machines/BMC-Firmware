@@ -9,6 +9,9 @@ KEYFILE="/etc/ssl/certs/bmcd_key.pem"
 start() {
     printf 'Starting %s...\n' "$DAEMON"
 
+    # Make the persistency storage read only
+    chmod 444 /var/lib/bmcd/bmcd.bin
+
     [ ! -f "$CERTFILE" ] || [ ! -f "$KEYFILE" ] && /etc/bmcd/generate_self_signedx509.sh
 
     start-stop-daemon --start --quiet --background --make-pidfile --pidfile "$PIDFILE" --no-close \
