@@ -1,7 +1,44 @@
 #!/bin/sh
 
+USER_INTERFACES="/mnt/overlay/upper/etc/network/interfaces"
+
 log() {
 	echo "PREINIT: $*"
+}
+
+# user_defined_old_interface_config
+#
+# Checks if the user has configured an interfaces file for fw < v2.1.
+# Requires the overlay filesystem to be mounted.
+#
+user_defined_old_interface_config() {
+    if [ ! -f "$USER_INTERFACES" ]; then
+        # No user override
+        return 1
+    fi
+
+    local is_new
+    local has_eth0
+
+    grep -qE "node[1-4]|ge[01]" "$USER_INTERFACES" && is_new=1 || is_new=0
+    grep -qE "^[^#]*eth0" "$USER_INTERFACES" && has_eth0=1 || has_eth0=0
+
+    if [ "$is_new" -eq 0 ] || [ "$has_eth0" -eq 1 ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+migrate_interfaces_v2_1() {
+if user_defined_old_interface_config; then
+    mv "$USER_INTERFACES" "${USER_INTERFACES}_bak"
+    # Add a comment block at the top of the new file
+    sed -i '1i# This file was automatically updated by a migration script\n#\
+        The original /etc/network/interfaces file is renamed to `interfaces_bak`.\n#\
+        From v2.1 onwards, eth0 is deprecated and configuration needs to be applied to interface br0 instead.\n#' "/etc/network/interfaces"
+    log migrated interfaces file
+fi
 }
 
 #
@@ -71,8 +108,11 @@ preinit() {
 
 	pivot_overlay $OVERLAY
 
+    migrate_interfaces_v2_1
+
 	log Beginning init
 	exec /sbin/init
 }
+
 
 preinit
