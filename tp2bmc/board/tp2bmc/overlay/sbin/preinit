@@ -1,8 +1,5 @@
 #!/bin/sh
 
-OVERLAY_INTERFACES="/mnt/overlay/upper/etc/network/interfaces"
-BR0_PORTS="node1 node2 node3 node4 ge0 ge1"
-
 log() {
 	echo "PREINIT: $*"
 }
