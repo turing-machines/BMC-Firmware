@@ -25,5 +25,6 @@ RUN apt-get update && apt-get install -y \
     u-boot-tools \
     mkbootimg \
     xxd \
+    shellcheck \
     && rm -rf /var/lib/apt/ \
     && rm -rf /var/cache/apt/
