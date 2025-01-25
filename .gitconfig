@@ -1,0 +1,8 @@
+[core]
+    eol = lf
+    autocrlf = input
+
+[alias]
+    root = rev-parse --show-toplevel
+    sha1 = !sh -c 'git rev-parse --short ${1:-HEAD}' --
+    build = !sh -c '$(git rev-parse --show-toplevel)/scripts/build.sh'
