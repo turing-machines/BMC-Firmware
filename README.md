@@ -154,7 +154,7 @@ the scripts directory.
 ## Commands
 
 When using the devcontainer the git repository is automatically configured to extend
-the git commands to include the additional aliasses for development.
+the git commands to include the additional aliases for development.
 
 If you are building on a native host you need to configure this manually.
 This can be done by running the following command.
@@ -194,7 +194,7 @@ root directory of this repository. It has all the dependencies needed to build t
 
 Start the devcontainer, after the workspace is up and running you can start your development or
 build the firmware using either the scripts from the script directory or the provided `git`
-aliasses. Because Linux and Windows have a case-sensitive filesystem the build can actually take
+aliases. Because Linux and Windows have a case-sensitive filesystem the build can actually take
 place on the host filesystem through the devcontainer mounted repository host directory.
 
 The workspace directory `/work` in the devcontainer is the repository directory on the host.
@@ -203,7 +203,7 @@ The workspace directory `/work` in the devcontainer is the repository directory 
 
 Start the devcontainer, after the workspace is up and running you can start your development or
 build the firmware using either the scripts from the script directory or the provided `git`
-aliasses. MacOS uses APFS which is a case-insensitive filesystem, this causes build problems.
+aliases. MacOS uses APFS which is a case-insensitive filesystem, this causes build problems.
 For this reason the workspace directory `/work` of the devcontainer is a docker volume which
 bypasses the filesystem restriction. The repository on the host is mounted in the devcontainer
 in the `/mnt` directory.
@@ -247,7 +247,7 @@ required to have the following packages installed:
 
 > **Commands**
 >
-> If you want the `git` aliasses to work check the section [Commands](#commands) and run the
+> If you want the `git` aliases to work check the section [Commands](#commands) and run the
 > command to activate the repository gitconfig.
 
 ```shell
