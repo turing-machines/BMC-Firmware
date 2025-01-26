@@ -9,3 +9,7 @@ root=$(git rev-parse --show-toplevel)
 if [[ -d "${root}/buildroot" ]]; then
     rm -rf "${root}/buildroot"
 fi
+
+if [[ -d "${root}/dist" ]]; then
+    rm -rf "${root}/dist"
+fi
