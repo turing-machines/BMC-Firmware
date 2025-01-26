@@ -12,4 +12,7 @@ if [[ "${HOST_OS^^}" == "DARWIN" ]]; then
     "$(git rev-parse --show-toplevel)/scripts/sync.sh"
 fi
 
+# Configure git config
+git config --local include.path ../.gitconfig
+
 echo "Container initialized"
