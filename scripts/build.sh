@@ -30,15 +30,42 @@ if make; then
         mkdir -p "${dist}"
     fi
 
+    printf '\n\n'
+    printf '================================================================================\n'
+    printf 'Build Completed\n\n'
+
     # Copy to dist folder
     if [[ -d "${build_root}/output/images" ]]; then
-        # Check of OTA Image
+        # Check for OTA Image
         if [[ -f "${build_root}/output/images/rootfs.erofs" ]]; then
             # OTA image exists, copy it to dist
+            echo "Copying OTA image"
             cp -v "${build_root}/output/images/rootfs.erofs" "${dist}/tp2-bmc-ota-$(date +%Y.%m.%d).tpu"
+            
+            # The image is a binary image therefor use sha256sum binary mode
+            echo "Generating SHA256 for: tp2-bmc-ota-$(date +%Y.%m.%d).tpu.sha256"
+            sha256sum -b "${dist}/tp2-bmc-ota-$(date +%Y.%m.%d).tpu" > "${dist}/tp2-bmc-ota-$(date +%Y.%m.%d).tpu.sha256"
         else
-            echo "Error: OTA Image not found"
+            echo "Error: OTA image not found"
         fi
+
+        # Check for SDCard image
+        if [[ -f "${build_root}/output/images/tp2-bmc-firmware-sdcard.img" ]]; then
+            # SDCard image, copy it to dist
+            echo "Copying SDCard image"
+            cp -v "${build_root}/output/images/tp2-bmc-firmware-sdcard.img" "${dist}/tp2-bmc-firmware-sdcard.img"
+
+            # The image is a binary image therefor use sha256sum binary mode
+            echo "Generating SHA256 for: tp2-bmc-firmware-sdcard.img"
+            sha256sum -b "${dist}/tp2-bmc-firmware-sdcard.img" > "${dist}/tp2-bmc-firmware-sdcard.img.sha256"
+        else
+            echo "Error: SDCard image not found"
+        fi
+    fi
+
+    # If on macOS sync to Host
+    if [[ "${HOST_OS^^}" == "DARWIN" ]]; then
+        "${root}/scripts/sync.sh"
     fi
 fi
 
