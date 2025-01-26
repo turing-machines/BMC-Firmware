@@ -11,7 +11,7 @@
 #
 
 # Configure shell
-set -euo pipefail
+set -eo pipefail
 set -x
 
 # Buildroot Version
