@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # shellcheck shell=bash
-#
+
 # This script downloads, unpacks and installs the buildroot system to a given
 # location. The default install location will be used when no install dir is
 # passed, this is the root directory of this repository.
@@ -17,12 +17,15 @@ set -x
 # Buildroot Version
 BUILDROOT_VER="2024.05.1"
 
+# Save current directory
+CWD=$(pwd)
+
 download_dir=$(mktemp -d)
 install_dir="$1"
 buildroot_url="https://buildroot.org/downloads/buildroot-${BUILDROOT_VER}.tar.gz"
 buildroot=$(basename "$buildroot_url")
 buildroot_folder="${buildroot%.tar.gz}"
-project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+project_root=$(git rev-parse --show-toplevel)
 
 pushd "$download_dir"
     wget "$buildroot_url"
@@ -47,3 +50,6 @@ for patchfile in "$project_root"/buildroot_patches/*; do
     fi
 done
 popd
+
+# Restore current directory
+cd "${CWD}" || exit 1
