@@ -3,8 +3,9 @@
 
 set -euo pipefail
 
-ROOT=$(git rev-parse --show-toplevel)
+# Get repository root
+root=$(git rev-parse --show-toplevel)
 
-if [[ -d "${ROOT}/buildroot" ]]; then
-    rm -rf "${ROOT}/buildroot"
+if [[ -d "${root}/buildroot" ]]; then
+    rm -rf "${root}/buildroot"
 fi

@@ -7,12 +7,12 @@ set -euo pipefail
 CWD=$(pwd)
 
 # Configure directories
-ROOT=$(git rev-parse --show-toplevel)
-DIST="${ROOT}/dist"
-BUILD_ROOT="${ROOT}/buildroot"
+root=$(git rev-parse --show-toplevel)
+dist="${root}/dist"
+build_root="${root}/buildroot"
 
 # Jump to build directory
-cd "${BUILD_ROOT}" || exit 1
+cd "${build_root}" || exit 1
 
 # Prepare buildroot
 make BR2_EXTERNAL=../tp2bmc tp2bmc_defconfig
@@ -22,20 +22,20 @@ if make; then
     # Check if we are running on darwin (macOS)
     # if we do then use the mounted dist folder, this is the repository directory on the host
     if [[ "${HOST_OS^^}" == "DARWIN" ]]; then
-        DIST="/mnt/dist"
+        dist="/mnt/dist"
     fi
 
     # Create dist folder if not exists
-    if [[ ! -d "${DIST}" ]]; then
-        mkdir -p "$DIST"
+    if [[ ! -d "${dist}" ]]; then
+        mkdir -p "${dist}"
     fi
 
     # Copy to dist folder
-    if [[ -d "${BUILD_ROOT}/output/images" ]]; then
+    if [[ -d "${build_root}/output/images" ]]; then
         # Check of OTA Image
-        if [[ -f "${BUILD_ROOT}/output/images/rootfs.erofs" ]]; then
+        if [[ -f "${build_root}/output/images/rootfs.erofs" ]]; then
             # OTA image exists, copy it to dist
-            cp -v "${BUILD_ROOT}/output/images/rootfs.erofs" "${DIST}/tp2-bmc-ota-$(date +%Y.%m.%d).tpu"
+            cp -v "${build_root}/output/images/rootfs.erofs" "${dist}/tp2-bmc-ota-$(date +%Y.%m.%d).tpu"
         else
             echo "Error: OTA Image not found"
         fi
