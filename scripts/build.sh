@@ -39,12 +39,14 @@ if make; then
         # Check for OTA Image
         if [[ -f "${build_root}/output/images/rootfs.erofs" ]]; then
             # OTA image exists, copy it to dist
+            OTA_FILENAME="tp2-bmc-firmware-ota-$(date +%Y.%m.%d).tpu"
+
             echo "Copying OTA image"
-            cp -v "${build_root}/output/images/rootfs.erofs" "${dist}/tp2-bmc-ota-$(date +%Y.%m.%d).tpu"
+            cp -v "${build_root}/output/images/rootfs.erofs" "${dist}/${OTA_FILENAME}"
             
             # The image is a binary image therefor use sha256sum binary mode
-            echo "Generating SHA256 for: tp2-bmc-ota-$(date +%Y.%m.%d).tpu.sha256"
-            sha256sum -b "${dist}/tp2-bmc-ota-$(date +%Y.%m.%d).tpu" > "${dist}/tp2-bmc-ota-$(date +%Y.%m.%d).tpu.sha256"
+            echo "Generating SHA256 for: ${OTA_FILENAME}.sha256"
+            sha256sum -b "${dist}/${OTA_FILENAME}" > "${dist}/${OTA_FILENAME}.sha256"
         else
             echo "Error: OTA image not found"
         fi
@@ -52,12 +54,14 @@ if make; then
         # Check for SDCard image
         if [[ -f "${build_root}/output/images/tp2-bmc-firmware-sdcard.img" ]]; then
             # SDCard image, copy it to dist
+            SDCARD_FILENAME="tp2-bmc-firmware-sdcard-$(date +%Y.%m.%d).img"
+
             echo "Copying SDCard image"
-            cp -v "${build_root}/output/images/tp2-bmc-firmware-sdcard.img" "${dist}/tp2-bmc-firmware-sdcard.img"
+            cp -v "${build_root}/output/images/tp2-bmc-firmware-sdcard.img" "${dist}/${SDCARD_FILENAME}"
 
             # The image is a binary image therefor use sha256sum binary mode
-            echo "Generating SHA256 for: tp2-bmc-firmware-sdcard.img"
-            sha256sum -b "${dist}/tp2-bmc-firmware-sdcard.img" > "${dist}/tp2-bmc-firmware-sdcard.img.sha256"
+            echo "Generating SHA256 for: ${SDCARD_FILENAME}"
+            sha256sum -b "${dist}/${SDCARD_FILENAME}" > "${dist}/${SDCARD_FILENAME}.sha256"
         else
             echo "Error: SDCard image not found"
         fi
