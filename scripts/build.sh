@@ -43,4 +43,4 @@ if make; then
 fi
 
 # Restore current directory
-cd "$CWD" || exit 1
+cd "${CWD}" || exit 1
