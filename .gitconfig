@@ -6,5 +6,5 @@
     root = rev-parse --show-toplevel
     sha1 = !sh -c 'git rev-parse --short ${1:-HEAD}' --
     build = !sh -c '$(git rev-parse --show-toplevel)/scripts/build.sh'
-    clean = !sh -c '$(git rev-parse --show-toplevel)/scripts/clean.sh'
+    cleanup = !sh -c '$(git rev-parse --show-toplevel)/scripts/clean.sh'
     sync = !sh -c '$(git rev-parse --show-toplevel)/scripts/sync.sh'
