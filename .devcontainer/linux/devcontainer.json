@@ -6,7 +6,7 @@
     "context": "..",
     "dockerfile": "../Dockerfile"
   },
-  "workspaceMount": "source=${localWorkspaceFolder},target=/mnt,type=bind,consistency=consistent,bind-propagation=rprivate",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/work,type=bind,consistency=consistent,bind-propagation=rprivate",
   "workspaceFolder": "/work",
   "containerEnv": {
     "HOST_OS": "LINUX"
