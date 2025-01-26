@@ -210,7 +210,8 @@ in the `/mnt` directory.
 
 In order to sync changes back and forth between the host and container if needed the command
 `git sync` can be used. However the devcontainer `/work` workspace is a full working git
-repository.
+repository. The log of the syncing between host and container can be viewed in the container
+log file `/tmp/sync.log`.
 
 > **IMPORTANT**
 >
