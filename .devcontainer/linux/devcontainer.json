@@ -4,7 +4,7 @@
   "name": "bmc-firmware",
   "build": {
     "context": "..",
-    "dockerfile": "../Dockerfile"
+    "dockerfile": "../../Dockerfile"
   },
   "workspaceMount": "source=${localWorkspaceFolder},target=/work,type=bind,consistency=consistent,bind-propagation=rprivate",
   "workspaceFolder": "/work",
