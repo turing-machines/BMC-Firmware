@@ -19,6 +19,9 @@ make BR2_EXTERNAL=../tp2bmc tp2bmc_defconfig
 
 # Build
 if make; then
+    OTA_FILENAME="tp2-bmc-firmware-ota-$(date +%Y.%m.%d).tpu"
+    SDCARD_FILENAME="tp2-bmc-firmware-sdcard-$(date +%Y.%m.%d).img"
+
     # Check if we are running on darwin (macOS)
     # if we do then use the mounted dist folder, this is the repository directory on the host
     if [[ "${HOST_OS^^}" == "DARWIN" ]]; then
@@ -39,8 +42,6 @@ if make; then
         # Check for OTA Image
         if [[ -f "${build_root}/output/images/rootfs.erofs" ]]; then
             # OTA image exists, copy it to dist
-            OTA_FILENAME="tp2-bmc-firmware-ota-$(date +%Y.%m.%d).tpu"
-
             echo "Copying OTA image"
             cp -v "${build_root}/output/images/rootfs.erofs" "${dist}/${OTA_FILENAME}"
             
@@ -54,8 +55,6 @@ if make; then
         # Check for SDCard image
         if [[ -f "${build_root}/output/images/tp2-bmc-firmware-sdcard.img" ]]; then
             # SDCard image, copy it to dist
-            SDCARD_FILENAME="tp2-bmc-firmware-sdcard-$(date +%Y.%m.%d).img"
-
             echo "Copying SDCard image"
             cp -v "${build_root}/output/images/tp2-bmc-firmware-sdcard.img" "${dist}/${SDCARD_FILENAME}"
 
@@ -71,6 +70,13 @@ if make; then
     if [[ "${HOST_OS^^}" == "DARWIN" ]]; then
         "${root}/scripts/sync.sh"
     fi
+
+    # Summary
+    printf '\n\n'
+    printf '================================================================================\n'
+    printf 'Summary\n\n'
+
+    printf "%s\n\n" "$(du -h "${dist}/${OTA_FILENAME}" "${dist}/${SDCARD_FILENAME}")"
 fi
 
 # Restore current directory
