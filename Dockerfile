@@ -31,3 +31,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/cache/apt/ \
     && wget -q -O /usr/bin/hadolint https://github.com/hadolint/hadolint/releases/download/v2.12.0/hadolint-Linux-x86_64 \
     && chmod 755 /usr/bin/hadolint
+
+# Persists command history
+ENV HISTFILE=/work/.devcontainer/.bash_history
+ENV PROMPT_COMMAND="history -a"
