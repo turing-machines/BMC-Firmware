@@ -140,6 +140,17 @@ the scripts directory.
 | init.sh      | This is the devcontainer initialization script, only used by the devcontainer on startup                                        |
 | sync.sh      | Only for macOS / darwin, synchronize changes to the host                                                                        |
 
+> **NOTE**
+>
+> If an additional script is added then some extra steps are required. The provided gitconfig turns off `filemode` this is due to the fact that development
+> takes place on multiple platforms. However, we want to be able to execute the scripts after we have committed them, so when writing the script giving
+> it `chmod +x` and then commiting is not sufficient. In order to commit the execute bit to the repsoitory the following command must be given
+> to commit the execute bit to the git repository.
+>
+> `git update-index --chmod=+x <FILE>`
+>
+> This will stage the execute bit to the git staging, after which it can be commited with a message `chore: update file permissions`.
+
 ## Commands
 
 When using the devcontainer the git repository is automatically configured to extend
