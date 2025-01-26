@@ -55,7 +55,7 @@ visibility reasons, we will mainly use the issue tracker of this repository.
 
 >**Note: If you are running a firmware version lower than < v2.0.0, you must do
 >a one-time-only SD card upgrade to version v2.0.0.**
-
+>
 >**Note 2: Prior to v2.0.0 a third-party tool 'PhoenixSuit' was required to
 >flash firmware. This tool is obsoleted, and only the methods described on our
 >website can be used to flash your board.**
