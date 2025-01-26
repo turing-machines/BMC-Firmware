@@ -1,6 +1,7 @@
 [core]
     eol = lf
     autocrlf = input
+    filemode = false
 
 [alias]
     root        = rev-parse --show-toplevel
