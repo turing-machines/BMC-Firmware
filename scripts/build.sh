@@ -10,7 +10,7 @@ CWD=$(pwd)
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../" && pwd)"
 dist="${root}/dist"
 build_root="${root}/buildroot"
-release="$(date +%Y.%m.%d)"
+release="$(date +'%Y.%m.%d'-"$(git rev-parse --short=8 HEAD)")"
 
 # Function to display usage
 usage() {
