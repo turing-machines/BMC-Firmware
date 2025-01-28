@@ -3,12 +3,7 @@
 
 set -meuo pipefail
 
-root=$(git rev-parse --show-toplevel)
-# root directory fallback
-if [[ -z "${root}" ]]; then
-    root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../" && pwd)"
-    echo "Using root directory: ${root}"
-fi
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../" && pwd)"
 
 echo "Enforcing permissions"
 sudo chmod 777 /work /mnt
@@ -25,7 +20,7 @@ if [[ "${HOST_OS^^}" == "DARWIN" ]]; then
     fi
     
     # Sync container and host
-    "{root}/scripts/sync.sh"
+    "${root}/scripts/sync.sh"
 fi
 
 echo "Container initialized"
