@@ -27,6 +27,12 @@ buildroot=$(basename "$buildroot_url")
 buildroot_folder="${buildroot%.tar.gz}"
 project_root=$(git rev-parse --show-toplevel)
 
+# Fix for GitHub Actions: root directory fallback
+if [[ -z "${project_root}" ]]; then
+    project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../" && pwd)"
+    echo "Using root directory: ${project_root}"
+fi
+
 pushd "$download_dir"
     wget "$buildroot_url"
     tar -xvf "$buildroot"
