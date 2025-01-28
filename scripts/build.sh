@@ -8,6 +8,12 @@ CWD=$(pwd)
 
 # Configure directories
 root=$(git rev-parse --show-toplevel)
+# Fix for GitHub Actions: root directory fallback
+if [[ -z "${root}" ]]; then
+    root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../" && pwd)"
+    echo "Using root directory: ${root}"
+fi
+
 dist="${root}/dist"
 build_root="${root}/buildroot"
 release="$(date +%Y.%m.%d)"
