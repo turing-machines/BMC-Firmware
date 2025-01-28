@@ -10,6 +10,30 @@ CWD=$(pwd)
 root=$(git rev-parse --show-toplevel)
 dist="${root}/dist"
 build_root="${root}/buildroot"
+release="$(date +%Y.%m.%d)"
+
+# Function to display usage
+usage() {
+    echo "Usage: $0 [--dir|-d <directory>] [--release|-r]"
+    exit 1
+}
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --dir|-d)
+            build_root="$2"
+            shift 2
+            ;;
+        --release|-r)
+            release="$2"
+            shift 2
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
 
 # Jump to build directory
 cd "${build_root}" || exit 1
@@ -19,8 +43,8 @@ make BR2_EXTERNAL=../tp2bmc tp2bmc_defconfig
 
 # Build
 if make; then
-    OTA_FILENAME="tp2-bmc-firmware-ota-$(date +%Y.%m.%d).tpu"
-    SDCARD_FILENAME="tp2-bmc-firmware-sdcard-$(date +%Y.%m.%d).img"
+    OTA_FILENAME="tp2-bmc-firmware-ota-${release}.tpu"
+    SDCARD_FILENAME="tp2-bmc-firmware-sdcard-${release}.img"
 
     # Check if we are running on darwin (macOS)
     # if we do then use the mounted dist folder, this is the repository directory on the host

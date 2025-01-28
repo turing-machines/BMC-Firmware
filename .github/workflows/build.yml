@@ -70,13 +70,13 @@ jobs:
           options: -v ${{ github.workspace }}:/work
           run: |
             /work/scripts/configure.sh
-            /work/scripts/build.sh
+            /work/scripts/build.sh --release ${{ env.BUILD_VERSION }}
 
       - name: stamp images
         run: |
           mkdir artifacts
-          sudo mv buildroot/output/images/tp2-bmc-firmware-sdcard.img artifacts/tp2-firmware-sdcard-${{ env.BUILD_VERSION }}.img
-          sudo mv buildroot/output/images/rootfs.erofs artifacts/tp2-ota-${{ env.BUILD_VERSION }}.tpu
+          sudo mv dist/tp2-bmc-firmware-sdcard-${{ env.BUILD_VERSION }}.img artifacts/tp2-bmc-firmware-sdcard-${{ env.BUILD_VERSION }}.img
+          sudo mv dist/tp2-bmc-firmware-ota-${{ env.BUILD_VERSION }}.tpu artifacts/tp2-bmc-firmware-ota-${{ env.BUILD_VERSION }}.tpu
 
       - name: archive artifacts
         uses: actions/upload-artifact@v4
