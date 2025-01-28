@@ -26,7 +26,9 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         --release|-r)
-            release="$2"
+            if [[ -n "$2" ]]; then
+                release="$2"
+            fi
             shift 2
             ;;
         *)
