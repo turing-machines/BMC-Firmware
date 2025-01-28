@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # shellcheck shell=bash
 
-set -meuo pipefail
+set -meo pipefail
 
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../" && pwd)"
 

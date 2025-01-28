@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # shellcheck shell=bash
 
-set -euo pipefail
+set -eo pipefail
 
 # Get repository root
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../" && pwd)"
