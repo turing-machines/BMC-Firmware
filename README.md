@@ -132,6 +132,26 @@ The `Apple Virtualization Framework` can cause Docker-Desktop to crash during a 
 ## Windows
 
 For building on Windows, both devcontainers can be used either the linux or darwin container.
+Before starting the container under Windows, you might have an issue regarding the End-Of-Line
+of the files.
+
+The best way to handle this is to normalize the repository to `LF` line endings.
+Run the following command before starting the devcontainer.
+
+```shell
+git config --local include.path ../.gitconfig
+git config --global core.eol lf
+git config --global core.autocrlf input
+```
+
+Now after this you can normalize the repository.
+
+```shell
+git rm -rf --cached .
+git reset --hard HEAD
+```
+
+This will force all the files to have the correct line endings.
 
 ### Build Performance
 
