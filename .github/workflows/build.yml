@@ -3,19 +3,19 @@ on:
   workflow_dispatch:
     inputs:
       logLevel:
-        description: 'Log level'
+        description: "Log level"
         required: true
-        default: 'info'
+        default: "info"
         type: choice
         options:
-        - off
-        - error
-        - warn
-        - info
-        - debug
-        - trace
+          - off
+          - error
+          - warn
+          - info
+          - debug
+          - trace
       bmcd_version:
-        description: 'BMC daemon version'
+        description: "BMC daemon version"
         required: false
         type: string
 
@@ -23,9 +23,9 @@ on:
     branches: ["master"]
   push:
     branches:
-      - '*'
+      - "*"
     tags:
-      - '*'
+      - "*"
 
 jobs:
   build:
@@ -37,19 +37,20 @@ jobs:
       - name: Maximize build space
         uses: AdityaGarg8/remove-unwanted-software@v4.1
         with:
-          remove-android: 'true'
+          remove-android: "true"
 
       - uses: actions/checkout@v4
         with:
-          fetch-depth: '0'
-      
+          fetch-depth: "0"
+
       - name: get version
-        run: echo "BUILD_VERSION=`git describe --tags`" >> $GITHUB_ENV
+        run: |
+          echo "BUILD_VERSION=$(git describe --tags 2> /dev/null || echo "$(date +'%Y.%m.%d.%H%M')")" >> $GITHUB_ENV
 
       - name: conditional bmcd version injection
         if: inputs.bmcd_version != ''
         run: |
-         sed -ir 's#^BMCD_VERSION.*#BMCD_VERSION=${{ inputs.bmcd_version }}#g' ${{ github.workspace }}/tp2bmc/package/bmcd/bmcd.mk
+          sed -ir 's#^BMCD_VERSION.*#BMCD_VERSION=${{ inputs.bmcd_version }}#g' ${{ github.workspace }}/tp2bmc/package/bmcd/bmcd.mk
 
       - uses: docker/setup-buildx-action@v3
       - uses: docker/build-push-action@v6
@@ -81,6 +82,6 @@ jobs:
       - name: archive artifacts
         uses: actions/upload-artifact@v4
         with:
-          if-no-files-found: error 
+          if-no-files-found: error
           name: tp2-${{ env.BUILD_VERSION }}
           path: artifacts/*
