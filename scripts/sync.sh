@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # shellcheck shell=bash
 
-set -euo pipefail
+set -eo pipefail
 
 if [[ "${HOST_OS^^}" == "DARWIN" ]]; then
     echo "Syncing repository to container"
