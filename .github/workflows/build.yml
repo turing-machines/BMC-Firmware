@@ -76,9 +76,7 @@ jobs:
 
       - name: stamp images
         run: |
-          mkdir artifacts
-          sudo mv dist/tp2-bmc-firmware-sdcard-${{ env.BUILD_VERSION }}.img artifacts/tp2-bmc-firmware-sdcard-${{ env.BUILD_VERSION }}.img
-          sudo mv dist/tp2-bmc-firmware-ota-${{ env.BUILD_VERSION }}.tpu artifacts/tp2-bmc-firmware-ota-${{ env.BUILD_VERSION }}.tpu
+          mv dist artifacts
 
       - name: archive artifacts
         uses: actions/upload-artifact@v4
