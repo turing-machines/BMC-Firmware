@@ -12,7 +12,8 @@
     "source=${localWorkspaceFolder},target=/mnt,type=bind,consistency=consistent,bind-propagation=rprivate"
   ],
   "containerEnv": {
-    "HOST_OS": "DARWIN"
+    "HOST_OS": "DARWIN",
+    "GIT_DISCOVERY_ACROSS_FILESYSTEM": "1"
   },
 
   // Uncomment the next line to run commands after the container is created.

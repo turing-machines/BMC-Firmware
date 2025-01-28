@@ -9,7 +9,8 @@
   "workspaceMount": "source=${localWorkspaceFolder},target=/work,type=bind,consistency=consistent,bind-propagation=rprivate",
   "workspaceFolder": "/work",
   "containerEnv": {
-    "HOST_OS": "LINUX"
+    "HOST_OS": "LINUX",
+    "GIT_DISCOVERY_ACROSS_FILESYSTEM": "1"
   },
 
   // Uncomment the next line to run commands after the container is created.
