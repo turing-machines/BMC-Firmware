@@ -45,7 +45,7 @@ jobs:
 
       - name: get version
         run: |
-          echo "BUILD_VERSION=$(git describe --tags 2> /dev/null || echo "$(date +'%Y.%m.%d.%H%M')")" >> $GITHUB_ENV
+          echo "BUILD_VERSION=$(git describe --tags)" >> $GITHUB_ENV
 
       - name: conditional bmcd version injection
         if: inputs.bmcd_version != ''
