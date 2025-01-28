@@ -25,6 +25,8 @@ facilitate most of this functionality.
 - [Start DevContainer](#start-devcontainer)
 - [macOS / Darwin](#macos--darwin)
   - [macOS / Darwin Build Performance](#macos--darwin-build-performance)
+- [Windows](#windows)
+  - [Build Performance](#build-performance)
 - [Scripts](#scripts)
 - [Commands](#commands)
 - [Building](#building)
@@ -126,6 +128,19 @@ the default linux devcontainer can be used.
 For the best performance on macOS Docker-Desktop is recommended with the use of
 the currently `BETA` feature of `Docker VMM` as Virtual Machine.
 The `Apple Virtualization Framework` can cause Docker-Desktop to crash during a build.
+
+## Windows
+
+For building on Windows, both devcontainers can be used either the linux or darwin container.
+
+### Build Performance
+
+When building on Windows with Anti-Virus software present, it is important to understand that
+this can severly impact build speed as each file will be scanned during the build process.
+Furthermore, the on-access scanner of Anti-Virus software can cause build compiliation corruption.
+In order to bypass this, Windows users can use the macOS / darwin devcontainer, this will build
+according to the same build process in a volume and the developer can use the `git sync` command
+or `./scripts/sync.sh` to sync files between the host and the devcontainer.
 
 ## Scripts
 
