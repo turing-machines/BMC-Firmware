@@ -333,3 +333,9 @@ For configure run:
 ```shell
 git configure --help
 ```
+
+The build script also provides additional arguments.
+
+```shell
+git build --help
+```
