@@ -14,7 +14,7 @@ release="$(date +'%Y.%m.%d'-"$(git rev-parse --short=8 HEAD)")"
 
 # Function to display usage
 usage() {
-    echo "Usage: $0 [--dir|-d <directory>] [--release|-r]"
+    echo "Usage: $0 [--dir|-d <directory>] [--release|-r] [--help|-h]"
     exit 1
 }
 
@@ -22,14 +22,23 @@ usage() {
 while [[ $# -gt 0 ]]; do
     case $1 in
         --dir|-d)
-            build_root="$2"
-            shift 2
+            if [[ -n "$2" ]]; then
+                build_root="$2"
+                shift 2
+            else
+                shift 1
+            fi
             ;;
         --release|-r)
             if [[ -n "$2" ]]; then
                 release="$2"
+                shift 2
+            else
+                shift 1
             fi
-            shift 2
+            ;;
+        --help|-h)
+            usage
             ;;
         *)
             usage
