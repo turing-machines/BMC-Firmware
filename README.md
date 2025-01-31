@@ -35,6 +35,7 @@ facilitate most of this functionality.
   - [Manual](#manual)
   - [Native](#native)
 - [Output](#output)
+- [Development](#development)
 
 ## Reporting issues & requesting features
 
@@ -321,3 +322,14 @@ we do not want to generate a text sha of a binary file.
 The build script automatically corrects the filename when copying the images to
 the `dist` directory. However, this is for aesthetics only, and to ensure that
 the Web UI accepts the generated OTA image.
+
+## Development
+
+If you require an additional buildroot directory you can run the configure script and
+set the target directory or install dir where to put the buildroot.
+
+For configure run:
+
+```shell
+git configure --help
+```
