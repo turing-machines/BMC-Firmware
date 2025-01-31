@@ -339,3 +339,8 @@ The build script also provides additional arguments.
 ```shell
 git build --help
 ```
+
+The .gitignore allows for two workign directories while developing.
+
+- tmp
+- wip
