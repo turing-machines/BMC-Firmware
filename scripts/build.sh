@@ -11,10 +11,11 @@ root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../" && pwd)"
 dist="${root}/dist"
 build_root="${root}/buildroot"
 release="$(date +'%Y.%m.%d'-"$(git rev-parse --short=8 HEAD)")"
+package=""
 
 # Function to display usage
 usage() {
-    echo "Usage: $0 [--dir|-d <directory>] [--release|-r] [--help|-h]"
+    echo "Usage: $0 [--dir|-d <directory>] [--release|-r] [--package|-p] [--help|-h]"
     exit 1
 }
 
@@ -40,6 +41,14 @@ while [[ $# -gt 0 ]]; do
         --help|-h)
             usage
             ;;
+        --package|-p)
+            if [[ -n "$2" ]]; then
+                package="$2"
+                shift 2
+            else
+                shift 1
+            fi
+            ;;
         *)
             usage
             ;;
@@ -52,8 +61,18 @@ cd "${build_root}" || exit 1
 # Prepare buildroot
 make BR2_EXTERNAL=../tp2bmc tp2bmc_defconfig
 
+cmd=(make)
+if [[ -n "$package" ]]; then
+    echo "Building Package: $package"
+    cmd+=("$package")
+fi
+
 # Build
-if make; then
+if "${cmd[@]}"; then
+    if [[ -n "$package" ]]; then
+        echo "Building package completed"
+        exit 0
+    fi
     OTA_FILENAME="tp2-bmc-firmware-ota-${release}.tpu"
     SDCARD_FILENAME="tp2-bmc-firmware-sdcard-${release}.img"
 
