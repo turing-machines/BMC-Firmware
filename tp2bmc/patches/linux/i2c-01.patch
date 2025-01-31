@@ -1,0 +1,58 @@
+From ee66a87c03cf41932978f2f28ec77808a12ce5b4 Mon Sep 17 00:00:00 2001
+From: Sam Edwards <sam@turingpi.com>
+Date: Tue, 19 Mar 2024 16:51:51 -0600
+Subject: [PATCH 1/5] i2c: mv64xxx: Clear bus errors before transfer
+
+The MV64XXX hardware can act as either a bus controller or target
+device. In order to protect target devices from a glitching bus
+(apparently), the core listens on the lines even when idle and moves the
+hardware FSM to the "BUS_ERR" state if an invalid transition is
+detected. The hardware then does not exit this state until reset.
+
+This feature is actually counterproductive when using the hardware as a
+controller (as this driver does): we do not actually *care* what
+happened on the bus previously, as long as it's ready for use when the
+new transfer starts. However, the controller will remember a previous
+glitch and trip up the driver after it attempts to send the start
+command. The driver logs and error and resets the controller, recovering
+from the BUS_ERR state, but not without erroring back the transfer with
+errno EAGAIN. Clients generally do not handle this gracefully.
+
+This is easily fixed by checking for the BUS_ERR condition upfront and
+issuing the hardware reset before beginning the transfer. This patch
+does NOT also call i2c_recover_bus(): the assumption is that the bus is
+fine, just the hardware is upset; if the bus is also in a bad state,
+this should not pass silently.
+
+Signed-off-by: Sam Edwards <sam@turingpi.com>
+---
+ drivers/i2c/busses/i2c-mv64xxx.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/drivers/i2c/busses/i2c-mv64xxx.c b/drivers/i2c/busses/i2c-mv64xxx.c
+index dc160cbc3155..958c52c799d4 100644
+--- a/drivers/i2c/busses/i2c-mv64xxx.c
++++ b/drivers/i2c/busses/i2c-mv64xxx.c
+@@ -752,6 +752,7 @@ mv64xxx_i2c_xfer_core(struct i2c_adapter *adap, struct i2c_msg msgs[], int num)
+ {
+ 	struct mv64xxx_i2c_data *drv_data = i2c_get_adapdata(adap);
+ 	int rc, ret = num;
++	u32 status;
+ 
+ 	rc = pm_runtime_resume_and_get(&adap->dev);
+ 	if (rc)
+@@ -761,6 +762,11 @@ mv64xxx_i2c_xfer_core(struct i2c_adapter *adap, struct i2c_msg msgs[], int num)
+ 	drv_data->msgs = msgs;
+ 	drv_data->num_msgs = num;
+ 
++	/* Calm down the hardware if it was upset by a bus glitch while idle */
++	status = readl(drv_data->reg_base + drv_data->reg_offsets.status);
++	if (status == MV64XXX_I2C_STATUS_BUS_ERR)
++		mv64xxx_i2c_hw_init(drv_data);
++
+ 	if (mv64xxx_i2c_can_offload(drv_data) && !drv_data->atomic)
+ 		rc = mv64xxx_i2c_offload_xfer(drv_data);
+ 	else
+-- 
+2.45.2
+
