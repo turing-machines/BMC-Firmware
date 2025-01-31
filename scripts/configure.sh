@@ -12,7 +12,6 @@
 
 # Configure shell
 set -eo pipefail
-set -x
 
 # Buildroot Version
 BUILDROOT_VER="2024.05.1"
@@ -21,11 +20,50 @@ BUILDROOT_VER="2024.05.1"
 CWD=$(pwd)
 
 download_dir=$(mktemp -d)
-install_dir="$1"
 buildroot_url="https://buildroot.org/downloads/buildroot-${BUILDROOT_VER}.tar.gz"
 buildroot=$(basename "$buildroot_url")
 buildroot_folder="${buildroot%.tar.gz}"
+buildroot_target="buildroot"
 project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../" && pwd)"
+
+# Function to display usage
+usage() {
+    echo "Usage: $0 [--dir|-d <directory>] [--release|-r] [--help|-h]"
+    exit 1
+}
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --install-dir|-i)
+            if [[ -n "$2" ]]; then
+                install_dir="$2"
+                shift 2
+            else
+                shift 1
+            fi
+            ;;
+        --target|-t)
+            if [[ -n "$2" ]]; then
+                buildroot_target="$2"
+                shift 2
+            else
+                shift 1
+            fi
+            ;;
+        --help|-h)
+            usage
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+
+printf 'Configure:\n'
+printf '  Buildroot Version: %s\n' "$BUILDROOT_VER"
+printf '  Install Directory: %s\n' "$install_dir"
+printf '  Target Directory:  %s\n' "$buildroot_target"
 
 pushd "$download_dir"
     wget "$buildroot_url"
@@ -35,15 +73,17 @@ popd
 if [ -z "$install_dir" ]; then
     # try to install it into the base-dir of the git repo
     install_dir="$project_root"
+else
+    mkdir -p "$install_dir"
 fi
 
-if [ -e "$install_dir/buildroot" ]; then
-    rm -rf "$install_dir/buildroot"
+if [ -e "$install_dir/$buildroot_target" ]; then
+    rm -rf "$install_dir/${buildroot_target:?}/"*
 fi
 
-mv "$download_dir/$buildroot_folder" "$install_dir/buildroot"
+mv "$download_dir/$buildroot_folder" "$install_dir/$buildroot_target"
 
-pushd "$install_dir/buildroot"
+pushd "$install_dir/$buildroot_target"
 for patchfile in "$project_root"/buildroot_patches/*; do
     if [ -f "$patchfile" ]; then
         patch -p1 < "$patchfile"

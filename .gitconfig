@@ -5,8 +5,8 @@
 
 [alias]
     root        = rev-parse --show-toplevel
-    sha1        = !sh -c 'git rev-parse --short ${1:-HEAD}' --
-    configure   = !sh -c '$(git rev-parse --show-toplevel)/scripts/configure.sh'
+    sha1        = !sh -c 'git rev-parse --short ${1:-HEAD}'
+    configure   = "!f() { $(git rev-parse --show-toplevel)/scripts/configure.sh $@; }; f"
     build       = !sh -c '$(git rev-parse --show-toplevel)/scripts/build.sh'
     cleanup     = !sh -c '$(git rev-parse --show-toplevel)/scripts/clean.sh'
     sync        = !sh -c '$(git rev-parse --show-toplevel)/scripts/sync.sh'
