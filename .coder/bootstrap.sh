@@ -6,7 +6,7 @@ git config include.path ../.gitconfig
 
 echo "Configure Build Environment"
 sudo apt-get update
-sudo apt-get install -yqq \
+sudo apt-get -qq install -y \
     build-essential \
     subversion \
     git-core \
