@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 # shellcheck shell=bash
 
+CLONE_PATH="${CLONE_PATH}"
+CLONE_PATH="$${CLONE_PATH/#\~/$${HOME}}"
+
 echo "Configuring Git"
-git config include.path ../.gitconfig
+git -C "$${CLONE_PATH}" config include.path ../.gitconfig
 
 echo "Configure Build Environment"
 sudo apt-get update
