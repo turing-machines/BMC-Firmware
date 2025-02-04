@@ -277,10 +277,18 @@ docker run -it --rm -v $PWD:/src -w /src -u $(id -u):$(id -g) bmc-firmware
 ./scripts/build.sh
 ```
 
+## Coder
+
+This repository has support for being used within a [Coder](https://coder.com) environment. Self-Hosted coder is supported.
+
+After starting your container/environment, you can auto-configure this repository by running `.coder/bootstrap.sh` which will configure your environment automatically. You can detect for this script in a module and run it while you boot-up your environment.
+
 ### Native
 
 Currently, only X86 Linux build hosts are supported. They are
 required to have the following packages installed:
+
+Instead of manually configuring the environment you can choose to run `.coder/boostrap.sh` which will autoconfigure your environment.
 
 > **Commands**
 >
