@@ -35,6 +35,15 @@ sudo apt-get -qq install -y \
     xxd \
     shellcheck
 
+case "$(uname)" in
+    Linux)
+        OS=Linux
+    ;;
+    Darwin)
+        OS=Darwin
+    ;;
+esac
+
 case "$(uname -m)" in
     aarch64|arm64)
         ARCH=arm64
@@ -45,7 +54,7 @@ case "$(uname -m)" in
 esac
 
 echo "Installing Hadolint" 
-sudo wget -q -O /usr/bin/hadolint "https://github.com/hadolint/hadolint/releases/download/v2.12.0/hadolint-Linux-${ARCH}"
+sudo wget -q -O /usr/bin/hadolint "https://github.com/hadolint/hadolint/releases/download/v2.12.0/hadolint-${OS}-${ARCH}"
 sudo chmod 755 /usr/bin/hadolint
 
 echo "Coder Environment Initialized"
