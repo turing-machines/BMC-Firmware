@@ -5,3 +5,5 @@ buildroot-*
 dist
 wip
 tmp
+linux
+linux-*
