@@ -28,7 +28,7 @@ overwrite_os_release() {
         build_version=$(git describe --tags)
         if [[ $? -ne 0 ]]; then
             echo "Error: Failed to get version from git describe"
-            build_vrsion="v2-unknown"
+            build_version="v2-unknown"
         fi
     fi
 
