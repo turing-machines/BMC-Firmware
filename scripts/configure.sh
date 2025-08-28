@@ -78,7 +78,7 @@ else
 fi
 
 if [ -e "$install_dir/$buildroot_target" ]; then
-    rm -rf "$install_dir/${buildroot_target:?}/"*
+    rm -rf "$install_dir/${buildroot_target:?}/"
 fi
 
 mv "$download_dir/$buildroot_folder" "$install_dir/$buildroot_target"
