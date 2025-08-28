@@ -11,7 +11,7 @@ sudo chown vscode:vscode /work
 
 # Configure git config
 # initialize git config before initial sync of .git directory
-git config --local include.path ../.gitconfig
+git config --global include.path "${PWD}/.gitconfig"
 
 if [[ "${HOST_OS^^}" == "DARWIN" ]]; then
     # Sync Git only for initial sync
